@@ -1,0 +1,29 @@
+{
+  "name": "faustvik/router",
+  "description": "Router php",
+  "keywords": [
+    "php",
+    "router",
+    "routing",
+    "http"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Victor",
+      "email": "victor.faust.dev@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "FaustVik\\Router\\": "src/"
+    }
+  },
+  "require-dev": {
+    "vimeo/psalm": "^4.7"
+  }
+}
