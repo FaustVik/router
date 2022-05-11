@@ -2,11 +2,14 @@
 
 namespace FaustVik\Router\interfaces\Router;
 
-interface RoutingInterface
+use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
+use FaustVik\Router\Route\RoutesCollection;
+
+interface RouterInterface
 {
     public function run(): void;
 
-    public function setCollection(\FaustVik\Router\Route\RoutesCollection $collection): self;
+    public function setCollection(RoutesCollection $collection): self;
 
     public function setUri(string $uri): self;
 

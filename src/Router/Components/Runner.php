@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-namespace FaustVik\Router\Router;
+namespace FaustVik\Router\Router\Components;
 
 use FaustVik\Router\exceptions\InvalidTypeRoute;
 use FaustVik\Router\exceptions\NotFoundClass;
 use FaustVik\Router\exceptions\NotFoundMethod;
+use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
 use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
 use FaustVik\Router\interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
-use FaustVik\Router\interfaces\RunnerInterface;
 use ReflectionClass;
+use ReflectionException;
 
 final class Runner implements RunnerInterface
 {
-    public function run(RouteInterface $route, array $params= []): void
+    public function run(RouteInterface $route, array $params = []): void
     {
         if ($route instanceof RouteAnonymousFuncInterface) {
             $this->runAnonymousFunc($route);
@@ -42,9 +43,9 @@ final class Runner implements RunnerInterface
      * @return void
      * @throws NotFoundClass
      * @throws NotFoundMethod
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function runClass(RouteClassInterface $route, array $params= []): void
+    public function runClass(RouteClassInterface $route, array $params = []): void
     {
         if (!class_exists($route->getClass())) {
             throw new NotFoundClass($route->getClass());

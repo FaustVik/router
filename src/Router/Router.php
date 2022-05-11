@@ -9,16 +9,17 @@ use FaustVik\Router\exceptions\NotFoundClass;
 use FaustVik\Router\exceptions\NotFoundMethod;
 use FaustVik\Router\interfaces\Additional\AdditionalActionCollectionInterface;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\interfaces\Router\ConfigInterface;
-use FaustVik\Router\interfaces\Router\RoutingInterface;
+use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
+use FaustVik\Router\interfaces\Router\RouterInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Router\Components\Config;
 use ReflectionClass;
-
+use ReflectionException;
 use function str_contains;
 
-final class Router implements RoutingInterface
+final class Router implements RouterInterface
 {
-    protected ?RoutesCollectionInterface $collections = null;
+    protected ?RoutesCollectionInterface           $collections       = null;
     protected ?AdditionalActionCollectionInterface $action_collection = null;
 
     protected ?string $uri          = null;
@@ -35,22 +36,23 @@ final class Router implements RoutingInterface
 
     public function setConfig(ConfigInterface $config): void
     {
-        $this->config= $config;
+        $this->config = $config;
     }
 
     public function getConfig(): ConfigInterface
     {
-        if (!$this->config){
+        if (!$this->config) {
             $this->config = new Config();
         }
 
-        return  $this->config;
+        return $this->config;
     }
 
     public function run(): void
     {
         $this->parse();
         $route = $this->match($this->uri);
+        $this->check($route);
         $this->getConfig()->getRunner()->run($route, $this->params);
     }
 
@@ -74,17 +76,17 @@ final class Router implements RoutingInterface
         $decodeUri = urldecode($this->getUri());
         if (str_contains($decodeUri, '?')) {
             [$this->uri, $this->paramsString] = explode('?', $decodeUri);
-        }else{
+        } else {
             $this->uri = $decodeUri;
         }
 
-        if ($this->paramsString){
+        if ($this->paramsString) {
             $params = explode('&', $this->paramsString);
 
             $arr = [];
 
-            foreach ($params as $str){
-                [$name,$value] = explode('=', $str);
+            foreach ($params as $str) {
+                [$name, $value] = explode('=', $str);
                 $arr[$name] = $value;
             }
 
@@ -110,14 +112,14 @@ final class Router implements RoutingInterface
     }
 
     /**
-     * @deprecated
-     *
      * @param RouteInterface $route
      *
      * @return void
      * @throws NotFoundClass
      * @throws NotFoundMethod
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @deprecated
+     *
      */
     protected function initAction(RouteInterface $route): void
     {
@@ -132,10 +134,10 @@ final class Router implements RoutingInterface
         $method = $reflection_class->getMethod($route->getAction());
 
         $atr = [];
-        if (!empty($method->getParameters())){
-            foreach ($method->getParameters() as $reflection_parameter){
-                if (isset($this->params[$reflection_parameter->getName()])){
-                   $atr[] = $this->params[$reflection_parameter->getName()];
+        if (!empty($method->getParameters())) {
+            foreach ($method->getParameters() as $reflection_parameter) {
+                if (isset($this->params[$reflection_parameter->getName()])) {
+                    $atr[] = $this->params[$reflection_parameter->getName()];
                 }
             }
         }
@@ -166,5 +168,10 @@ final class Router implements RoutingInterface
     {
         $this->action_collection = $collection;
         return $this;
+    }
+
+    protected function check(RouteInterface $route): void
+    {
+        $this->getConfig()->getCheckerHttpMethod()::isAllow($route->getMethods());
     }
 }

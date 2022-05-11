@@ -1,6 +1,6 @@
 <?php
 
-namespace FaustVik\Router\interfaces;
+namespace FaustVik\Router\interfaces\Router\Components;
 
 use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
 use FaustVik\Router\interfaces\Routes\RouteClassInterface;

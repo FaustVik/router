@@ -51,12 +51,14 @@ Class for run action (controller class or anonymous function)
 
 Config router
 
-- you can make your config implement the interface `ConfigInterface`
+Methods:
+- setRunner()
+- setCheckerHttpMethod()
 
+
+- you can make your config implement the interface `ConfigInterface`
 - you can make your runner implement the interface `RunnerInterface`:
-```php 
-class RunnerSmp implements \FaustVik\Router\interfaces\RunnerInterface
-```
+- you can make your checker allowed http methods implement the interface `CheckHttpMethodInterface`:
 
 and set to Config:
 
