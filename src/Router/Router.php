@@ -109,6 +109,16 @@ final class Router implements RoutingInterface
         throw new NoMatch($uri);
     }
 
+    /**
+     * @deprecated
+     *
+     * @param RouteInterface $route
+     *
+     * @return void
+     * @throws NotFoundClass
+     * @throws NotFoundMethod
+     * @throws \ReflectionException
+     */
     protected function initAction(RouteInterface $route): void
     {
         if (!class_exists($route->getClass())) {
