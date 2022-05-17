@@ -16,6 +16,12 @@ use ReflectionException;
 
 final class Runner implements RunnerInterface
 {
+    /**
+     * @throws NotFoundMethod
+     * @throws ReflectionException
+     * @throws NotFoundClass
+     * @throws InvalidTypeRoute
+     */
     public function run(RouteInterface $route, array $params = []): void
     {
         if ($route instanceof RouteAnonymousFuncInterface) {
@@ -31,6 +37,11 @@ final class Runner implements RunnerInterface
         throw new InvalidTypeRoute();
     }
 
+    /**
+     * @param RouteAnonymousFuncInterface $route
+     *
+     * @return void
+     */
     public function runAnonymousFunc(RouteAnonymousFuncInterface $route): void
     {
         call_user_func($route->getFunc());

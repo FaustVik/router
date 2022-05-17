@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace FaustVik\Router\Route;
 
 use Closure;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
+use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 {
-    protected string  $route;
-    protected array   $methods = [];
-    protected ?string $alias   = null;
-    protected array   $arg     = [];
-    protected Closure $func;
+    private string  $route;
+    private array   $methods = [];
+    private ?string $alias   = null;
+    private Closure $func;
 
     public static function create(string $route, callable $func, array $methods = [], ?string $alias = null): RouteInterface
     {

@@ -9,12 +9,12 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 final class Route implements RouteClassInterface
 {
-    protected string  $route;
-    protected string  $class;
-    protected string  $action;
-    protected array   $methods = [];
-    protected ?string $alias   = null;
-    protected array   $arg     = [];
+    private string  $route;
+    private string  $class;
+    private string  $action;
+    private array   $methods = [];
+    private ?string $alias   = null;
+    private array   $arg     = [];
 
     public static function create(string $route, string $class, string $action, array $arg = [], array $methods = [], ?string $alias = null): RouteInterface
     {

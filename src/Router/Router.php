@@ -5,28 +5,22 @@ declare(strict_types=1);
 namespace FaustVik\Router\Router;
 
 use FaustVik\Router\exceptions\NoMatch;
-use FaustVik\Router\exceptions\NotFoundClass;
-use FaustVik\Router\exceptions\NotFoundMethod;
-use FaustVik\Router\interfaces\Additional\AdditionalActionCollectionInterface;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\RouterInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\Router\Components\Config;
-use ReflectionClass;
-use ReflectionException;
 use function str_contains;
 
 final class Router implements RouterInterface
 {
-    protected ?RoutesCollectionInterface           $collections       = null;
-    protected ?AdditionalActionCollectionInterface $action_collection = null;
+    private ?RoutesCollectionInterface $collections = null;
 
-    protected ?string $uri          = null;
-    protected ?string $paramsString = null;
-    protected ?string $uriRaw       = null;
-    protected array $params = [];
-    private ?ConfigInterface $config = null;
+    private ?string          $uri          = null;
+    private ?string          $paramsString = null;
+    private ?string          $uriRaw       = null;
+    private array            $params       = [];
+    private ?ConfigInterface $config       = null;
 
     public function setCollection(RoutesCollectionInterface $collection): self
     {
@@ -51,7 +45,7 @@ final class Router implements RouterInterface
     public function run(): void
     {
         $this->parse();
-        $route = $this->match($this->uri);
+        $route = $this->match();
         $this->check($route);
         $this->getConfig()->getRunner()->run($route, $this->params);
     }
@@ -95,79 +89,13 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param string $uri
      *
      * @return RouteInterface
      * @throws NoMatch
      */
-    protected function match(string $uri): RouteInterface
+    protected function match(): RouteInterface
     {
-        foreach ($this->collections->get() as $route) {
-            if (in_array($uri, [$route->alias(), $route->getRoute()], true)) {
-                return $route;
-            }
-        }
-
-        throw new NoMatch($uri);
-    }
-
-    /**
-     * @param RouteInterface $route
-     *
-     * @return void
-     * @throws NotFoundClass
-     * @throws NotFoundMethod
-     * @throws ReflectionException
-     * @deprecated
-     *
-     */
-    protected function initAction(RouteInterface $route): void
-    {
-        if (!class_exists($route->getClass())) {
-            throw new NotFoundClass($route->getClass());
-        }
-
-        $reflection_class = new ReflectionClass($route->getClass());
-
-        $controller = $reflection_class->newInstanceArgs($route->getArg());
-
-        $method = $reflection_class->getMethod($route->getAction());
-
-        $atr = [];
-        if (!empty($method->getParameters())) {
-            foreach ($method->getParameters() as $reflection_parameter) {
-                if (isset($this->params[$reflection_parameter->getName()])) {
-                    $atr[] = $this->params[$reflection_parameter->getName()];
-                }
-            }
-        }
-
-        if (!method_exists($controller, $route->getAction())) {
-            throw new NotFoundMethod($route->getAction(), $route->getClass());
-        }
-
-        if ($this->action_collection) {
-            $before = $this->action_collection->getBeforeList()[$route->getClass()] ?? null;
-
-            if ($before && method_exists($controller, $before->getAction())) {
-                call_user_func_array([$controller, $before->getAction()], []);
-            }
-        }
-
-        call_user_func_array([$controller, $route->getAction()], $atr);
-
-        if ($this->action_collection) {
-            $after = $this->action_collection->getAfterList()[$route->getClass()] ?? null;
-            if ($after && method_exists($controller, $after->getAction())) {
-                call_user_func_array([$controller, $after->getAction()], []);
-            }
-        }
-    }
-
-    public function setActionCollection(AdditionalActionCollectionInterface $collection): self
-    {
-        $this->action_collection = $collection;
-        return $this;
+        return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
     }
 
     protected function check(RouteInterface $route): void

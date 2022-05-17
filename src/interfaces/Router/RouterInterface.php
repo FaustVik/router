@@ -15,7 +15,7 @@ interface RouterInterface
 
     public function getUri(): string;
 
-    public function setConfig(ConfigInterface $config);
+    public function setConfig(ConfigInterface $config): void;
 
     public function getConfig(): ConfigInterface;
 }

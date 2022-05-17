@@ -6,48 +6,55 @@ namespace FaustVik\Router\Router\Components;
 
 use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
+use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
 
 final class Config implements ConfigInterface
 {
-    private ?RunnerInterface          $runner  = null;
-    private ?CheckHttpMethodInterface $checker = null;
+    private RunnerInterface          $runner;
+    private CheckHttpMethodInterface $checker;
+    private MatchingRouteInterface   $match;
 
-    public function setRunner(RunnerInterface $runner = null): void
+    public function __construct()
+    {
+        $this->runner  = new Runner();
+        $this->checker = new CheckerHttpMethod();
+        $this->match   = new Matching();
+    }
+
+    public function setRunner(RunnerInterface $runner): void
     {
         $this->runner = $runner;
-        $this->setDefaultRunner();
     }
 
     public function getRunner(): RunnerInterface
     {
-        $this->setDefaultRunner();
         return $this->runner;
     }
 
-    protected function setDefaultRunner(): void
-    {
-        if (!$this->runner) {
-            $this->runner = new Runner();
-        }
-    }
-
-    public function setCheckerHttpMethod(CheckHttpMethodInterface $checker = null): void
+    public function setCheckerHttpMethod(CheckHttpMethodInterface $checker): void
     {
         $this->checker = $checker;
-        $this->setDefaultCheckerHttpMethod();
     }
 
     public function getCheckerHttpMethod(): CheckHttpMethodInterface
     {
-        $this->setDefaultCheckerHttpMethod();
         return $this->checker;
     }
 
-    protected function setDefaultCheckerHttpMethod(): void
+    /**
+     * @return MatchingRouteInterface
+     */
+    public function getMatch(): MatchingRouteInterface
     {
-        if (!$this->checker) {
-            $this->checker = new CheckerHttpMethod();
-        }
+        return $this->match;
+    }
+
+    /**
+     * @param MatchingRouteInterface $matcher
+     */
+    public function setMatcher(MatchingRouteInterface $matcher): void
+    {
+        $this->match = $matcher;
     }
 }

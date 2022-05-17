@@ -10,7 +10,7 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 final class RoutesCollection implements RoutesCollectionInterface
 {
     /**@var RouteInterface[] $collections */
-    protected array $collections = [];
+    private array $collections = [];
 
     public function set(RouteInterface ...$routes): void
     {
