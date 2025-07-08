@@ -4,7 +4,7 @@ namespace FaustVik\Router\interfaces\Router\Components;
 
 use FaustVik\Router\exceptions\NoMatch;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Router\Components\MatchResult;
 
 interface MatchingRouteInterface
 {
@@ -12,8 +12,8 @@ interface MatchingRouteInterface
      * @param string                    $uri
      * @param RoutesCollectionInterface $collections
      *
-     * @return RouteInterface
+     * @return MatchResult
      * @throws NoMatch
      */
-    public function match(string $uri, RoutesCollectionInterface $collections): RouteInterface;
+    public function match(string $uri, RoutesCollectionInterface $collections): MatchResult;
 }

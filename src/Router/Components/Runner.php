@@ -13,6 +13,7 @@ use FaustVik\Router\interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 
 final class Runner implements RunnerInterface
 {
@@ -25,7 +26,7 @@ final class Runner implements RunnerInterface
     public function run(RouteInterface $route, array $params = []): void
     {
         if ($route instanceof RouteAnonymousFuncInterface) {
-            $this->runAnonymousFunc($route);
+            $this->runAnonymousFunc($route, $params);
             return;
         }
 
@@ -39,12 +40,25 @@ final class Runner implements RunnerInterface
 
     /**
      * @param RouteAnonymousFuncInterface $route
+     * @param array $params
      *
      * @return void
+     * @throws ReflectionException
      */
-    public function runAnonymousFunc(RouteAnonymousFuncInterface $route): void
+    public function runAnonymousFunc(RouteAnonymousFuncInterface $route, array $params = []): void
     {
-        call_user_func($route->getFunc());
+        $reflection = new ReflectionFunction($route->getFunc());
+        
+        $args = [];
+        if (!empty($reflection->getParameters())) {
+            foreach ($reflection->getParameters() as $reflection_parameter) {
+                if (isset($params[$reflection_parameter->getName()])) {
+                    $args[] = $params[$reflection_parameter->getName()];
+                }
+            }
+        }
+
+        call_user_func_array($route->getFunc(), $args);
     }
 
     /**

@@ -10,6 +10,7 @@ use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\RouterInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\Router\Components\Config;
+use FaustVik\Router\Router\Components\MatchResult;
 use function str_contains;
 
 final class Router implements RouterInterface
@@ -45,9 +46,16 @@ final class Router implements RouterInterface
     public function run(): void
     {
         $this->parse();
-        $route = $this->match();
+        $matchResult = $this->match();
+        $route = $matchResult->getRoute();
+        
+        // Объединяем параметры из URL с параметрами из query string
+        // Параметры из URL имеют приоритет над query параметрами
+        $urlParams = $matchResult->getParameters();
+        $allParams = array_merge($this->params, $urlParams);
+        
         $this->check($route);
-        $this->getConfig()->getRunner()->run($route, $this->params);
+        $this->getConfig()->getRunner()->run($route, $allParams);
     }
 
     public function setUri(string $uri): self
@@ -68,6 +76,7 @@ final class Router implements RouterInterface
     protected function parse(): void
     {
         $decodeUri = urldecode($this->getUri());
+        
         if (str_contains($decodeUri, '?')) {
             [$this->uri, $this->paramsString] = explode('?', $decodeUri);
         } else {
@@ -90,10 +99,10 @@ final class Router implements RouterInterface
 
     /**
      *
-     * @return RouteInterface
+     * @return MatchResult
      * @throws NoMatch
      */
-    protected function match(): RouteInterface
+    protected function match(): MatchResult
     {
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
     }

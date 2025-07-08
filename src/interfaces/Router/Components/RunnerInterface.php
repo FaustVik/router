@@ -22,10 +22,11 @@ interface RunnerInterface
      * Run only RouteAnonymousFuncInterface route
      *
      * @param RouteAnonymousFuncInterface $route
+     * @param array                       $params
      *
      * @return void
      */
-    public function runAnonymousFunc(RouteAnonymousFuncInterface $route): void;
+    public function runAnonymousFunc(RouteAnonymousFuncInterface $route, array $params = []): void;
 
     /**
      * Run only RouteClassInterface route
