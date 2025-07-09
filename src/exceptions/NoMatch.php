@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace FaustVik\Router\exceptions;
 
 class NoMatch extends Exception

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace FaustVik\Router\interfaces\Router\Components;
 
 use FaustVik\Router\interfaces\Cache\CacheInterface;

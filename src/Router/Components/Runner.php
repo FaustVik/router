@@ -83,7 +83,7 @@ final class Runner implements RunnerInterface
                     $args[] = null;
                 }
             }
-        }
+        }//end if
 
         call_user_func_array($route->getFunc(), $args);
     }
@@ -131,7 +131,7 @@ final class Runner implements RunnerInterface
                     $atr[] = null;
                 }
             }
-        }
+        }//end if
 
         if (!method_exists($controller, $route->getAction())) {
             throw new NotFoundMethod($route->getAction(), $route->getClass());

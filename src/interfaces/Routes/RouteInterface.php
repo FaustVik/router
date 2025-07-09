@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace FaustVik\Router\interfaces\Routes;
 
 use FaustVik\Router\Validation\ParameterValidationRule;

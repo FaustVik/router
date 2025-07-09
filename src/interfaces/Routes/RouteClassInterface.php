@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace FaustVik\Router\interfaces\Routes;
 
 interface RouteClassInterface extends RouteInterface

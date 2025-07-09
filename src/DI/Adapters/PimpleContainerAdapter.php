@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace FaustVik\Router\DI\Adapters;
 
 use FaustVik\Router\interfaces\DI\RouterContainerInterface;
