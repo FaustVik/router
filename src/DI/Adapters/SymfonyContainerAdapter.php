@@ -18,7 +18,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
+    }//end __construct()
 
     /**
      * @inheritDoc
@@ -26,7 +26,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }
+    }//end get()
 
     /**
      * @inheritDoc
@@ -34,7 +34,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     public function has(string $id): bool
     {
         return $this->container->has($id);
-    }
+    }//end has()
 
     /**
      * @inheritDoc
@@ -42,7 +42,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     public function canResolve(string $id): bool
     {
         return $this->container->has($id) || class_exists($id);
-    }
+    }//end canResolve()
 
     /**
      * @inheritDoc
@@ -65,7 +65,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }
+    }//end resolve()
 
     /**
      * @inheritDoc
@@ -75,7 +75,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
         // Symfony container is typically configured and compiled
         // Runtime binding is not supported in most Symfony containers
         throw new \RuntimeException("Runtime binding is not supported in Symfony container adapter. Configure services in container builder.");
-    }
+    }//end bind()
 
     /**
      * @inheritDoc
@@ -84,7 +84,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     {
         // Same as bind - not supported at runtime
         throw new \RuntimeException("Runtime binding is not supported in Symfony container adapter. Configure services in container builder.");
-    }
+    }//end singleton()
 
     /**
      * @inheritDoc
@@ -92,7 +92,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
-    }
+    }//end bound()
 
     /**
      * Create instance using reflection
@@ -132,5 +132,5 @@ class SymfonyContainerAdapter implements RouterContainerInterface
         }
 
         return $reflectionClass->newInstanceArgs($dependencies);
-    }
-}
+    }//end createInstanceWithReflection()
+}//end class

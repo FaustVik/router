@@ -75,4 +75,4 @@ interface RouterInterface
      * @return ConfigInterface Текущая конфигурация роутера
      */
     public function getConfig(): ConfigInterface;
-}
+}//end interface

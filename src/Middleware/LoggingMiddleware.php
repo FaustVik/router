@@ -15,7 +15,7 @@ final class LoggingMiddleware implements MiddlewareInterface
     public function __construct(string $logFile = 'router.log')
     {
         $this->logFile = $logFile;
-    }
+    }//end __construct()
 
     public function handle(Request $request, callable $next): Response
     {
@@ -29,7 +29,8 @@ final class LoggingMiddleware implements MiddlewareInterface
         $response = $next($request);
 
         $endTime = microtime(true);
-        $duration = round(($endTime - $startTime) * 1000, 2); // в миллисекундах
+        $duration = round(($endTime - $startTime) * 1000, 2);
+// в миллисекундах
         $statusCode = $response->getStatusCode();
 
         // Формируем лог сообщение
@@ -49,14 +50,14 @@ final class LoggingMiddleware implements MiddlewareInterface
         $this->writeToLog($logMessage);
 
         return $response;
-    }
+    }//end handle()
 
     private function writeToLog(string $message): void
     {
         // Простая запись в файл
         // В реальном приложении лучше использовать PSR-3 логгер
         file_put_contents($this->logFile, $message, FILE_APPEND | LOCK_EX);
-    }
+    }//end writeToLog()
 
     private function getStatusText(int $statusCode): string
     {
@@ -74,5 +75,5 @@ final class LoggingMiddleware implements MiddlewareInterface
             500 => 'Internal Server Error',
             default => 'Unknown'
         };
-    }
-}
+    }//end getStatusText()
+}//end class

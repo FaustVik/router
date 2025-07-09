@@ -21,7 +21,7 @@ class DefaultContainer implements RouterContainerInterface
     public function __construct()
     {
         $this->container = new Container();
-    }
+    }//end __construct()
 
     /**
      * Create container with configuration
@@ -44,7 +44,7 @@ class DefaultContainer implements RouterContainerInterface
         }
 
         return $instance;
-    }
+    }//end withConfig()
 
     /**
      * Create container with closure configuration
@@ -54,7 +54,7 @@ class DefaultContainer implements RouterContainerInterface
         $instance = new self();
         $configurator($instance);
         return $instance;
-    }
+    }//end withClosure()
 
     /**
      * @inheritDoc
@@ -62,7 +62,7 @@ class DefaultContainer implements RouterContainerInterface
     public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }
+    }//end get()
 
     /**
      * @inheritDoc
@@ -70,7 +70,7 @@ class DefaultContainer implements RouterContainerInterface
     public function has(string $id): bool
     {
         return $this->container->has($id);
-    }
+    }//end has()
 
     /**
      * @inheritDoc
@@ -78,7 +78,7 @@ class DefaultContainer implements RouterContainerInterface
     public function canResolve(string $id): bool
     {
         return $this->container->has($id) || class_exists($id);
-    }
+    }//end canResolve()
 
     /**
      * @inheritDoc
@@ -93,7 +93,7 @@ class DefaultContainer implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }
+    }//end resolve()
 
     /**
      * @inheritDoc
@@ -102,7 +102,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         $this->bindings[$abstract] = $concrete;
         $this->container->set($abstract, $concrete);
-    }
+    }//end bind()
 
     /**
      * @inheritDoc
@@ -112,7 +112,7 @@ class DefaultContainer implements RouterContainerInterface
         $this->singletons[$abstract] = $concrete;
         // PHP-DI treats all bindings as singletons by default
         $this->container->set($abstract, $concrete);
-    }
+    }//end singleton()
 
     /**
      * @inheritDoc
@@ -120,7 +120,7 @@ class DefaultContainer implements RouterContainerInterface
     public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
-    }
+    }//end bound()
 
     /**
      * Get all bindings
@@ -128,7 +128,7 @@ class DefaultContainer implements RouterContainerInterface
     public function getBindings(): array
     {
         return $this->bindings;
-    }
+    }//end getBindings()
 
     /**
      * Get all singletons
@@ -136,7 +136,7 @@ class DefaultContainer implements RouterContainerInterface
     public function getSingletons(): array
     {
         return $this->singletons;
-    }
+    }//end getSingletons()
 
     /**
      * Clear all bindings and singletons
@@ -146,7 +146,7 @@ class DefaultContainer implements RouterContainerInterface
         $this->bindings = [];
         $this->singletons = [];
         $this->container = new Container();
-    }
+    }//end clear()
 
     /**
      * Get the underlying PHP-DI container
@@ -154,7 +154,7 @@ class DefaultContainer implements RouterContainerInterface
     public function getContainer(): Container
     {
         return $this->container;
-    }
+    }//end getContainer()
 
     /**
      * Set a factory for creating instances
@@ -162,7 +162,7 @@ class DefaultContainer implements RouterContainerInterface
     public function factory(string $abstract, \Closure $factory): void
     {
         $this->bind($abstract, $factory);
-    }
+    }//end factory()
 
     /**
      * Bind an interface to implementation
@@ -170,7 +170,7 @@ class DefaultContainer implements RouterContainerInterface
     public function bindInterface(string $interface, string $implementation): void
     {
         $this->bind($interface, $implementation);
-    }
+    }//end bindInterface()
 
     /**
      * Register a singleton factory
@@ -178,5 +178,5 @@ class DefaultContainer implements RouterContainerInterface
     public function singletonFactory(string $abstract, \Closure $factory): void
     {
         $this->singleton($abstract, $factory);
-    }
-}
+    }//end singletonFactory()
+}//end class

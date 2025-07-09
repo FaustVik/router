@@ -156,4 +156,4 @@ interface ConfigInterface
      * @return RouterContainerInterface|null DI контейнер или null если не установлен
      */
     public function getContainer(): ?RouterContainerInterface;
-}
+}//end interface

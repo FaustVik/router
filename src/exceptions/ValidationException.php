@@ -20,25 +20,25 @@ class ValidationException extends Exception
 
         $message = "Validation failed for parameter '{$parameter}' with value '{$value}': " . implode(', ', $errors);
         parent::__construct($message, $code);
-    }
+    }//end __construct()
 
     public function getParameter(): string
     {
         return $this->parameter;
-    }
+    }//end getParameter()
 
     public function getValue(): string
     {
         return $this->value;
-    }
+    }//end getValue()
 
     public function getErrors(): array
     {
         return $this->errors;
-    }
+    }//end getErrors()
 
     public function getErrorsAsString(): string
     {
         return implode(', ', $this->errors);
-    }
-}
+    }//end getErrorsAsString()
+}//end class

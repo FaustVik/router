@@ -18,7 +18,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     public function __construct(Container $container)
     {
         $this->container = $container;
-    }
+    }//end __construct()
 
     /**
      * @inheritDoc
@@ -26,7 +26,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }
+    }//end get()
 
     /**
      * @inheritDoc
@@ -34,7 +34,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     public function has(string $id): bool
     {
         return $this->container->has($id);
-    }
+    }//end has()
 
     /**
      * @inheritDoc
@@ -43,7 +43,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     {
         // PHP-DI can resolve any class through reflection
         return $this->container->has($id) || class_exists($id);
-    }
+    }//end canResolve()
 
     /**
      * @inheritDoc
@@ -58,7 +58,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }
+    }//end resolve()
 
     /**
      * @inheritDoc
@@ -66,7 +66,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     public function bind(string $abstract, mixed $concrete): void
     {
         $this->container->set($abstract, $concrete);
-    }
+    }//end bind()
 
     /**
      * @inheritDoc
@@ -75,7 +75,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     {
         // PHP-DI treats all bindings as singletons by default
         $this->container->set($abstract, $concrete);
-    }
+    }//end singleton()
 
     /**
      * @inheritDoc
@@ -83,5 +83,5 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
-    }
-}
+    }//end bound()
+}//end class

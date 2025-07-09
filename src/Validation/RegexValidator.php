@@ -32,15 +32,15 @@ class RegexValidator implements ParameterValidatorInterface
         }
 
         return true;
-    }
+    }//end validate()
 
     public function getErrorMessage(): string
     {
         return $this->errorMessage;
-    }
+    }//end getErrorMessage()
 
     public function getName(): string
     {
         return 'regex';
-    }
-}
+    }//end getName()
+}//end class

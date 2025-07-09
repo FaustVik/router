@@ -15,4 +15,4 @@ interface MiddlewareInterface
      * @return Response
      */
     public function handle(Request $request, callable $next): Response;
-}
+}//end interface

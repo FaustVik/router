@@ -49,7 +49,7 @@ class ContainerAdapterFactory
             'Unsupported container type: ' . get_class($container) .
             '. Container must implement PSR-11 ContainerInterface or be a supported container type.'
         );
-    }
+    }//end createFor()
 
     /**
      * Check if container is a Symfony container
@@ -74,7 +74,7 @@ class ContainerAdapterFactory
 
         // Check if it's a Symfony container by namespace
         return str_contains($className, 'Symfony\\Component\\DependencyInjection\\');
-    }
+    }//end isSymfonyContainer()
 
     /**
      * Check if container is a Pimple container
@@ -97,7 +97,7 @@ class ContainerAdapterFactory
 
         // Check if it's a Pimple container by namespace
         return str_contains($className, 'Pimple\\');
-    }
+    }//end isPimpleContainer()
 
     /**
      * Create adapter by container type name
@@ -110,7 +110,7 @@ class ContainerAdapterFactory
             'pimple' => new PimpleContainerAdapter($container),
             default => throw new \InvalidArgumentException("Unsupported container type: {$type}")
         };
-    }
+    }//end createByType()
 
     /**
      * Get supported container types
@@ -122,7 +122,7 @@ class ContainerAdapterFactory
             'symfony' => SymfonyContainerAdapter::class,
             'pimple' => PimpleContainerAdapter::class,
         ];
-    }
+    }//end getSupportedTypes()
 
     /**
      * Check if container type is supported
@@ -135,5 +135,5 @@ class ContainerAdapterFactory
         } catch (\InvalidArgumentException) {
             return false;
         }
-    }
-}
+    }//end isSupported()
+}//end class

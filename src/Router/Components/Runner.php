@@ -25,23 +25,17 @@ final class Runner implements RunnerInterface
     public function __construct(?RouterContainerInterface $container = null)
     {
         $this->container = $container;
-    }
+    }//end __construct()
 
-    /**
-     * Set DI container
-     */
     public function setContainer(?RouterContainerInterface $container): void
     {
         $this->container = $container;
-    }
+    }//end setContainer()
 
-    /**
-     * Get DI container
-     */
     public function getContainer(): ?RouterContainerInterface
     {
         return $this->container;
-    }
+    }//end getContainer()
 
     /**
      * @throws NotFoundMethod
@@ -62,14 +56,9 @@ final class Runner implements RunnerInterface
         }
 
         throw new InvalidTypeRoute();
-    }
+    }//end run()
 
     /**
-     * @param RouteAnonymousFuncInterface $route
-     * @param array $params
-     * @param Request|null $request
-     *
-     * @return void
      * @throws ReflectionException
      */
     public function runAnonymousFunc(RouteAnonymousFuncInterface $route, array $params = [], ?Request $request = null): void
@@ -98,17 +87,12 @@ final class Runner implements RunnerInterface
                     $args[] = null;
                 }
             }
-        }
+        }//end if
 
         call_user_func_array($route->getFunc(), $args);
-    }
+    }//end runAnonymousFunc()
 
     /**
-     * @param RouteClassInterface $route
-     * @param array               $params
-     * @param Request|null        $request
-     *
-     * @return void
      * @throws NotFoundClass
      * @throws NotFoundMethod
      * @throws ReflectionException
@@ -152,12 +136,12 @@ final class Runner implements RunnerInterface
                     $atr[] = null;
                 }
             }
-        }
+        }//end if
 
         if (!method_exists($controller, $route->getAction())) {
             throw new NotFoundMethod($route->getAction(), $route->getClass());
         }
 
         call_user_func_array([$controller, $route->getAction()], $atr);
-    }
-}
+    }//end runClass()
+}//end class

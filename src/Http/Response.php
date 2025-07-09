@@ -21,39 +21,25 @@ namespace FaustVik\Router\Http;
  */
 final class Response
 {
-    /** @var string Содержимое ответа */
     private string $content;
-
-    /** @var int HTTP статус код */
     private int $statusCode;
-
-    /** @var array HTTP заголовки */
     private array $headers;
 
     /**
      * Конструктор HTTP ответа
-     *
-     * @param string $content Содержимое ответа
-     * @param integer $statusCode HTTP статус код (по умолчанию 200)
-     * @param array $headers HTTP заголовки
      */
     public function __construct(string $content = '', int $statusCode = 200, array $headers = [])
     {
         $this->content = $content;
         $this->statusCode = $statusCode;
         $this->headers = $headers;
-    }
+    }//end __construct()
 
     /**
      * Создает JSON ответ
      *
      * Автоматически устанавливает Content-Type: application/json
      * и кодирует данные в JSON формат.
-     *
-     * @param array $data Данные для кодирования в JSON
-     * @param integer $statusCode HTTP статус код (по умолчанию 200)
-     * @param array $headers Дополнительные HTTP заголовки
-     * @return self Экземпляр Response с JSON данными
      */
     public static function json(array $data, int $statusCode = 200, array $headers = []): self
     {
@@ -61,68 +47,44 @@ final class Response
         $headers = array_merge(['Content-Type' => 'application/json'], $headers);
 
         return new self($content, $statusCode, $headers);
-    }
+    }//end json()
 
     /**
      * Создает HTML ответ
      *
      * Автоматически устанавливает Content-Type: text/html
-     *
-     * @param string $content HTML содержимое
-     * @param integer $statusCode HTTP статус код (по умолчанию 200)
-     * @param array $headers Дополнительные HTTP заголовки
-     * @return self Экземпляр Response с HTML содержимым
      */
     public static function html(string $content, int $statusCode = 200, array $headers = []): self
     {
         $headers = array_merge(['Content-Type' => 'text/html'], $headers);
 
         return new self($content, $statusCode, $headers);
-    }
+    }//end html()
 
     /**
      * Создает редирект
      *
      * Устанавливает заголовок Location и соответствующий статус код
-     *
-     * @param string $url URL для редиректа
-     * @param integer $statusCode HTTP статус код (по умолчанию 302)
-     * @return self Экземпляр Response с редиректом
      */
     public static function redirect(string $url, int $statusCode = 302): self
     {
         return new self('', $statusCode, ['Location' => $url]);
-    }
+    }//end redirect()
 
-    /**
-     * Получает содержимое ответа
-     *
-     * @return string Содержимое ответа
-     */
     public function getContent(): string
     {
         return $this->content;
-    }
+    }//end getContent()
 
-    /**
-     * Получает HTTP статус код
-     *
-     * @return integer HTTP статус код
-     */
     public function getStatusCode(): int
     {
         return $this->statusCode;
-    }
+    }//end getStatusCode()
 
-    /**
-     * Получает все HTTP заголовки
-     *
-     * @return array HTTP заголовки
-     */
     public function getHeaders(): array
     {
         return $this->headers;
-    }
+    }//end getHeaders()
 
     /**
      * Получает конкретный HTTP заголовок
@@ -134,71 +96,56 @@ final class Response
     public function getHeader(string $key, mixed $default = null): mixed
     {
         return $this->headers[$key] ?? $default;
-    }
+    }//end getHeader()
 
     /**
      * Создает новый экземпляр ответа с измененным содержимым
      *
      * Использует immutable pattern - возвращает новый экземпляр,
      * не изменяя текущий.
-     *
-     * @param string $content Новое содержимое
-     * @return self Новый экземпляр ответа
      */
     public function withContent(string $content): self
     {
         $clone = clone $this;
         $clone->content = $content;
         return $clone;
-    }
+    }//end withContent()
 
     /**
      * Создает новый экземпляр ответа с измененным статус кодом
-     *
-     * @param integer $statusCode Новый HTTP статус код
-     * @return self Новый экземпляр ответа
      */
     public function withStatusCode(int $statusCode): self
     {
         $clone = clone $this;
         $clone->statusCode = $statusCode;
         return $clone;
-    }
+    }//end withStatusCode()
 
     /**
      * Создает новый экземпляр ответа с добавленным заголовком
-     *
-     * @param string $key Название заголовка
-     * @param string $value Значение заголовка
-     * @return self Новый экземпляр ответа
      */
     public function withHeader(string $key, string $value): self
     {
         $clone = clone $this;
         $clone->headers[$key] = $value;
         return $clone;
-    }
+    }//end withHeader()
 
     /**
      * Создает новый экземпляр ответа с добавленными заголовками
-     *
-     * @param array $headers Заголовки для добавления
-     * @return self Новый экземпляр ответа
      */
     public function withHeaders(array $headers): self
     {
         $clone = clone $this;
         $clone->headers = array_merge($clone->headers, $headers);
         return $clone;
-    }
+    }//end withHeaders()
 
     /**
      * Отправляет ответ клиенту
      *
      * Устанавливает HTTP статус код, заголовки и выводит содержимое.
      * Проверяет, что заголовки еще не были отправлены.
-     *
-     * @return void
      */
     public function send(): void
     {
@@ -214,5 +161,5 @@ final class Response
 
         // Вывод содержимого
         echo $this->content;
-    }
-}
+    }//end send()
+}//end class

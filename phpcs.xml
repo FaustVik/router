@@ -22,22 +22,13 @@
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <rule ref="Generic.Formatting.SpaceAfterCast"/>
     <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
-    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Generic.PHP.LowerCaseKeyword"/>
+    <rule ref="Generic.PHP.LowerCaseType"/>
     <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
-    <rule ref="Squiz.Classes.LowercaseClassKeywords"/>
-
-    <!-- Настройки отступов -->
-    <arg name="tab-width" value="4"/>
-    <arg name="encoding" value="utf-8"/>
-
-    <!-- Показать прогресс -->
-    <arg value="p"/>
-    
-    <!-- Использовать цвета -->
-    <arg name="colors"/>
-    
-    <!-- Показать все нарушения -->
-    <arg value="s"/>
+    <rule ref="Squiz.ControlStructures.ControlSignature"/>
+    <rule ref="Squiz.Functions.FunctionDeclarationArgumentSpacing"/>
+    <rule ref="Squiz.Scope.MethodScope"/>
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
 
     <!-- Максимальная длина строки -->
     <rule ref="Generic.Files.LineLength">
@@ -45,15 +36,84 @@
             <property name="lineLimit" value="120"/>
             <property name="absoluteLineLimit" value="140"/>
         </properties>
-        <exclude-pattern>*/examples/*</exclude-pattern>
     </rule>
 
-    <!-- Исключения для примеров -->
-    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-        <exclude-pattern>*/examples/*</exclude-pattern>
+    <!-- Отключаем ВСЕ требования к PHPDoc комментариям -->
+    <!-- Мы пишем их только там, где это действительно нужно -->
+    <rule ref="Squiz.Commenting.FunctionComment">
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ThrowsNotCapital"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ThrowsNoFullStop"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentNotCapital"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentAlignment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturnNotVoid"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectParamVarName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ThrowsNotCapital"/>
+        <exclude name="Squiz.Commenting.FunctionComment.EmptyThrows"/>
+        <exclude name="Squiz.Commenting.FunctionComment.DuplicateReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="Squiz.Commenting.FunctionComment.WrongStyle"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing"/>
     </rule>
     
-    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+    <!-- Отключаем требование PHPDoc для переменных -->
+    <rule ref="Squiz.Commenting.VariableComment">
+        <exclude name="Squiz.Commenting.VariableComment.Missing"/>
+        <exclude name="Squiz.Commenting.VariableComment.MissingVar"/>
+    </rule>
+    
+    <!-- Отключаем требование PHPDoc для классов -->
+    <rule ref="Squiz.Commenting.ClassComment">
+        <exclude name="Squiz.Commenting.ClassComment.Missing"/>
+    </rule>
+
+    <!-- Отключаем требование PHPDoc для файлов -->
+    <rule ref="Squiz.Commenting.FileComment">
+        <exclude name="Squiz.Commenting.FileComment.Missing"/>
+    </rule>
+
+    <!-- Отключаем требование PHPDoc в целом -->
+    <rule ref="PEAR.Commenting.FunctionComment">
+        <exclude name="PEAR.Commenting.FunctionComment.Missing"/>
+        <exclude name="PEAR.Commenting.FunctionComment.MissingReturn"/>
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="PEAR.Commenting.FunctionComment.ParamNameNoMatch"/>
+        <exclude name="PEAR.Commenting.FunctionComment.InvalidReturn"/>
+        <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamName"/>
+    </rule>
+    
+    <!-- Отключаем строгие требования к комментариям -->
+    <rule ref="Generic.Commenting.DocComment">
+        <exclude name="Generic.Commenting.DocComment.MissingShort"/>
+        <exclude name="Generic.Commenting.DocComment.TagValueIndent"/>
+        <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
+        <exclude name="Generic.Commenting.DocComment.ParamNotFirst"/>
+        <exclude name="Generic.Commenting.DocComment.TagsNotGrouped"/>
+        <exclude name="Generic.Commenting.DocComment.SpacingBeforeShort"/>
+        <exclude name="Generic.Commenting.DocComment.ContentAfterOpen"/>
+        <exclude name="Generic.Commenting.DocComment.ContentBeforeClose"/>
+    </rule>
+    
+    <!-- Отключаем все остальные требования к комментариям -->
+    <rule ref="Generic.Commenting">
+        <exclude name="Generic.Commenting.Todo"/>
+        <exclude name="Generic.Commenting.Fixme"/>
+    </rule>
+
+    <!-- Настройки для примеров (отключаем большинство правил) -->
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
         <exclude-pattern>*/examples/*</exclude-pattern>
     </rule>
     
@@ -61,14 +121,41 @@
         <exclude-pattern>*/examples/*</exclude-pattern>
     </rule>
 
-    <!-- Настройки для комментариев -->
-    <rule ref="Squiz.Commenting.FunctionComment">
-        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
-        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
-        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
-        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
-        <!-- Отключить требование комментариев для примеров -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
         <exclude-pattern>*/examples/*</exclude-pattern>
     </rule>
 
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+    <rule ref="Generic.Files.OneObjectStructurePerFile">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+    <rule ref="Generic.Files.LineLength">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+    
+    <!-- Разрешаем echo/print в примерах -->
+    <rule ref="Squiz.PHP.EmbeddedPhp">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+    
+    <!-- Не требуем declare(strict_types=1) в примерах -->
+    <rule ref="Generic.PHP.RequireStrictTypes">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+    <!-- Не требуем комментарии в примерах -->
+    <rule ref="Squiz.Commenting">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+    <!-- Показываем прогресс -->
+    <config name="show_progress" value="1"/>
+    <config name="colors" value="1"/>
+    
+    <!-- Игнорируем некоторые предупреждения -->
+    <config name="ignore_warnings_on_exit" value="1"/>
 </ruleset> 

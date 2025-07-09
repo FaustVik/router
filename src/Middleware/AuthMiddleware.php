@@ -30,8 +30,8 @@ final class AuthMiddleware implements MiddlewareInterface
             );
         }
 
-        $token = substr($authHeader, 7); // Убираем "Bearer "
-
+        $token = substr($authHeader, 7);
+// Убираем "Bearer "
         // Простая проверка токена
         if (empty($token) || $token === 'invalid') {
             return Response::json(
@@ -46,7 +46,7 @@ final class AuthMiddleware implements MiddlewareInterface
 
         // Передаем управление следующему middleware
         return $next($request);
-    }
+    }//end handle()
 
     private function getUserIdFromToken(string $token): int
     {
@@ -57,5 +57,5 @@ final class AuthMiddleware implements MiddlewareInterface
             'user-token' => 2,
             default => 0
         };
-    }
-}
+    }//end getUserIdFromToken()
+}//end class

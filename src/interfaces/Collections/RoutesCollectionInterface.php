@@ -12,4 +12,4 @@ interface RoutesCollectionInterface
      * @return RouteInterface[]
      */
     public function get(): array;
-}
+}//end interface

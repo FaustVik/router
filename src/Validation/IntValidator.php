@@ -32,15 +32,15 @@ class IntValidator implements ParameterValidatorInterface
         }
 
         return true;
-    }
+    }//end validate()
 
     public function getErrorMessage(): string
     {
         return $this->errorMessage;
-    }
+    }//end getErrorMessage()
 
     public function getName(): string
     {
         return 'int';
-    }
-}
+    }//end getName()
+}//end class

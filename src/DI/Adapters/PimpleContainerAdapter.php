@@ -18,7 +18,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
+    }//end __construct()
 
     /**
      * @inheritDoc
@@ -26,7 +26,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }
+    }//end get()
 
     /**
      * @inheritDoc
@@ -34,7 +34,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     public function has(string $id): bool
     {
         return $this->container->has($id);
-    }
+    }//end has()
 
     /**
      * @inheritDoc
@@ -42,7 +42,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     public function canResolve(string $id): bool
     {
         return $this->container->has($id) || class_exists($id);
-    }
+    }//end canResolve()
 
     /**
      * @inheritDoc
@@ -63,7 +63,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }
+    }//end resolve()
 
     /**
      * @inheritDoc
@@ -72,7 +72,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     {
         // Pimple doesn't support runtime binding through PSR-11 interface
         throw new \RuntimeException("Runtime binding is not supported in Pimple container adapter. Use Pimple native API or configure services before creating adapter.");
-    }
+    }//end bind()
 
     /**
      * @inheritDoc
@@ -81,7 +81,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     {
         // Same as bind - not supported at runtime
         throw new \RuntimeException("Runtime binding is not supported in Pimple container adapter. Use Pimple native API or configure services before creating adapter.");
-    }
+    }//end singleton()
 
     /**
      * @inheritDoc
@@ -89,7 +89,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
     public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
-    }
+    }//end bound()
 
     /**
      * Create instance using reflection
@@ -129,5 +129,5 @@ class PimpleContainerAdapter implements RouterContainerInterface
         }
 
         return $reflectionClass->newInstanceArgs($dependencies);
-    }
-}
+    }//end createInstanceWithReflection()
+}//end class

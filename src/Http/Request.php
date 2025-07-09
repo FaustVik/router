@@ -20,36 +20,16 @@ namespace FaustVik\Router\Http;
  */
 final class Request
 {
-    /** @var string HTTP метод (GET, POST, PUT, DELETE и т.д.) */
     private string $method;
-
-    /** @var string URI пути запроса */
     private string $uri;
-
-    /** @var array Параметры маршрута (извлеченные из URI) */
     private array $params;
-
-    /** @var array Query параметры (из query string) */
     private array $query;
-
-    /** @var array HTTP заголовки */
     private array $headers;
-
-    /** @var array Серверные переменные ($_SERVER) */
     private array $server;
-
-    /** @var array Атрибуты запроса (для передачи данных через middleware) */
     private array $attributes = [];
 
     /**
      * Конструктор HTTP запроса
-     *
-     * @param string $method HTTP метод (GET, POST, PUT, DELETE и т.д.)
-     * @param string $uri URI пути запроса
-     * @param array $params Параметры маршрута
-     * @param array $query Query параметры
-     * @param array $headers HTTP заголовки
-     * @param array $server Серверные переменные
      */
     public function __construct(
         string $method = '',
@@ -65,14 +45,12 @@ final class Request
         $this->query = $query;
         $this->headers = $headers;
         $this->server = $server;
-    }
+    }//end __construct()
 
     /**
      * Создает запрос из глобальных переменных PHP
      *
      * Использует $_SERVER, $_GET и getallheaders() для создания объекта запроса
-     *
-     * @return self Экземпляр запроса
      */
     public static function createFromGlobals(): self
     {
@@ -83,37 +61,22 @@ final class Request
         $server = $_SERVER;
 
         return new self($method, $uri, [], $query, $headers, $server);
-    }
+    }//end createFromGlobals()
 
-    /**
-     * Получает HTTP метод запроса
-     *
-     * @return string HTTP метод (GET, POST, PUT, DELETE и т.д.)
-     */
     public function getMethod(): string
     {
         return $this->method;
-    }
+    }//end getMethod()
 
-    /**
-     * Получает URI запроса
-     *
-     * @return string URI пути запроса
-     */
     public function getUri(): string
     {
         return $this->uri;
-    }
+    }//end getUri()
 
-    /**
-     * Получает все параметры маршрута
-     *
-     * @return array Параметры маршрута
-     */
     public function getParams(): array
     {
         return $this->params;
-    }
+    }//end getParams()
 
     /**
      * Получает конкретный параметр маршрута
@@ -125,17 +88,12 @@ final class Request
     public function getParam(string $key, mixed $default = null): mixed
     {
         return $this->params[$key] ?? $default;
-    }
+    }//end getParam()
 
-    /**
-     * Получает все query параметры
-     *
-     * @return array Query параметры
-     */
     public function getQuery(): array
     {
         return $this->query;
-    }
+    }//end getQuery()
 
     /**
      * Получает конкретный query параметр
@@ -147,17 +105,12 @@ final class Request
     public function getQueryParam(string $key, mixed $default = null): mixed
     {
         return $this->query[$key] ?? $default;
-    }
+    }//end getQueryParam()
 
-    /**
-     * Получает все HTTP заголовки
-     *
-     * @return array HTTP заголовки
-     */
     public function getHeaders(): array
     {
         return $this->headers;
-    }
+    }//end getHeaders()
 
     /**
      * Получает конкретный HTTP заголовок
@@ -169,17 +122,12 @@ final class Request
     public function getHeader(string $key, mixed $default = null): mixed
     {
         return $this->headers[$key] ?? $default;
-    }
+    }//end getHeader()
 
-    /**
-     * Получает все серверные переменные
-     *
-     * @return array Серверные переменные
-     */
     public function getServer(): array
     {
         return $this->server;
-    }
+    }//end getServer()
 
     /**
      * Получает конкретную серверную переменную
@@ -191,7 +139,7 @@ final class Request
     public function getServerParam(string $key, mixed $default = null): mixed
     {
         return $this->server[$key] ?? $default;
-    }
+    }//end getServerParam()
 
     /**
      * Получает атрибут запроса
@@ -206,48 +154,38 @@ final class Request
     public function getAttribute(string $key, mixed $default = null): mixed
     {
         return $this->attributes[$key] ?? $default;
-    }
+    }//end getAttribute()
 
     /**
      * Создает новый экземпляр запроса с добавленным атрибутом
      *
      * Используется immutable pattern - возвращает новый экземпляр,
      * не изменяя текущий.
-     *
-     * @param string $key Ключ атрибута
-     * @param mixed $value Значение атрибута
-     * @return self Новый экземпляр запроса с атрибутом
      */
     public function withAttribute(string $key, mixed $value): self
     {
         $clone = clone $this;
         $clone->attributes[$key] = $value;
         return $clone;
-    }
+    }//end withAttribute()
 
     /**
      * Создает новый экземпляр запроса с измененными параметрами
-     *
-     * @param array $params Новые параметры маршрута
-     * @return self Новый экземпляр запроса с параметрами
      */
     public function withParams(array $params): self
     {
         $clone = clone $this;
         $clone->params = $params;
         return $clone;
-    }
+    }//end withParams()
 
     /**
      * Создает новый экземпляр запроса с измененным URI
-     *
-     * @param string $uri Новый URI
-     * @return self Новый экземпляр запроса с URI
      */
     public function withUri(string $uri): self
     {
         $clone = clone $this;
         $clone->uri = $uri;
         return $clone;
-    }
-}
+    }//end withUri()
+}//end class

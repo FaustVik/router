@@ -4,4 +4,4 @@ namespace FaustVik\Router\exceptions;
 
 class Exception extends \Exception
 {
-}
+}//end class

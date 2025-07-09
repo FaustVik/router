@@ -11,4 +11,4 @@ interface ParameterValidatorInterface
     public function getErrorMessage(): string;
 
     public function getName(): string;
-}
+}//end interface

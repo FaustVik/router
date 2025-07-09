@@ -41,4 +41,4 @@ interface RunnerInterface
      * @return void
      */
     public function runClass(RouteClassInterface $route, array $params = [], ?Request $request = null): void;
-}
+}//end interface

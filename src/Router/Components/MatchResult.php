@@ -12,15 +12,15 @@ final class MatchResult
         private RouteInterface $route,
         private array $parameters = []
     ) {
-    }
+    }//end __construct()
 
     public function getRoute(): RouteInterface
     {
         return $this->route;
-    }
+    }//end getRoute()
 
     public function getParameters(): array
     {
         return $this->parameters;
-    }
-}
+    }//end getParameters()
+}//end class
