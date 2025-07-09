@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router;
 
-use FaustVik\Router\exceptions\NoMatch;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
@@ -14,22 +13,24 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\Middleware\MiddlewareStack;
 use FaustVik\Router\Router\Components\Config;
 use FaustVik\Router\Router\Components\MatchResult;
+use FaustVik\Router\Validation\ParameterValidator;
+use FaustVik\Router\exceptions\ValidationException;
 use function str_contains;
 
 final class Router implements RouterInterface
 {
+    private ?string $uriRaw = null;
+    private ?string $uri = null;
+    private ?string $paramsString = null;
+    private ?array $params = null;
+    private ConfigInterface $config;
     private ?RoutesCollectionInterface $collections = null;
+    private ?ParameterValidator $parameterValidator = null;
 
-    private ?string          $uri          = null;
-    private ?string          $paramsString = null;
-    private ?string          $uriRaw       = null;
-    private array            $params       = [];
-    private ?ConfigInterface $config       = null;
-
-    public function setCollection(RoutesCollectionInterface $collection): self
+    public function __construct()
     {
-        $this->collections = $collection;
-        return $this;
+        $this->config = new Config();
+        $this->parameterValidator = new ParameterValidator();
     }
 
     public function setConfig(ConfigInterface $config): void
@@ -39,11 +40,13 @@ final class Router implements RouterInterface
 
     public function getConfig(): ConfigInterface
     {
-        if (!$this->config) {
-            $this->config = new Config();
-        }
-
         return $this->config;
+    }
+
+    public function setCollection(RoutesCollectionInterface $collections): self
+    {
+        $this->collections = $collections;
+        return $this;
     }
 
     public function run(): void
@@ -55,7 +58,10 @@ final class Router implements RouterInterface
         // Объединяем параметры из URL с параметрами из query string
         // Параметры из URL имеют приоритет над query параметрами
         $urlParams = $matchResult->getParameters();
-        $allParams = array_merge($this->params, $urlParams);
+        $allParams = array_merge($this->params ?? [], $urlParams);
+        
+        // Валидируем параметры
+        $this->validateParameters($route, $urlParams);
         
         $this->check($route);
         
@@ -81,6 +87,24 @@ final class Router implements RouterInterface
         
         // Отправляем ответ
         $response->send();
+    }
+
+    private function validateParameters(RouteInterface $route, array $parameters): void
+    {
+        $validationRules = $route->getValidationRules();
+        if (empty($validationRules)) {
+            return;
+        }
+
+        try {
+            $this->parameterValidator->validate($parameters, $validationRules);
+        } catch (ValidationException $e) {
+            // Здесь можно настроить обработку ошибок валидации
+            // Пока просто выводим ошибку и завершаем выполнение
+            http_response_code(400);
+            echo "Validation Error: " . $e->getMessage();
+            exit;
+        }
     }
 
     public function setUri(string $uri): self
@@ -114,19 +138,16 @@ final class Router implements RouterInterface
             $arr = [];
 
             foreach ($params as $str) {
-                [$name, $value] = explode('=', $str);
-                $arr[$name] = $value;
+                if (str_contains($str, '=')) {
+                    [$name, $value] = explode('=', $str);
+                    $arr[$name] = $value;
+                }
             }
 
             $this->params = $arr;
         }
     }
 
-    /**
-     *
-     * @return MatchResult
-     * @throws NoMatch
-     */
     protected function match(): MatchResult
     {
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);

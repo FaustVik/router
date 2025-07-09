@@ -6,6 +6,7 @@ namespace FaustVik\Router\Route;
 
 use FaustVik\Router\interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class Route implements RouteClassInterface
 {
@@ -16,6 +17,7 @@ final class Route implements RouteClassInterface
     private ?string $alias   = null;
     private array   $arg     = [];
     private array   $middleware = [];
+    private array   $validationRules = [];
 
     public static function create(string $route, string $class, string $action, array $arg = [], array $methods = [], ?string $alias = null): RouteInterface
     {
@@ -68,6 +70,17 @@ final class Route implements RouteClassInterface
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
+        return $this;
+    }
+
+    public function getValidationRules(): array
+    {
+        return $this->validationRules;
+    }
+
+    public function validate(array $rules): self
+    {
+        $this->validationRules = $rules;
         return $this;
     }
 }

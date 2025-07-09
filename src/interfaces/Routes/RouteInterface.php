@@ -2,6 +2,8 @@
 
 namespace FaustVik\Router\interfaces\Routes;
 
+use FaustVik\Router\Validation\ParameterValidationRule;
+
 interface RouteInterface
 {
     /**
@@ -39,4 +41,19 @@ interface RouteInterface
      * @return self
      */
     public function middleware(array $middleware): self;
+
+    /**
+     * Get validation rules for route parameters
+     *
+     * @return ParameterValidationRule[]
+     */
+    public function getValidationRules(): array;
+
+    /**
+     * Set validation rules for route parameters
+     *
+     * @param ParameterValidationRule[] $rules
+     * @return self
+     */
+    public function validate(array $rules): self;
 }

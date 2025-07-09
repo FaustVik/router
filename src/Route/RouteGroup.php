@@ -6,12 +6,14 @@ namespace FaustVik\Router\Route;
 
 use FaustVik\Router\interfaces\Routes\RouteGroupInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class RouteGroup implements RouteGroupInterface
 {
     private string $prefix = '';
     private array $middleware = [];
     private array $routes = [];
+    private array $validationRules = [];
 
     public function __construct(
         private readonly RoutesCollection $collection
@@ -35,75 +37,164 @@ final class RouteGroup implements RouteGroupInterface
         return $this;
     }
 
+    public function validate(array $rules): self
+    {
+        $this->validationRules = array_merge($this->validationRules, $rules);
+        return $this;
+    }
+
     public function get(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute(['GET'], $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, ['GET']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function post(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute(['POST'], $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, ['POST']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function put(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute(['PUT'], $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, ['PUT']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function delete(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute(['DELETE'], $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, ['DELETE']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function patch(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute(['PATCH'], $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, ['PATCH']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function any(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function match(array $methods, string $route, string $class, string $action, array $arg = []): RouteInterface
     {
-        return $this->addRoute($methods, $route, $class, $action, $arg);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = Route::create($fullRoute, $class, $action, $arg, $methods);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
-    // Методы для анонимных функций
     public function getFunc(string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute(['GET'], $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['GET']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function postFunc(string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute(['POST'], $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['POST']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function putFunc(string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute(['PUT'], $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['PUT']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function deleteFunc(string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute(['DELETE'], $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['DELETE']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function patchFunc(string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute(['PATCH'], $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['PATCH']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function anyFunc(string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function matchFunc(array $methods, string $route, callable $func): RouteInterface
     {
-        return $this->addFuncRoute($methods, $route, $func);
+        $fullRoute = $this->prefix . $route;
+        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, $methods);
+        $routeObject->middleware($this->middleware);
+        $routeObject->validate($this->validationRules);
+        $this->collection->set($routeObject);
+        $this->routes[] = $routeObject;
+        return $routeObject;
     }
 
     public function group(callable $callback): void
@@ -112,6 +203,7 @@ final class RouteGroup implements RouteGroupInterface
         // Копируем текущее состояние для вложенной группы
         $nestedGroup->prefix = $this->prefix;
         $nestedGroup->middleware = array_merge([], $this->middleware);
+        $nestedGroup->validationRules = array_merge([], $this->validationRules);
         
         $callback($nestedGroup);
         
@@ -121,53 +213,8 @@ final class RouteGroup implements RouteGroupInterface
         }
     }
 
-    /**
-     * @return RouteInterface[]
-     */
     public function getRoutes(): array
     {
         return $this->routes;
-    }
-
-    private function addRoute(array $methods, string $route, string $class, string $action, array $arg = []): RouteInterface
-    {
-        // Добавляем префикс к маршруту
-        $fullRoute = $this->prefix . '/' . ltrim($route, '/');
-        $fullRoute = rtrim($fullRoute, '/') ?: '/';
-
-        // Создаем маршрут
-        $routeObject = Route::create($fullRoute, $class, $action, $arg, $methods);
-
-        // Применяем middleware группы
-        if (!empty($this->middleware)) {
-            $routeObject->middleware($this->middleware);
-        }
-
-        // Добавляем в коллекцию и локальный массив
-        $this->routes[] = $routeObject;
-        $this->collection->set($routeObject);
-
-        return $routeObject;
-    }
-
-    private function addFuncRoute(array $methods, string $route, callable $func): RouteInterface
-    {
-        // Добавляем префикс к маршруту
-        $fullRoute = $this->prefix . '/' . ltrim($route, '/');
-        $fullRoute = rtrim($fullRoute, '/') ?: '/';
-
-        // Создаем маршрут с анонимной функцией
-        $routeObject = RouteAnonymousFunc::create($fullRoute, $func, $methods);
-
-        // Применяем middleware группы
-        if (!empty($this->middleware)) {
-            $routeObject->middleware($this->middleware);
-        }
-
-        // Добавляем в коллекцию и локальный массив
-        $this->routes[] = $routeObject;
-        $this->collection->set($routeObject);
-
-        return $routeObject;
     }
 } 

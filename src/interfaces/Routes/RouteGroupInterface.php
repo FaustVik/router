@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\interfaces\Routes;
 
+use FaustVik\Router\Validation\ParameterValidationRule;
+
 interface RouteGroupInterface
 {
     public function prefix(string $prefix): self;
     
     public function middleware(array $middleware): self;
+    
+    public function validate(array $rules): self;
     
     public function get(string $route, string $class, string $action, array $arg = []): RouteInterface;
     
@@ -23,7 +27,7 @@ interface RouteGroupInterface
     public function any(string $route, string $class, string $action, array $arg = []): RouteInterface;
     
     public function match(array $methods, string $route, string $class, string $action, array $arg = []): RouteInterface;
-    
+
     // Методы для анонимных функций
     public function getFunc(string $route, callable $func): RouteInterface;
     
@@ -38,7 +42,8 @@ interface RouteGroupInterface
     public function anyFunc(string $route, callable $func): RouteInterface;
     
     public function matchFunc(array $methods, string $route, callable $func): RouteInterface;
-    
+
+    // Группировка
     public function group(callable $callback): void;
     
     /**
