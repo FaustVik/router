@@ -184,7 +184,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function getUri(): string
     {
         if (!$this->uriRaw) {
-            $this->uriRaw = $_SERVER['REQUEST_URI'];
+            $this->uriRaw = $_SERVER['REQUEST_URI'] ?? '/';
         }
 
         return $this->uriRaw;
