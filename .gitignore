@@ -6,3 +6,6 @@ vendor/
 # PHPStan
 phpstan.neon.dist
 phpstan-baseline.neon
+
+# Log files
+*.log

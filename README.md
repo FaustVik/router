@@ -35,6 +35,99 @@ $router->setCollection($collections);
 $router->run();
 ```
 
+## Middleware поддержка
+
+Роутер поддерживает middleware для обработки запросов. Middleware выполняется в порядке добавления.
+
+### Основные классы для middleware
+
+- **Request** - объект HTTP запроса
+- **Response** - объект HTTP ответа  
+- **MiddlewareInterface** - интерфейс для создания middleware
+- **MiddlewareStack** - управление стеком middleware
+
+### Примеры использования
+
+```php
+use FaustVik\Router\Middleware\AuthMiddleware;
+use FaustVik\Router\Middleware\LoggingMiddleware;
+use FaustVik\Router\Middleware\CorsMiddleware;
+
+// Маршрут с middleware
+$route = Route::create('/admin/users', AdminController::class, 'index', [], ['GET'])
+    ->middleware([
+        AuthMiddleware::class,
+        LoggingMiddleware::class
+    ]);
+
+// Анонимная функция с middleware
+$route = RouteAnonymousFunc::create('/api/data', function() {
+    return Response::json(['data' => 'Hello World']);
+}, ['GET'])
+    ->middleware([
+        CorsMiddleware::class,
+        LoggingMiddleware::class
+    ]);
+```
+
+### Встроенные middleware
+
+#### AuthMiddleware
+Проверяет Authorization заголовок и устанавливает атрибуты пользователя.
+
+```php
+$route->middleware([AuthMiddleware::class]);
+
+// В контроллере можно получить данные пользователя
+function show(Request $request) {
+    $userId = $request->getAttribute('user_id');
+    $isAuthenticated = $request->getAttribute('authenticated');
+}
+```
+
+#### LoggingMiddleware
+Логирует HTTP запросы с информацией о времени выполнения.
+
+```php
+$route->middleware([new LoggingMiddleware('custom.log')]);
+```
+
+#### CorsMiddleware
+Обрабатывает CORS заголовки для API.
+
+```php
+$corsMiddleware = new CorsMiddleware(
+    allowedOrigins: ['https://example.com'],
+    allowedMethods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowCredentials: true
+);
+
+$route->middleware([$corsMiddleware]);
+```
+
+### Создание собственного middleware
+
+```php
+use FaustVik\Router\Http\Request;
+use FaustVik\Router\Http\Response;
+use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+
+class CustomMiddleware implements MiddlewareInterface
+{
+    public function handle(Request $request, callable $next): Response
+    {
+        // Логика до выполнения действия
+        
+        $response = $next($request);
+        
+        // Логика после выполнения действия
+        
+        return $response;
+    }
+}
+```
+
 ## Статический анализ кода
 
 Проект использует PHPStan для статического анализа кода:

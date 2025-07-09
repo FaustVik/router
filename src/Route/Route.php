@@ -15,6 +15,7 @@ final class Route implements RouteClassInterface
     private array   $methods = [];
     private ?string $alias   = null;
     private array   $arg     = [];
+    private array   $middleware = [];
 
     public static function create(string $route, string $class, string $action, array $arg = [], array $methods = [], ?string $alias = null): RouteInterface
     {
@@ -57,5 +58,16 @@ final class Route implements RouteClassInterface
     public function getArg(): array
     {
         return $this->arg;
+    }
+
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
+    }
+
+    public function middleware(array $middleware): self
+    {
+        $this->middleware = $middleware;
+        return $this;
     }
 }

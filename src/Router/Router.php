@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace FaustVik\Router\Router;
 
 use FaustVik\Router\exceptions\NoMatch;
+use FaustVik\Router\Http\Request;
+use FaustVik\Router\Http\Response;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\RouterInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Middleware\MiddlewareStack;
 use FaustVik\Router\Router\Components\Config;
 use FaustVik\Router\Router\Components\MatchResult;
 use function str_contains;
@@ -55,7 +58,29 @@ final class Router implements RouterInterface
         $allParams = array_merge($this->params, $urlParams);
         
         $this->check($route);
-        $this->getConfig()->getRunner()->run($route, $allParams);
+        
+        // Создаем объект запроса
+        $request = Request::createFromGlobals()
+            ->withUri($this->uri)
+            ->withParams($allParams);
+        
+        // Создаем middleware stack
+        $finalHandler = function(Request $request) use ($route, $allParams): Response {
+            ob_start();
+            $this->getConfig()->getRunner()->run($route, $allParams);
+            $content = ob_get_clean();
+            
+            return new Response($content ?: '');
+        };
+        
+        $middlewareStack = new MiddlewareStack($finalHandler);
+        $middlewareStack->addFromArray($route->getMiddleware());
+        
+        // Выполняем middleware stack
+        $response = $middlewareStack->execute($request);
+        
+        // Отправляем ответ
+        $response->send();
     }
 
     public function setUri(string $uri): self
