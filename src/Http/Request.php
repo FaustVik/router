@@ -35,7 +35,7 @@ final class Request
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         $query = $_GET;
-        $headers = getallheaders() ?: [];
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
         $server = $_SERVER;
 
         return new self($method, $uri, [], $query, $headers, $server);

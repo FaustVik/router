@@ -249,6 +249,31 @@ $router = new Router();
 $router->setConfig($config);
 ```
 
+## Examples
+
+Comprehensive examples demonstrating router capabilities from basic to advanced:
+
+### 🟢 Beginner Level
+- **[basic-example.php](examples/basic-example.php)** - Router introduction with controllers and URL parameters
+- **[url-parameters-example.php](examples/url-parameters-example.php)** - Advanced URL parameter handling and validation
+
+### 🟡 Intermediate Level  
+- **[response-types-example.php](examples/response-types-example.php)** - JSON, HTML, redirects, custom headers, XML, CORS
+- **[rest-api-example.php](examples/rest-api-example.php)** - Full REST API with CRUD operations and relationships
+
+### 🟠 Advanced Level
+- **[error-handling-example.php](examples/error-handling-example.php)** - Comprehensive error handling and exception management
+
+### Quick Start
+```bash
+cd examples
+php basic-example.php
+REQUEST_URI="/users/123" php basic-example.php
+REQUEST_URI="/api" php rest-api-example.php
+```
+
+See **[examples/README.md](examples/README.md)** for detailed documentation, testing commands, and learning path.
+
 ## License
 
 MIT
