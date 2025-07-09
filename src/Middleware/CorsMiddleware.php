@@ -29,6 +29,7 @@ final class CorsMiddleware implements MiddlewareInterface
         $this->allowCredentials = $allowCredentials;
         $this->maxAge = $maxAge;
     }
+
     public function handle(Request $request, callable $next): Response
     {
         $origin = $request->getHeader('Origin');
@@ -44,6 +45,7 @@ final class CorsMiddleware implements MiddlewareInterface
         // Добавляем CORS заголовки к ответу
         return $this->addCorsHeaders($response, $origin);
     }
+
     private function createPreflightResponse(?string $origin): Response
     {
         $headers = [
@@ -62,6 +64,7 @@ final class CorsMiddleware implements MiddlewareInterface
 
         return new Response('', 200, $headers);
     }
+
     private function addCorsHeaders(Response $response, ?string $origin): Response
     {
         $headers = [];
@@ -76,6 +79,7 @@ final class CorsMiddleware implements MiddlewareInterface
 
         return $response->withHeaders($headers);
     }
+
     private function isOriginAllowed(?string $origin): bool
     {
         if (in_array('*', $this->allowedOrigins, true)) {

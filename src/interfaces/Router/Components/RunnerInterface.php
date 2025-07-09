@@ -29,7 +29,11 @@ interface RunnerInterface
      *
      * @return void
      */
-    public function runAnonymousFunc(RouteAnonymousFuncInterface $route, array $params = [], ?Request $request = null): void;
+    public function runAnonymousFunc(
+        RouteAnonymousFuncInterface $route,
+        array $params = [],
+        ?Request $request = null
+    ): void;
 
     /**
      * Run only RouteClassInterface route

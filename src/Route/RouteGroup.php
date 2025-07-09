@@ -19,6 +19,7 @@ final class RouteGroup implements RouteGroupInterface
         private readonly RoutesCollection $collection
     ) {
     }
+
     public function prefix(string $prefix): self
     {
         // Если уже есть префикс, добавляем к нему
@@ -30,16 +31,19 @@ final class RouteGroup implements RouteGroupInterface
         }
         return $this;
     }
+
     public function middleware(array $middleware): self
     {
         $this->middleware = array_merge($this->middleware, $middleware);
         return $this;
     }
+
     public function validate(array $rules): self
     {
         $this->validationRules = array_merge($this->validationRules, $rules);
         return $this;
     }
+
     public function get(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -50,6 +54,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function post(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -60,6 +65,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function put(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -70,6 +76,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function delete(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -80,6 +87,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function patch(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -90,6 +98,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function any(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -100,6 +109,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function match(array $methods, string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -110,6 +120,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function getFunc(string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -120,6 +131,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function postFunc(string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -130,6 +142,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function putFunc(string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -140,6 +153,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function deleteFunc(string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -150,6 +164,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function patchFunc(string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -160,6 +175,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function anyFunc(string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -170,6 +186,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function matchFunc(array $methods, string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -180,6 +197,7 @@ final class RouteGroup implements RouteGroupInterface
         $this->routes[] = $routeObject;
         return $routeObject;
     }
+
     public function group(callable $callback): void
     {
         $nestedGroup = new self($this->collection);
@@ -195,6 +213,7 @@ final class RouteGroup implements RouteGroupInterface
             $this->routes[] = $route;
         }
     }
+
     public function getRoutes(): array
     {
         return $this->routes;

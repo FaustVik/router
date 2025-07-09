@@ -39,10 +39,12 @@ class StringValidator implements ParameterValidatorInterface
 
         return true;
     }
+
     public function getErrorMessage(): string
     {
         return $this->errorMessage;
     }
+
     public function getName(): string
     {
         return 'string';

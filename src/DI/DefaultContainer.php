@@ -22,6 +22,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         $this->container = new Container();
     }
+
     /**
      * Create container with configuration
      */
@@ -44,6 +45,7 @@ class DefaultContainer implements RouterContainerInterface
 
         return $instance;
     }
+
     /**
      * Create container with closure configuration
      */
@@ -52,16 +54,24 @@ class DefaultContainer implements RouterContainerInterface
         $instance = new self();
         $configurator($instance);
         return $instance;
-    }    public function get(string $id): mixed
+    }
+
+    public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }    public function has(string $id): bool
+    }
+
+    public function has(string $id): bool
     {
         return $this->container->has($id);
-    }    public function canResolve(string $id): bool
+    }
+
+    public function canResolve(string $id): bool
     {
         return $this->container->has($id) || class_exists($id);
-    }    public function resolve(string $class, array $parameters = []): object
+    }
+
+    public function resolve(string $class, array $parameters = []): object
     {
         try {
             if (!empty($parameters)) {
@@ -71,19 +81,26 @@ class DefaultContainer implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }    public function bind(string $abstract, mixed $concrete): void
+    }
+
+    public function bind(string $abstract, mixed $concrete): void
     {
         $this->bindings[$abstract] = $concrete;
         $this->container->set($abstract, $concrete);
-    }    public function singleton(string $abstract, mixed $concrete): void
+    }
+
+    public function singleton(string $abstract, mixed $concrete): void
     {
         $this->singletons[$abstract] = $concrete;
         // PHP-DI treats all bindings as singletons by default
         $this->container->set($abstract, $concrete);
-    }    public function bound(string $abstract): bool
+    }
+
+    public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
     }
+
     /**
      * Get all bindings
      */
@@ -91,6 +108,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         return $this->bindings;
     }
+
     /**
      * Get all singletons
      */
@@ -98,6 +116,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         return $this->singletons;
     }
+
     /**
      * Clear all bindings and singletons
      */
@@ -107,6 +126,7 @@ class DefaultContainer implements RouterContainerInterface
         $this->singletons = [];
         $this->container = new Container();
     }
+
     /**
      * Get the underlying PHP-DI container
      */
@@ -114,6 +134,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         return $this->container;
     }
+
     /**
      * Set a factory for creating instances
      */
@@ -121,6 +142,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         $this->bind($abstract, $factory);
     }
+
     /**
      * Bind an interface to implementation
      */
@@ -128,6 +150,7 @@ class DefaultContainer implements RouterContainerInterface
     {
         $this->bind($interface, $implementation);
     }
+
     /**
      * Register a singleton factory
      */

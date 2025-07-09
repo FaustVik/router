@@ -18,16 +18,27 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }    public function get(string $id): mixed
+    }
+
+    public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }    public function has(string $id): bool
+    }
+
+    public function has(string $id): bool
     {
         return $this->container->has($id);
-    }    public function canResolve(string $id): bool
+    }
+
+    public function canResolve(string $id): bool
     {
         return $this->container->has($id) || class_exists($id);
-    }    public function resolve(string $class, array $parameters = []): object
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function resolve(string $class, array $parameters = []): object
     {
         try {
             // Symfony container doesn't support parameters in get() method
@@ -45,21 +56,34 @@ class SymfonyContainerAdapter implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }    public function bind(string $abstract, mixed $concrete): void
+    }
+
+    public function bind(string $abstract, mixed $concrete): void
     {
         // Symfony container is typically configured and compiled
         // Runtime binding is not supported in most Symfony containers
-        throw new \RuntimeException("Runtime binding is not supported in Symfony container adapter. Configure services in container builder.");
-    }    public function singleton(string $abstract, mixed $concrete): void
+        throw new \RuntimeException(
+            "Runtime binding is not supported in Symfony container adapter. Configure services in container builder."
+        );
+    }
+
+    public function singleton(string $abstract, mixed $concrete): void
     {
         // Same as bind - not supported at runtime
-        throw new \RuntimeException("Runtime binding is not supported in Symfony container adapter. Configure services in container builder.");
-    }    public function bound(string $abstract): bool
+        throw new \RuntimeException(
+            "Runtime binding is not supported in Symfony container adapter. Configure services in container builder."
+        );
+    }
+
+    public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
     }
+
     /**
      * Create instance using reflection
+     *
+     * @throws \RuntimeException
      */
     private function createInstanceWithReflection(string $class, array $parameters = []): object
     {
@@ -90,8 +114,9 @@ class SymfonyContainerAdapter implements RouterContainerInterface
                 }
             } else {
                 // For built-in types, use provided parameters or default
-                $dependencies[] = $parameters[$parameter->getName()] ??
-                    ($parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null);
+                $dependencies[] = $parameters[$parameter->getName()] ?? (
+                    $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null
+                );
             }
         }
 

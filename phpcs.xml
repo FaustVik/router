@@ -38,7 +38,30 @@
     <rule ref="Squiz.ControlStructures.ControlSignature"/>
     <rule ref="Squiz.Functions.FunctionDeclarationArgumentSpacing"/>
     <rule ref="Squiz.Scope.MethodScope"/>
-    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
+    <!-- Контролируем лишние пробелы в коде -->
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+        <properties>
+            <property name="ignoreBlankLines" value="false"/>
+        </properties>
+    </rule>
+    
+    <!-- Правила для операторов присваивания -->
+    <rule ref="Squiz.WhiteSpace.OperatorSpacing"/>
+    
+    <!-- Запрещаем выравнивание присваиваний -->
+    <rule ref="Generic.Formatting.DisallowMultipleStatements"/>
+    
+    <!-- Правила для пустых строк -->
+    <rule ref="Generic.Files.EndFileNewline"/>
+    <rule ref="PSR2.Classes.ClassDeclaration"/>
+    <rule ref="PSR2.Methods.MethodDeclaration"/>
+    <rule ref="Squiz.WhiteSpace.FunctionSpacing">
+        <properties>
+            <property name="spacing" value="1"/>
+            <property name="spacingBeforeFirst" value="0"/>
+            <property name="spacingAfterLast" value="0"/>
+        </properties>
+    </rule>
     
     <!-- Важно: НЕ включаем Squiz.Commenting.* правила -->
 
@@ -105,6 +128,15 @@
         <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamType"/>
         <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamName"/>
     </rule>
+
+    <!-- Отключаем требование PHPDoc для файлов и классов PEAR -->
+    <rule ref="PEAR.Commenting.FileComment">
+        <exclude name="PEAR.Commenting.FileComment.Missing"/>
+    </rule>
+
+    <rule ref="PEAR.Commenting.ClassComment">
+        <exclude name="PEAR.Commenting.ClassComment.Missing"/>
+    </rule>
     
     <!-- Отключаем строгие требования к комментариям -->
     <rule ref="Generic.Commenting.DocComment">
@@ -139,6 +171,15 @@
     </rule>
     
     <rule ref="Squiz.Commenting.InlineComment">
+        <severity>0</severity>
+    </rule>
+    
+    <!-- Отключаем все остальные правила комментариев -->
+    <rule ref="PEAR.Commenting">
+        <severity>0</severity>
+    </rule>
+    
+    <rule ref="Generic.Commenting">
         <severity>0</severity>
     </rule>
 
@@ -179,6 +220,15 @@
 
     <!-- Не требуем комментарии в примерах -->
     <rule ref="Squiz.Commenting">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+    
+    <!-- Отключаем все правила комментариев для примеров -->
+    <rule ref="PEAR.Commenting">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+    
+    <rule ref="Generic.Commenting">
         <exclude-pattern>*/examples/*</exclude-pattern>
     </rule>
 

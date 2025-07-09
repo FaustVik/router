@@ -12,6 +12,7 @@ use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 interface AuthServiceInterface
 {
     public function authenticate(string $token): bool;
+
     public function getUser(string $token): array;
 }
 

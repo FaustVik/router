@@ -17,10 +17,12 @@ class UserController
     {
         echo "Список пользователей";
     }
+
     public function show(): void
     {
         echo "Показать пользователя";
     }
+
     public function create(): void
     {
         echo "Создать пользователя";
@@ -33,6 +35,7 @@ class AdminController
     {
         echo "Админ панель";
     }
+
     public function users(): void
     {
         echo "Управление пользователями";

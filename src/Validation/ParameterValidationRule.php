@@ -16,10 +16,12 @@ class ParameterValidationRule
     {
         $this->parameterName = $parameterName;
     }
+
     public static function for(string $parameterName): self
     {
         return new self($parameterName);
     }
+
     public function int(array $options = []): self
     {
         $this->validators[] = [
@@ -28,6 +30,7 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function string(array $options = []): self
     {
         $this->validators[] = [
@@ -36,6 +39,7 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function regex(string $pattern, string $message = null): self
     {
         $options = ['pattern' => $pattern];
@@ -49,6 +53,7 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function email(): self
     {
         $this->validators[] = [
@@ -57,6 +62,7 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function uuid(): self
     {
         $this->validators[] = [
@@ -65,6 +71,7 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function slug(array $options = []): self
     {
         $this->validators[] = [
@@ -73,6 +80,7 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function custom(ParameterValidatorInterface $validator, array $options = []): self
     {
         $this->validators[] = [
@@ -81,24 +89,29 @@ class ParameterValidationRule
         ];
         return $this;
     }
+
     public function optional(): self
     {
         $this->required = false;
         return $this;
     }
+
     public function required(): self
     {
         $this->required = true;
         return $this;
     }
+
     public function getParameterName(): string
     {
         return $this->parameterName;
     }
+
     public function getValidators(): array
     {
         return $this->validators;
     }
+
     public function isRequired(): bool
     {
         return $this->required;

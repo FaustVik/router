@@ -99,6 +99,10 @@ class UserController
 }
 
 // Функция для создания настроенного роутера
+
+/**
+ * @return Router
+ */
 function createRouter(): Router
 {
     $router = new Router();

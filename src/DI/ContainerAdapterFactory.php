@@ -17,6 +17,8 @@ class ContainerAdapterFactory
 {
     /**
      * Create adapter for given container
+     *
+     * @throws \InvalidArgumentException
      */
     public static function createFor(object $container): RouterContainerInterface
     {
@@ -50,6 +52,7 @@ class ContainerAdapterFactory
             '. Container must implement PSR-11 ContainerInterface or be a supported container type.'
         );
     }
+
     /**
      * Check if container is a Symfony container
      */
@@ -74,6 +77,7 @@ class ContainerAdapterFactory
         // Check if it's a Symfony container by namespace
         return str_contains($className, 'Symfony\\Component\\DependencyInjection\\');
     }
+
     /**
      * Check if container is a Pimple container
      */
@@ -96,8 +100,11 @@ class ContainerAdapterFactory
         // Check if it's a Pimple container by namespace
         return str_contains($className, 'Pimple\\');
     }
+
     /**
      * Create adapter by container type name
+     *
+     * @throws \InvalidArgumentException
      */
     public static function createByType(string $type, object $container): RouterContainerInterface
     {
@@ -108,6 +115,7 @@ class ContainerAdapterFactory
             default => throw new \InvalidArgumentException("Unsupported container type: {$type}")
         };
     }
+
     /**
      * Get supported container types
      */
@@ -119,6 +127,7 @@ class ContainerAdapterFactory
             'pimple' => PimpleContainerAdapter::class,
         ];
     }
+
     /**
      * Check if container type is supported
      */

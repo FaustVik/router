@@ -18,16 +18,27 @@ class PimpleContainerAdapter implements RouterContainerInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }    public function get(string $id): mixed
+    }
+
+    public function get(string $id): mixed
     {
         return $this->container->get($id);
-    }    public function has(string $id): bool
+    }
+
+    public function has(string $id): bool
     {
         return $this->container->has($id);
-    }    public function canResolve(string $id): bool
+    }
+
+    public function canResolve(string $id): bool
     {
         return $this->container->has($id) || class_exists($id);
-    }    public function resolve(string $class, array $parameters = []): object
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function resolve(string $class, array $parameters = []): object
     {
         try {
             if ($this->container->has($class)) {
@@ -43,20 +54,35 @@ class PimpleContainerAdapter implements RouterContainerInterface
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
-    }    public function bind(string $abstract, mixed $concrete): void
+    }
+
+    public function bind(string $abstract, mixed $concrete): void
     {
         // Pimple doesn't support runtime binding through PSR-11 interface
-        throw new \RuntimeException("Runtime binding is not supported in Pimple container adapter. Use Pimple native API or configure services before creating adapter.");
-    }    public function singleton(string $abstract, mixed $concrete): void
+        throw new \RuntimeException(
+            "Runtime binding is not supported in Pimple container adapter. " .
+            "Use Pimple native API or configure services before creating adapter."
+        );
+    }
+
+    public function singleton(string $abstract, mixed $concrete): void
     {
         // Same as bind - not supported at runtime
-        throw new \RuntimeException("Runtime binding is not supported in Pimple container adapter. Use Pimple native API or configure services before creating adapter.");
-    }    public function bound(string $abstract): bool
+        throw new \RuntimeException(
+            "Runtime binding is not supported in Pimple container adapter. " .
+            "Use Pimple native API or configure services before creating adapter."
+        );
+    }
+
+    public function bound(string $abstract): bool
     {
         return $this->container->has($abstract);
     }
+
     /**
      * Create instance using reflection
+     *
+     * @throws \RuntimeException
      */
     private function createInstanceWithReflection(string $class, array $parameters = []): object
     {
@@ -87,8 +113,9 @@ class PimpleContainerAdapter implements RouterContainerInterface
                 }
             } else {
                 // For built-in types, use provided parameters or default
-                $dependencies[] = $parameters[$parameter->getName()] ??
-                    ($parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null);
+                $dependencies[] = $parameters[$parameter->getName()] ?? (
+                    $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null
+                );
             }
         }
 

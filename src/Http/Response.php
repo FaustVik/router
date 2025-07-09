@@ -34,6 +34,7 @@ final class Response
         $this->statusCode = $statusCode;
         $this->headers = $headers;
     }
+
     /**
      * Создает JSON ответ
      *
@@ -47,6 +48,7 @@ final class Response
 
         return new self($content, $statusCode, $headers);
     }
+
     /**
      * Создает HTML ответ
      *
@@ -58,6 +60,7 @@ final class Response
 
         return new self($content, $statusCode, $headers);
     }
+
     /**
      * Создает редирект
      *
@@ -67,18 +70,22 @@ final class Response
     {
         return new self('', $statusCode, ['Location' => $url]);
     }
+
     public function getContent(): string
     {
         return $this->content;
     }
+
     public function getStatusCode(): int
     {
         return $this->statusCode;
     }
+
     public function getHeaders(): array
     {
         return $this->headers;
     }
+
     /**
      * Получает конкретный HTTP заголовок
      *
@@ -90,6 +97,7 @@ final class Response
     {
         return $this->headers[$key] ?? $default;
     }
+
     /**
      * Создает новый экземпляр ответа с измененным содержимым
      *
@@ -102,6 +110,7 @@ final class Response
         $clone->content = $content;
         return $clone;
     }
+
     /**
      * Создает новый экземпляр ответа с измененным статус кодом
      */
@@ -111,6 +120,7 @@ final class Response
         $clone->statusCode = $statusCode;
         return $clone;
     }
+
     /**
      * Создает новый экземпляр ответа с добавленным заголовком
      */
@@ -120,6 +130,7 @@ final class Response
         $clone->headers[$key] = $value;
         return $clone;
     }
+
     /**
      * Создает новый экземпляр ответа с добавленными заголовками
      */
@@ -129,6 +140,7 @@ final class Response
         $clone->headers = array_merge($clone->headers, $headers);
         return $clone;
     }
+
     /**
      * Отправляет ответ клиенту
      *

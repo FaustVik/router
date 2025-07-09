@@ -46,6 +46,7 @@ final class Request
         $this->headers = $headers;
         $this->server = $server;
     }
+
     /**
      * Создает запрос из глобальных переменных PHP
      *
@@ -61,18 +62,22 @@ final class Request
 
         return new self($method, $uri, [], $query, $headers, $server);
     }
+
     public function getMethod(): string
     {
         return $this->method;
     }
+
     public function getUri(): string
     {
         return $this->uri;
     }
+
     public function getParams(): array
     {
         return $this->params;
     }
+
     /**
      * Получает конкретный параметр маршрута
      *
@@ -84,10 +89,12 @@ final class Request
     {
         return $this->params[$key] ?? $default;
     }
+
     public function getQuery(): array
     {
         return $this->query;
     }
+
     /**
      * Получает конкретный query параметр
      *
@@ -99,10 +106,12 @@ final class Request
     {
         return $this->query[$key] ?? $default;
     }
+
     public function getHeaders(): array
     {
         return $this->headers;
     }
+
     /**
      * Получает конкретный HTTP заголовок
      *
@@ -114,10 +123,12 @@ final class Request
     {
         return $this->headers[$key] ?? $default;
     }
+
     public function getServer(): array
     {
         return $this->server;
     }
+
     /**
      * Получает конкретную серверную переменную
      *
@@ -129,6 +140,7 @@ final class Request
     {
         return $this->server[$key] ?? $default;
     }
+
     /**
      * Получает атрибут запроса
      *
@@ -143,6 +155,7 @@ final class Request
     {
         return $this->attributes[$key] ?? $default;
     }
+
     /**
      * Создает новый экземпляр запроса с добавленным атрибутом
      *
@@ -155,6 +168,7 @@ final class Request
         $clone->attributes[$key] = $value;
         return $clone;
     }
+
     /**
      * Создает новый экземпляр запроса с измененными параметрами
      */
@@ -164,6 +178,7 @@ final class Request
         $clone->params = $params;
         return $clone;
     }
+
     /**
      * Создает новый экземпляр запроса с измененным URI
      */

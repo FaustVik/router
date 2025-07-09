@@ -209,9 +209,7 @@ foreach ($routes->get() as $index => $route) {
         $index + 1,
         implode('|', $route->getMethods()),
         $route->getRoute(),
-        $route instanceof \FaustVik\Router\Route\Route
-            ? $route->getClass() . '@' . $route->getAction()
-            : 'Anonymous Function'
+        $route instanceof \FaustVik\Router\Route\Route ? $route->getClass() . '@' . $route->getAction() : 'Anonymous Function'
     );
 }
 

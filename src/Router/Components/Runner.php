@@ -26,18 +26,18 @@ final class Runner implements RunnerInterface
     {
         $this->container = $container;
     }
+
     public function setContainer(?RouterContainerInterface $container): void
     {
         $this->container = $container;
     }
+
     public function getContainer(): ?RouterContainerInterface
     {
         return $this->container;
     }
+
     /**
-     * @throws NotFoundMethod
-     * @throws ReflectionException
-     * @throws NotFoundClass
      * @throws InvalidTypeRoute
      */
     public function run(RouteInterface $route, array $params = [], ?Request $request = null): void
@@ -54,11 +54,15 @@ final class Runner implements RunnerInterface
 
         throw new InvalidTypeRoute();
     }
+
     /**
      * @throws ReflectionException
      */
-    public function runAnonymousFunc(RouteAnonymousFuncInterface $route, array $params = [], ?Request $request = null): void
-    {
+    public function runAnonymousFunc(
+        RouteAnonymousFuncInterface $route,
+        array $params = [],
+        ?Request $request = null
+    ): void {
         $reflection = new ReflectionFunction($route->getFunc());
 
         $args = [];
@@ -68,7 +72,10 @@ final class Runner implements RunnerInterface
                 $paramType = $reflection_parameter->getType();
 
                 // Если параметр типа Request, используем переданный Request или создаем новый
-                if ($paramType && $paramType instanceof ReflectionNamedType && $paramType->getName() === 'FaustVik\Router\Http\Request') {
+                if (
+                    $paramType && $paramType instanceof ReflectionNamedType &&
+                    $paramType->getName() === 'FaustVik\Router\Http\Request'
+                ) {
                     if ($request) {
                         $args[] = $request;
                     } else {
@@ -87,10 +94,10 @@ final class Runner implements RunnerInterface
 
         call_user_func_array($route->getFunc(), $args);
     }
+
     /**
      * @throws NotFoundClass
      * @throws NotFoundMethod
-     * @throws ReflectionException
      */
     public function runClass(RouteClassInterface $route, array $params = [], ?Request $request = null): void
     {
@@ -116,7 +123,10 @@ final class Runner implements RunnerInterface
                 $paramType = $reflection_parameter->getType();
 
                 // Если параметр типа Request, используем переданный Request или создаем новый
-                if ($paramType && $paramType instanceof ReflectionNamedType && $paramType->getName() === 'FaustVik\Router\Http\Request') {
+                if (
+                    $paramType && $paramType instanceof ReflectionNamedType &&
+                    $paramType->getName() === 'FaustVik\Router\Http\Request'
+                ) {
                     if ($request) {
                         $atr[] = $request;
                     } else {

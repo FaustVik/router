@@ -56,6 +56,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $this->config = new Config();
         $this->parameterValidator = new ParameterValidator();
     }
+
     /**
      * Устанавливает конфигурацию роутера
      */
@@ -63,6 +64,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->config = $config;
     }
+
     /**
      * Получает текущую конфигурацию роутера
      */
@@ -70,6 +72,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->config;
     }
+
     /**
      * Устанавливает коллекцию маршрутов
      */
@@ -78,6 +81,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $this->collections = $collections;
         return $this;
     }
+
     /**
      * Основной метод запуска роутера
      *
@@ -140,6 +144,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Отправляем ответ клиенту
         $response->send();
     }
+
     /**
      * Валидирует параметры маршрута
      *
@@ -165,6 +170,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             exit;
         }
     }
+
     /**
      * Устанавливает URI для обработки
      *
@@ -176,6 +182,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $this->uriRaw = $uri;
         return $this;
     }
+
     /**
      * Получает URI для обработки
      *
@@ -189,6 +196,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         return $this->uriRaw;
     }
+
     /**
      * Парсит URI запроса
      *
@@ -226,6 +234,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             $this->params = $arr;
         }
     }
+
     /**
      * Находит подходящий маршрут для URI
      *
@@ -238,6 +247,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
     }
+
     /**
      * Проверяет разрешенные HTTP методы для маршрута
      *
@@ -250,6 +260,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->getConfig()->getCheckerHttpMethod()::isAllow($route->getMethods());
     }
+
     /**
      * Включает кеширование маршрутов
      *
@@ -260,6 +271,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->config->enableCache();
     }
+
     /**
      * Отключает кеширование маршрутов
      *
@@ -270,6 +282,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->config->disableCache();
     }
+
     /**
      * Проверяет, включено ли кеширование
      */
@@ -277,6 +290,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->config->isCacheEnabled();
     }
+
     /**
      * Устанавливает кеш-драйвер
      */
@@ -284,6 +298,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->config->setCache($cache);
     }
+
     /**
      * Получает текущий кеш-драйвер
      */
@@ -291,6 +306,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->config->getCache();
     }
+
     /**
      * Очищает кеш маршрутов
      *
@@ -300,6 +316,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->config->clearCache();
     }
+
     /**
      * Генерирует ключ кеша для текущего URI
      */
@@ -307,6 +324,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return 'router_cache_' . md5($this->getUri());
     }
+
     // ============================================================================
     // DI Container methods - Методы для работы с Dependency Injection контейнером
     // ============================================================================
@@ -339,6 +357,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         return $this;
     }
+
     /**
      * Устанавливает кастомный контейнер
      *
@@ -361,6 +380,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         return $this;
     }
+
     /**
      * Получает текущий DI контейнер
      */
@@ -368,6 +388,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->container;
     }
+
     /**
      * Проверяет, включен ли DI
      */
@@ -375,6 +396,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         return $this->container !== null;
     }
+
     /**
      * Настраивает контейнер с помощью массива конфигурации
      *
@@ -418,6 +440,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         return $this;
     }
+
     /**
      * Привязывает сервис к контейнеру
      *
@@ -442,6 +465,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $this->container->bind($abstract, $concrete);
         return $this;
     }
+
     /**
      * Привязывает singleton к контейнеру
      *

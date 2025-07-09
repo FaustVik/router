@@ -20,11 +20,13 @@ final class MiddlewareStack
     {
         $this->finalHandler = $finalHandler;
     }
+
     public function add(MiddlewareInterface $middleware): self
     {
         $this->middleware[] = $middleware;
         return $this;
     }
+
     public function addFromArray(array $middleware): self
     {
         foreach ($middleware as $item) {
@@ -39,6 +41,7 @@ final class MiddlewareStack
         }
         return $this;
     }
+
     public function execute(Request $request): Response
     {
         $index = 0;
@@ -55,14 +58,17 @@ final class MiddlewareStack
 
         return $next($request);
     }
+
     public function count(): int
     {
         return count($this->middleware);
     }
+
     public function isEmpty(): bool
     {
         return empty($this->middleware);
     }
+
     public function clear(): self
     {
         $this->middleware = [];

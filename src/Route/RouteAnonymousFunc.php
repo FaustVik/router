@@ -23,8 +23,13 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         $this->func = static function () {
         };
     }
-    public static function create(string $route, callable $func, array $methods = [], ?string $alias = null): RouteInterface
-    {
+
+    public static function create(
+        string $route,
+        callable $func,
+        array $methods = [],
+        ?string $alias = null
+    ): RouteInterface {
         $self          = new self();
         $self->route   = $route;
         $self->func    = $func(...);
@@ -33,35 +38,43 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 
         return $self;
     }
+
     public function getRoute(): string
     {
         return $this->route;
     }
+
     public function getFunc(): Closure
     {
         return $this->func;
     }
+
     public function getMethods(): array
     {
         return $this->methods;
     }
+
     public function alias(): ?string
     {
         return $this->alias;
     }
+
     public function getMiddleware(): array
     {
         return $this->middleware;
     }
+
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
         return $this;
     }
+
     public function getValidationRules(): array
     {
         return $this->validationRules;
     }
+
     public function validate(array $rules): self
     {
         $this->validationRules = $rules;

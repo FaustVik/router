@@ -26,9 +26,15 @@ interface RouteGroupInterface
 
     public function any(string $route, string $class, string $action, array $arg = []): RouteInterface;
 
-    public function match(array $methods, string $route, string $class, string $action, array $arg = []): RouteInterface;
+    public function match(
+        array $methods,
+        string $route,
+        string $class,
+        string $action,
+        array $arg = []
+    ): RouteInterface;
 
-    // Методы для анонимных функций
+    /** Методы для анонимных функций */
     public function getFunc(string $route, callable $func): RouteInterface;
 
     public function postFunc(string $route, callable $func): RouteInterface;
@@ -43,7 +49,7 @@ interface RouteGroupInterface
 
     public function matchFunc(array $methods, string $route, callable $func): RouteInterface;
 
-    // Группировка
+    /** Группировка */
     public function group(callable $callback): void;
 
     /**

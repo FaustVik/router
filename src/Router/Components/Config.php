@@ -29,30 +29,37 @@ final class Config implements ConfigInterface
         $this->checker = new CheckerHttpMethod();
         $this->match   = new CachedMatching(new Matching(), new FileCache());
     }
+
     public function setRunner(RunnerInterface $runner): void
     {
         $this->runner = $runner;
     }
+
     public function getRunner(): RunnerInterface
     {
         return $this->runner;
     }
+
     public function setCheckerHttpMethod(CheckHttpMethodInterface $checker): void
     {
         $this->checker = $checker;
     }
+
     public function getCheckerHttpMethod(): CheckHttpMethodInterface
     {
         return $this->checker;
     }
+
     public function getMatch(): MatchingRouteInterface
     {
         return $this->match;
     }
+
     public function setMatcher(MatchingRouteInterface $matcher): void
     {
         $this->match = $matcher;
     }
+
     public function enableCache(): void
     {
         $this->cacheEnabled = true;
@@ -60,6 +67,7 @@ final class Config implements ConfigInterface
             $this->match->enableCache();
         }
     }
+
     public function disableCache(): void
     {
         $this->cacheEnabled = false;
@@ -67,10 +75,12 @@ final class Config implements ConfigInterface
             $this->match->disableCache();
         }
     }
+
     public function isCacheEnabled(): bool
     {
         return $this->cacheEnabled;
     }
+
     public function setCache(CacheInterface $cache): void
     {
         $this->cache = $cache;
@@ -78,10 +88,12 @@ final class Config implements ConfigInterface
             $this->match->setCache($cache);
         }
     }
+
     public function getCache(): ?CacheInterface
     {
         return $this->cache;
     }
+
     public function setCacheTtl(int $ttl): void
     {
         $this->cacheTtl = $ttl;
@@ -89,10 +101,12 @@ final class Config implements ConfigInterface
             $this->match->setCacheTtl($ttl);
         }
     }
+
     public function getCacheTtl(): int
     {
         return $this->cacheTtl;
     }
+
     public function clearCache(): bool
     {
         if ($this->match instanceof CachedMatching) {
@@ -100,6 +114,7 @@ final class Config implements ConfigInterface
         }
         return false;
     }
+
     public function setContainer(?RouterContainerInterface $container): void
     {
         $this->container = $container;
@@ -109,6 +124,7 @@ final class Config implements ConfigInterface
             $this->runner->setContainer($container);
         }
     }
+
     public function getContainer(): ?RouterContainerInterface
     {
         return $this->container;

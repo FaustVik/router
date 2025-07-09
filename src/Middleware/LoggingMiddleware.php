@@ -16,6 +16,7 @@ final class LoggingMiddleware implements MiddlewareInterface
     {
         $this->logFile = $logFile;
     }
+
     public function handle(Request $request, callable $next): Response
     {
         $startTime = microtime(true);
@@ -50,12 +51,14 @@ final class LoggingMiddleware implements MiddlewareInterface
 
         return $response;
     }
+
     private function writeToLog(string $message): void
     {
         // Простая запись в файл
         // В реальном приложении лучше использовать PSR-3 логгер
         file_put_contents($this->logFile, $message, FILE_APPEND | LOCK_EX);
     }
+
     private function getStatusText(int $statusCode): string
     {
         return match ($statusCode) {

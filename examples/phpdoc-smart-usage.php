@@ -34,12 +34,20 @@ class SmartPhpDocExample
     private array $config = [];
 
     // ❌ НЕ НУЖЕН PHPDoc для простого конструктора
+
+    /**
+     * @param string $name
+     */
     public function __construct(string $name)
     {
         $this->name = $name;
     }
 
     // ❌ НЕ НУЖЕН PHPDoc для простых геттеров/сеттеров
+
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
@@ -56,6 +64,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для массивов с типизированными элементами
+
     /**
      * @return RouteInterface[]
      */
@@ -73,6 +82,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для методов с исключениями
+
     /**
      * @throws \InvalidArgumentException Если маршрут невалидный
      * @throws \RuntimeException Если маршрут уже существует
@@ -91,6 +101,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для сложного поведения
+
     /**
      * Находит маршрут по паттерну
      *
@@ -117,6 +128,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для mixed типов
+
     /**
      * @param mixed $value
      * @return mixed
@@ -135,6 +147,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для callable типов
+
     /**
      * @param callable $callback
      * @param array<string, mixed> $parameters
@@ -163,6 +176,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для методов с комплексными возвращаемыми типами
+
     /**
      * @return array{routes: RouteInterface[], middleware: MiddlewareInterface[], config: array<string, mixed>}
      */
@@ -176,6 +190,7 @@ class SmartPhpDocExample
     }
 
     // ✅ ПОЛЕЗЕН PHPDoc для дженерик-подобных методов
+
     /**
      * @template T
      * @param class-string<T> $className
