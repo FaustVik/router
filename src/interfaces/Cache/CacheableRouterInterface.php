@@ -40,4 +40,4 @@ interface CacheableRouterInterface
      * Получить ключ кеша для роутов
      */
     public function getCacheKey(): string;
-} 
+}

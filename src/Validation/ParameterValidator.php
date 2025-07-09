@@ -43,6 +43,6 @@ class ParameterValidator
             if (!empty($errors)) {
                 throw new ValidationException($parameterName, $parameterValue, $errors);
             }
-        }//end foreach
-    }//end validate()
-}//end class
+        }
+    }
+}

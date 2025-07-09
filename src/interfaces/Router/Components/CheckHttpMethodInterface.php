@@ -23,4 +23,4 @@ interface CheckHttpMethodInterface
      * @return string
      */
     public static function getRequestMethod(): string;
-}//end interface
+}

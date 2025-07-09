@@ -45,4 +45,4 @@ interface CacheInterface
      * Удалить множественные значения
      */
     public function deleteMultiple(array $keys): bool;
-} 
+}

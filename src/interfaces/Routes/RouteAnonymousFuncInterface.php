@@ -25,4 +25,4 @@ interface RouteAnonymousFuncInterface extends RouteInterface
      * @return Closure
      */
     public function getFunc(): Closure;
-}//end interface
+}

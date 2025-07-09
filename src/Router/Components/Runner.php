@@ -25,18 +25,15 @@ final class Runner implements RunnerInterface
     public function __construct(?RouterContainerInterface $container = null)
     {
         $this->container = $container;
-    }//end __construct()
-
+    }
     public function setContainer(?RouterContainerInterface $container): void
     {
         $this->container = $container;
-    }//end setContainer()
-
+    }
     public function getContainer(): ?RouterContainerInterface
     {
         return $this->container;
-    }//end getContainer()
-
+    }
     /**
      * @throws NotFoundMethod
      * @throws ReflectionException
@@ -56,8 +53,7 @@ final class Runner implements RunnerInterface
         }
 
         throw new InvalidTypeRoute();
-    }//end run()
-
+    }
     /**
      * @throws ReflectionException
      */
@@ -87,11 +83,10 @@ final class Runner implements RunnerInterface
                     $args[] = null;
                 }
             }
-        }//end if
+        }
 
         call_user_func_array($route->getFunc(), $args);
-    }//end runAnonymousFunc()
-
+    }
     /**
      * @throws NotFoundClass
      * @throws NotFoundMethod
@@ -136,12 +131,12 @@ final class Runner implements RunnerInterface
                     $atr[] = null;
                 }
             }
-        }//end if
+        }
 
         if (!method_exists($controller, $route->getAction())) {
             throw new NotFoundMethod($route->getAction(), $route->getClass());
         }
 
         call_user_func_array([$controller, $route->getAction()], $atr);
-    }//end runClass()
-}//end class
+    }
+}

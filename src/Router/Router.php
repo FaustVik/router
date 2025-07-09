@@ -55,24 +55,21 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->config = new Config();
         $this->parameterValidator = new ParameterValidator();
-    }//end __construct()
-
+    }
     /**
      * Устанавливает конфигурацию роутера
      */
     public function setConfig(ConfigInterface $config): void
     {
         $this->config = $config;
-    }//end setConfig()
-
+    }
     /**
      * Получает текущую конфигурацию роутера
      */
     public function getConfig(): ConfigInterface
     {
         return $this->config;
-    }//end getConfig()
-
+    }
     /**
      * Устанавливает коллекцию маршрутов
      */
@@ -80,8 +77,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->collections = $collections;
         return $this;
-    }//end setCollection()
-
+    }
     /**
      * Основной метод запуска роутера
      *
@@ -143,8 +139,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         // Отправляем ответ клиенту
         $response->send();
-    }//end run()
-
+    }
     /**
      * Валидирует параметры маршрута
      *
@@ -169,8 +164,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             echo "Validation Error: " . $e->getMessage();
             exit;
         }
-    }//end validateParameters()
-
+    }
     /**
      * Устанавливает URI для обработки
      *
@@ -181,8 +175,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->uriRaw = $uri;
         return $this;
-    }//end setUri()
-
+    }
     /**
      * Получает URI для обработки
      *
@@ -195,8 +188,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         }
 
         return $this->uriRaw;
-    }//end getUri()
-
+    }
     /**
      * Парсит URI запроса
      *
@@ -233,8 +225,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
             $this->params = $arr;
         }
-    }//end parse()
-
+    }
     /**
      * Находит подходящий маршрут для URI
      *
@@ -246,8 +237,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     protected function match(): MatchResult
     {
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
-    }//end match()
-
+    }
     /**
      * Проверяет разрешенные HTTP методы для маршрута
      *
@@ -259,8 +249,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     protected function check(RouteInterface $route): void
     {
         $this->getConfig()->getCheckerHttpMethod()::isAllow($route->getMethods());
-    }//end check()
-
+    }
     /**
      * Включает кеширование маршрутов
      *
@@ -270,8 +259,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function enableCache(): void
     {
         $this->config->enableCache();
-    }//end enableCache()
-
+    }
     /**
      * Отключает кеширование маршрутов
      *
@@ -281,32 +269,28 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function disableCache(): void
     {
         $this->config->disableCache();
-    }//end disableCache()
-
+    }
     /**
      * Проверяет, включено ли кеширование
      */
     public function isCacheEnabled(): bool
     {
         return $this->config->isCacheEnabled();
-    }//end isCacheEnabled()
-
+    }
     /**
      * Устанавливает кеш-драйвер
      */
     public function setCache(CacheInterface $cache): void
     {
         $this->config->setCache($cache);
-    }//end setCache()
-
+    }
     /**
      * Получает текущий кеш-драйвер
      */
     public function getCache(): ?CacheInterface
     {
         return $this->config->getCache();
-    }//end getCache()
-
+    }
     /**
      * Очищает кеш маршрутов
      *
@@ -315,16 +299,14 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function clearRouteCache(): bool
     {
         return $this->config->clearCache();
-    }//end clearRouteCache()
-
+    }
     /**
      * Генерирует ключ кеша для текущего URI
      */
     public function getCacheKey(): string
     {
         return 'router_cache_' . md5($this->getUri());
-    }//end getCacheKey()
-
+    }
     // ============================================================================
     // DI Container methods - Методы для работы с Dependency Injection контейнером
     // ============================================================================
@@ -356,8 +338,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $this->config->setContainer($this->container);
 
         return $this;
-    }//end enableDI()
-
+    }
     /**
      * Устанавливает кастомный контейнер
      *
@@ -379,24 +360,21 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $this->config->setContainer($this->container);
 
         return $this;
-    }//end setContainer()
-
+    }
     /**
      * Получает текущий DI контейнер
      */
     public function getContainer(): ?RouterContainerInterface
     {
         return $this->container;
-    }//end getContainer()
-
+    }
     /**
      * Проверяет, включен ли DI
      */
     public function isDIEnabled(): bool
     {
         return $this->container !== null;
-    }//end isDIEnabled()
-
+    }
     /**
      * Настраивает контейнер с помощью массива конфигурации
      *
@@ -439,8 +417,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         }
 
         return $this;
-    }//end configureContainer()
-
+    }
     /**
      * Привязывает сервис к контейнеру
      *
@@ -464,8 +441,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         $this->container->bind($abstract, $concrete);
         return $this;
-    }//end bind()
-
+    }
     /**
      * Привязывает singleton к контейнеру
      *
@@ -489,5 +465,5 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         $this->container->singleton($abstract, $concrete);
         return $this;
-    }//end singleton()
-}//end class
+    }
+}

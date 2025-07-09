@@ -33,8 +33,7 @@ final class Response
         $this->content = $content;
         $this->statusCode = $statusCode;
         $this->headers = $headers;
-    }//end __construct()
-
+    }
     /**
      * Создает JSON ответ
      *
@@ -47,8 +46,7 @@ final class Response
         $headers = array_merge(['Content-Type' => 'application/json'], $headers);
 
         return new self($content, $statusCode, $headers);
-    }//end json()
-
+    }
     /**
      * Создает HTML ответ
      *
@@ -59,8 +57,7 @@ final class Response
         $headers = array_merge(['Content-Type' => 'text/html'], $headers);
 
         return new self($content, $statusCode, $headers);
-    }//end html()
-
+    }
     /**
      * Создает редирект
      *
@@ -69,23 +66,19 @@ final class Response
     public static function redirect(string $url, int $statusCode = 302): self
     {
         return new self('', $statusCode, ['Location' => $url]);
-    }//end redirect()
-
+    }
     public function getContent(): string
     {
         return $this->content;
-    }//end getContent()
-
+    }
     public function getStatusCode(): int
     {
         return $this->statusCode;
-    }//end getStatusCode()
-
+    }
     public function getHeaders(): array
     {
         return $this->headers;
-    }//end getHeaders()
-
+    }
     /**
      * Получает конкретный HTTP заголовок
      *
@@ -96,8 +89,7 @@ final class Response
     public function getHeader(string $key, mixed $default = null): mixed
     {
         return $this->headers[$key] ?? $default;
-    }//end getHeader()
-
+    }
     /**
      * Создает новый экземпляр ответа с измененным содержимым
      *
@@ -109,8 +101,7 @@ final class Response
         $clone = clone $this;
         $clone->content = $content;
         return $clone;
-    }//end withContent()
-
+    }
     /**
      * Создает новый экземпляр ответа с измененным статус кодом
      */
@@ -119,8 +110,7 @@ final class Response
         $clone = clone $this;
         $clone->statusCode = $statusCode;
         return $clone;
-    }//end withStatusCode()
-
+    }
     /**
      * Создает новый экземпляр ответа с добавленным заголовком
      */
@@ -129,8 +119,7 @@ final class Response
         $clone = clone $this;
         $clone->headers[$key] = $value;
         return $clone;
-    }//end withHeader()
-
+    }
     /**
      * Создает новый экземпляр ответа с добавленными заголовками
      */
@@ -139,8 +128,7 @@ final class Response
         $clone = clone $this;
         $clone->headers = array_merge($clone->headers, $headers);
         return $clone;
-    }//end withHeaders()
-
+    }
     /**
      * Отправляет ответ клиенту
      *
@@ -161,5 +149,5 @@ final class Response
 
         // Вывод содержимого
         echo $this->content;
-    }//end send()
-}//end class
+    }
+}

@@ -29,6 +29,8 @@
     <rule ref="Squiz.Functions.FunctionDeclarationArgumentSpacing"/>
     <rule ref="Squiz.Scope.MethodScope"/>
     <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
+    
+    <!-- Важно: НЕ включаем Squiz.Commenting.* правила -->
 
     <!-- Максимальная длина строки -->
     <rule ref="Generic.Files.LineLength">
@@ -110,6 +112,27 @@
     <rule ref="Generic.Commenting">
         <exclude name="Generic.Commenting.Todo"/>
         <exclude name="Generic.Commenting.Fixme"/>
+    </rule>
+    
+    <!-- Полностью отключаем правила для избыточных комментариев -->
+    <rule ref="Squiz.Commenting.ClosingDeclarationComment">
+        <severity>0</severity>
+    </rule>
+    
+    <rule ref="Squiz.Commenting.FunctionComment">
+        <severity>0</severity>
+    </rule>
+    
+    <rule ref="Squiz.Commenting.ClassComment">
+        <severity>0</severity>
+    </rule>
+    
+    <rule ref="Squiz.Commenting.VariableComment">
+        <severity>0</severity>
+    </rule>
+    
+    <rule ref="Squiz.Commenting.InlineComment">
+        <severity>0</severity>
     </rule>
 
     <!-- Настройки для примеров (отключаем большинство правил) -->

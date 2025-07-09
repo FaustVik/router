@@ -46,8 +46,7 @@ final class AuthMiddleware implements MiddlewareInterface
 
         // Передаем управление следующему middleware
         return $next($request);
-    }//end handle()
-
+    }
     private function getUserIdFromToken(string $token): int
     {
         // Простая заглушка для демонстрации
@@ -57,5 +56,5 @@ final class AuthMiddleware implements MiddlewareInterface
             'user-token' => 2,
             default => 0
         };
-    }//end getUserIdFromToken()
-}//end class
+    }
+}

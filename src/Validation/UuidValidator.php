@@ -21,15 +21,13 @@ class UuidValidator implements ParameterValidatorInterface
         }
 
         return true;
-    }//end validate()
-
+    }
     public function getErrorMessage(): string
     {
         return $this->errorMessage;
-    }//end getErrorMessage()
-
+    }
     public function getName(): string
     {
         return 'uuid';
-    }//end getName()
-}//end class
+    }
+}

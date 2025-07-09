@@ -43,4 +43,4 @@ interface RouteClassInterface extends RouteInterface
      * @return array
      */
     public function getArg(): array;
-}//end interface
+}

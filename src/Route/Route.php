@@ -30,57 +30,47 @@ final class Route implements RouteClassInterface
         $self->arg     = $arg;
 
         return $self;
-    }//end create()
-
+    }
     public function getClass(): string
     {
         return $this->class;
-    }//end getClass()
-
+    }
     public function getRoute(): string
     {
         return $this->route;
-    }//end getRoute()
-
+    }
     public function getAction(): string
     {
         return $this->action;
-    }//end getAction()
-
+    }
     public function getMethods(): array
     {
         return $this->methods;
-    }//end getMethods()
-
+    }
     public function alias(): ?string
     {
         return $this->alias;
-    }//end alias()
-
+    }
     public function getArg(): array
     {
         return $this->arg;
-    }//end getArg()
-
+    }
     public function getMiddleware(): array
     {
         return $this->middleware;
-    }//end getMiddleware()
-
+    }
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
         return $this;
-    }//end middleware()
-
+    }
     public function getValidationRules(): array
     {
         return $this->validationRules;
-    }//end getValidationRules()
-
+    }
     public function validate(array $rules): self
     {
         $this->validationRules = $rules;
         return $this;
-    }//end validate()
-}//end class
+    }
+}

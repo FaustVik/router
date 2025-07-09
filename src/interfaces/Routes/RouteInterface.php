@@ -56,4 +56,4 @@ interface RouteInterface
      * @return self
      */
     public function validate(array $rules): self;
-}//end interface
+}

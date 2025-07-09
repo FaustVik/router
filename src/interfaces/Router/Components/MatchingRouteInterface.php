@@ -16,4 +16,4 @@ interface MatchingRouteInterface
      * @throws NoMatch
      */
     public function match(string $uri, RoutesCollectionInterface $collections): MatchResult;
-}//end interface
+}

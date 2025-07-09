@@ -30,8 +30,7 @@ final class Matching implements MatchingRouteInterface
         }
 
         throw new NoMatch($uri);
-    }//end match()
-
+    }
     private function matchWithParameters(string $uri, RouteInterface $route): ?MatchResult
     {
         // Проверяем основной маршрут
@@ -49,8 +48,7 @@ final class Matching implements MatchingRouteInterface
         }
 
         return null;
-    }//end matchWithParameters()
-
+    }
     private function matchPattern(string $uri, string $pattern): ?array
     {
         // Разбиваем URI и паттерн на сегменты
@@ -82,21 +80,18 @@ final class Matching implements MatchingRouteInterface
         }
 
         return $parameters;
-    }//end matchPattern()
-
+    }
     private function getSegments(string $path): array
     {
         // Используем array_values для пересоздания индексов
         return array_values(array_filter(explode('/', $path), fn($segment) => $segment !== ''));
-    }//end getSegments()
-
+    }
     private function isParameter(string $segment): bool
     {
         return str_starts_with($segment, '{') && str_ends_with($segment, '}');
-    }//end isParameter()
-
+    }
     private function getParameterName(string $segment): string
     {
         return substr($segment, 1, -1);
-    }//end getParameterName()
-}//end class
+    }
+}

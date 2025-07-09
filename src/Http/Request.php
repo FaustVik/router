@@ -45,8 +45,7 @@ final class Request
         $this->query = $query;
         $this->headers = $headers;
         $this->server = $server;
-    }//end __construct()
-
+    }
     /**
      * Создает запрос из глобальных переменных PHP
      *
@@ -61,23 +60,19 @@ final class Request
         $server = $_SERVER;
 
         return new self($method, $uri, [], $query, $headers, $server);
-    }//end createFromGlobals()
-
+    }
     public function getMethod(): string
     {
         return $this->method;
-    }//end getMethod()
-
+    }
     public function getUri(): string
     {
         return $this->uri;
-    }//end getUri()
-
+    }
     public function getParams(): array
     {
         return $this->params;
-    }//end getParams()
-
+    }
     /**
      * Получает конкретный параметр маршрута
      *
@@ -88,13 +83,11 @@ final class Request
     public function getParam(string $key, mixed $default = null): mixed
     {
         return $this->params[$key] ?? $default;
-    }//end getParam()
-
+    }
     public function getQuery(): array
     {
         return $this->query;
-    }//end getQuery()
-
+    }
     /**
      * Получает конкретный query параметр
      *
@@ -105,13 +98,11 @@ final class Request
     public function getQueryParam(string $key, mixed $default = null): mixed
     {
         return $this->query[$key] ?? $default;
-    }//end getQueryParam()
-
+    }
     public function getHeaders(): array
     {
         return $this->headers;
-    }//end getHeaders()
-
+    }
     /**
      * Получает конкретный HTTP заголовок
      *
@@ -122,13 +113,11 @@ final class Request
     public function getHeader(string $key, mixed $default = null): mixed
     {
         return $this->headers[$key] ?? $default;
-    }//end getHeader()
-
+    }
     public function getServer(): array
     {
         return $this->server;
-    }//end getServer()
-
+    }
     /**
      * Получает конкретную серверную переменную
      *
@@ -139,8 +128,7 @@ final class Request
     public function getServerParam(string $key, mixed $default = null): mixed
     {
         return $this->server[$key] ?? $default;
-    }//end getServerParam()
-
+    }
     /**
      * Получает атрибут запроса
      *
@@ -154,8 +142,7 @@ final class Request
     public function getAttribute(string $key, mixed $default = null): mixed
     {
         return $this->attributes[$key] ?? $default;
-    }//end getAttribute()
-
+    }
     /**
      * Создает новый экземпляр запроса с добавленным атрибутом
      *
@@ -167,8 +154,7 @@ final class Request
         $clone = clone $this;
         $clone->attributes[$key] = $value;
         return $clone;
-    }//end withAttribute()
-
+    }
     /**
      * Создает новый экземпляр запроса с измененными параметрами
      */
@@ -177,8 +163,7 @@ final class Request
         $clone = clone $this;
         $clone->params = $params;
         return $clone;
-    }//end withParams()
-
+    }
     /**
      * Создает новый экземпляр запроса с измененным URI
      */
@@ -187,5 +172,5 @@ final class Request
         $clone = clone $this;
         $clone->uri = $uri;
         return $clone;
-    }//end withUri()
-}//end class
+    }
+}

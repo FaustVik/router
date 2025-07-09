@@ -7,5 +7,5 @@ class NotFoundClass extends Exception
     public function __construct(string $class)
     {
         parent::__construct(sprintf("Not found class: %s", $class));
-    }//end __construct()
-}//end class
+    }
+}

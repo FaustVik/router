@@ -22,8 +22,7 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     {
         $this->func = static function () {
         };
-    }//end __construct()
-
+    }
     public static function create(string $route, callable $func, array $methods = [], ?string $alias = null): RouteInterface
     {
         $self          = new self();
@@ -33,47 +32,39 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         $self->alias   = $alias;
 
         return $self;
-    }//end create()
-
+    }
     public function getRoute(): string
     {
         return $this->route;
-    }//end getRoute()
-
+    }
     public function getFunc(): Closure
     {
         return $this->func;
-    }//end getFunc()
-
+    }
     public function getMethods(): array
     {
         return $this->methods;
-    }//end getMethods()
-
+    }
     public function alias(): ?string
     {
         return $this->alias;
-    }//end alias()
-
+    }
     public function getMiddleware(): array
     {
         return $this->middleware;
-    }//end getMiddleware()
-
+    }
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
         return $this;
-    }//end middleware()
-
+    }
     public function getValidationRules(): array
     {
         return $this->validationRules;
-    }//end getValidationRules()
-
+    }
     public function validate(array $rules): self
     {
         $this->validationRules = $rules;
         return $this;
-    }//end validate()
-}//end class
+    }
+}

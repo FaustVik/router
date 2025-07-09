@@ -23,10 +23,9 @@ final class CheckerHttpMethod implements CheckHttpMethodInterface
         }
 
         return true;
-    }//end isAllow()
-
+    }
     public static function getRequestMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    }//end getRequestMethod()
-}//end class
+    }
+}

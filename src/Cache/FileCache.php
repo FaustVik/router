@@ -146,4 +146,4 @@ final class FileCache implements CacheInterface
     {
         return $this->cacheDir . '/' . $this->prefix . md5($key) . '.cache';
     }
-} 
+}

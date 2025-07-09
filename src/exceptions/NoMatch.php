@@ -7,5 +7,5 @@ class NoMatch extends Exception
     public function __construct(string $uri)
     {
         parent::__construct(sprintf("Not found route for uri: %s", $uri));
-    }//end __construct()
-}//end class
+    }
+}
