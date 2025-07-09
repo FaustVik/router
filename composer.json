@@ -16,7 +16,9 @@
   ],
   "minimum-stability": "stable",
   "require": {
-    "php": ">=8.1"
+    "php": ">=8.1",
+    "php-di/php-di": "^7.0",
+    "psr/container": "^2.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^1.10"

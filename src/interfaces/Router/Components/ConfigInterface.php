@@ -3,112 +3,157 @@
 namespace FaustVik\Router\interfaces\Router\Components;
 
 use FaustVik\Router\interfaces\Cache\CacheInterface;
+use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 
+/**
+ * Интерфейс конфигурации роутера
+ * 
+ * Определяет методы для настройки компонентов роутера:
+ * - Настройка выполнения маршрутов (Runner)
+ * - Проверка HTTP методов
+ * - Поиск маршрутов (Matching)
+ * - Настройка кеширования
+ * - Настройка Dependency Injection
+ * 
+ * @package FaustVik\Router\interfaces\Router\Components
+ */
 interface ConfigInterface
 {
+    // ============================================================================
+    // Runner methods - Методы для работы с выполнением маршрутов
+    // ============================================================================
+
     /**
-     * Set custom Runner
+     * Устанавливает кастомный компонент для выполнения маршрутов
      *
-     * @param RunnerInterface $runner
-     *
+     * @param RunnerInterface $runner Компонент для выполнения контроллеров
      * @return void
      */
     public function setRunner(RunnerInterface $runner): void;
 
     /**
-     * Get custom Runner or get default Runner
+     * Получает компонент для выполнения маршрутов
      *
-     * @return RunnerInterface
+     * @return RunnerInterface Компонент для выполнения контроллеров
      */
     public function getRunner(): RunnerInterface;
 
+    // ============================================================================
+    // HTTP Method Checker methods - Методы для проверки HTTP методов
+    // ============================================================================
+
     /**
-     * Set checker for allow http methods
+     * Устанавливает проверщик разрешенных HTTP методов
      *
-     * @param CheckHttpMethodInterface $checker
-     *
+     * @param CheckHttpMethodInterface $checker Проверщик HTTP методов
      * @return void
      */
     public function setCheckerHttpMethod(CheckHttpMethodInterface $checker): void;
 
     /**
-     * Get checker for allow http methods
+     * Получает проверщик разрешенных HTTP методов
      *
-     * @return CheckHttpMethodInterface
+     * @return CheckHttpMethodInterface Проверщик HTTP методов
      */
     public function getCheckerHttpMethod(): CheckHttpMethodInterface;
 
+    // ============================================================================
+    // Route Matching methods - Методы для поиска маршрутов
+    // ============================================================================
+
     /**
-     * Set custom matcher uri with route
+     * Устанавливает кастомный компонент для поиска маршрутов
      *
-     * @param MatchingRouteInterface $matcher
-     *
+     * @param MatchingRouteInterface $matcher Компонент для поиска маршрутов
      * @return void
      */
     public function setMatcher(MatchingRouteInterface $matcher): void;
 
     /**
-     * Get matcher
+     * Получает компонент для поиска маршрутов
      *
-     * @return MatchingRouteInterface
+     * @return MatchingRouteInterface Компонент для поиска маршрутов
      */
     public function getMatch(): MatchingRouteInterface;
 
+    // ============================================================================
+    // Cache methods - Методы для работы с кешированием
+    // ============================================================================
+
     /**
-     * Enable route caching
+     * Включает кеширование маршрутов
      *
      * @return void
      */
     public function enableCache(): void;
 
     /**
-     * Disable route caching
+     * Отключает кеширование маршрутов
      *
      * @return void
      */
     public function disableCache(): void;
 
     /**
-     * Check if caching is enabled
+     * Проверяет, включено ли кеширование
      *
-     * @return bool
+     * @return bool true если кеширование включено
      */
     public function isCacheEnabled(): bool;
 
     /**
-     * Set cache driver
+     * Устанавливает драйвер кеша
      *
-     * @param CacheInterface $cache
+     * @param CacheInterface $cache Драйвер кеша
      * @return void
      */
     public function setCache(CacheInterface $cache): void;
 
     /**
-     * Get cache driver
+     * Получает драйвер кеша
      *
-     * @return CacheInterface|null
+     * @return CacheInterface|null Драйвер кеша или null если не установлен
      */
     public function getCache(): ?CacheInterface;
 
     /**
-     * Set cache TTL
+     * Устанавливает время жизни кеша (TTL)
      *
-     * @param int $ttl
+     * @param int $ttl Время жизни кеша в секундах
      * @return void
      */
     public function setCacheTtl(int $ttl): void;
 
     /**
-     * Get cache TTL
+     * Получает время жизни кеша (TTL)
      *
-     * @return int
+     * @return int Время жизни кеша в секундах
      */
     public function getCacheTtl(): int;
 
     /**
-     * Clear route cache
+     * Очищает кеш маршрутов
      *
-     * @return bool
+     * @return bool true если кеш успешно очищен
      */
     public function clearCache(): bool;
+
+    // ============================================================================
+    // DI Container methods - Методы для работы с Dependency Injection
+    // ============================================================================
+
+    /**
+     * Устанавливает DI контейнер
+     *
+     * @param RouterContainerInterface|null $container DI контейнер
+     * @return void
+     */
+    public function setContainer(?RouterContainerInterface $container): void;
+
+    /**
+     * Получает DI контейнер
+     *
+     * @return RouterContainerInterface|null DI контейнер или null если не установлен
+     */
+    public function getContainer(): ?RouterContainerInterface;
 }

@@ -9,6 +9,7 @@ use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
 use FaustVik\Router\interfaces\Cache\CacheInterface;
+use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\Cache\CachedMatching;
 use FaustVik\Router\Cache\FileCache;
 
@@ -20,6 +21,7 @@ final class Config implements ConfigInterface
     private ?CacheInterface          $cache = null;
     private bool                     $cacheEnabled = false;
     private int                      $cacheTtl = 3600;
+    private ?RouterContainerInterface $container = null;
 
     public function __construct()
     {
@@ -117,5 +119,26 @@ final class Config implements ConfigInterface
             return $this->match->clearCache();
         }
         return false;
+    }
+
+    /**
+     * Set DI container
+     */
+    public function setContainer(?RouterContainerInterface $container): void
+    {
+        $this->container = $container;
+        
+        // Update runner with container
+        if ($this->runner instanceof Runner) {
+            $this->runner->setContainer($container);
+        }
+    }
+
+    /**
+     * Get DI container
+     */
+    public function getContainer(): ?RouterContainerInterface
+    {
+        return $this->container;
     }
 }
