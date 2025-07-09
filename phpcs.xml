@@ -17,6 +17,16 @@
         <exclude name="PSR12.Files.FileHeader.IncorrectOrder"/>
         <exclude name="PSR12.Files.FileHeader.SpacingAfterBlock"/>
     </rule>
+    
+    <!-- Исключаем правила для комментариев //end -->
+    <rule ref="Squiz.Commenting.ClosingDeclarationComment">
+        <severity>0</severity>
+    </rule>
+    
+    <!-- Исключаем правила для комментариев //end if/foreach в длинных условиях -->
+    <rule ref="Squiz.Commenting.LongConditionClosingComment">
+        <severity>0</severity>
+    </rule>
 
     <!-- Дополнительные правила -->
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
@@ -115,9 +125,6 @@
     </rule>
     
     <!-- Полностью отключаем правила для избыточных комментариев -->
-    <rule ref="Squiz.Commenting.ClosingDeclarationComment">
-        <severity>0</severity>
-    </rule>
     
     <rule ref="Squiz.Commenting.FunctionComment">
         <severity>0</severity>
