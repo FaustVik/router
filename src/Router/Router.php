@@ -15,9 +15,11 @@ use FaustVik\Router\Router\Components\Config;
 use FaustVik\Router\Router\Components\MatchResult;
 use FaustVik\Router\Validation\ParameterValidator;
 use FaustVik\Router\exceptions\ValidationException;
+use FaustVik\Router\interfaces\Cache\CacheableRouterInterface;
+use FaustVik\Router\interfaces\Cache\CacheInterface;
 use function str_contains;
 
-final class Router implements RouterInterface
+final class Router implements RouterInterface, CacheableRouterInterface
 {
     private ?string $uriRaw = null;
     private ?string $uri = null;
@@ -156,5 +158,40 @@ final class Router implements RouterInterface
     protected function check(RouteInterface $route): void
     {
         $this->getConfig()->getCheckerHttpMethod()::isAllow($route->getMethods());
+    }
+
+    public function enableCache(): void
+    {
+        $this->config->enableCache();
+    }
+
+    public function disableCache(): void
+    {
+        $this->config->disableCache();
+    }
+
+    public function isCacheEnabled(): bool
+    {
+        return $this->config->isCacheEnabled();
+    }
+
+    public function setCache(CacheInterface $cache): void
+    {
+        $this->config->setCache($cache);
+    }
+
+    public function getCache(): ?CacheInterface
+    {
+        return $this->config->getCache();
+    }
+
+    public function clearRouteCache(): bool
+    {
+        return $this->config->clearCache();
+    }
+
+    public function getCacheKey(): string
+    {
+        return 'router_cache_' . md5($this->getUri());
     }
 }

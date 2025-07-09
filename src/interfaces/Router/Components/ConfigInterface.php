@@ -2,6 +2,8 @@
 
 namespace FaustVik\Router\interfaces\Router\Components;
 
+use FaustVik\Router\interfaces\Cache\CacheInterface;
+
 interface ConfigInterface
 {
     /**
@@ -51,4 +53,62 @@ interface ConfigInterface
      * @return MatchingRouteInterface
      */
     public function getMatch(): MatchingRouteInterface;
+
+    /**
+     * Enable route caching
+     *
+     * @return void
+     */
+    public function enableCache(): void;
+
+    /**
+     * Disable route caching
+     *
+     * @return void
+     */
+    public function disableCache(): void;
+
+    /**
+     * Check if caching is enabled
+     *
+     * @return bool
+     */
+    public function isCacheEnabled(): bool;
+
+    /**
+     * Set cache driver
+     *
+     * @param CacheInterface $cache
+     * @return void
+     */
+    public function setCache(CacheInterface $cache): void;
+
+    /**
+     * Get cache driver
+     *
+     * @return CacheInterface|null
+     */
+    public function getCache(): ?CacheInterface;
+
+    /**
+     * Set cache TTL
+     *
+     * @param int $ttl
+     * @return void
+     */
+    public function setCacheTtl(int $ttl): void;
+
+    /**
+     * Get cache TTL
+     *
+     * @return int
+     */
+    public function getCacheTtl(): int;
+
+    /**
+     * Clear route cache
+     *
+     * @return bool
+     */
+    public function clearCache(): bool;
 }

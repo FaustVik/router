@@ -14,8 +14,48 @@
 ### Для продвинутых
 - **`rest-api-example.php`** - Полноценный REST API с CRUD операциями
 - **`error-handling-example.php`** - Обработка ошибок, исключения, HTTP коды
+- **`cache-example.php`** - Базовое кеширование маршрутов
+- **`cache-production-example.php`** - Кеширование для продакшн окружения
 
 ## Новые возможности v.2.0-alpha
+
+### 🚀 Кеширование маршрутов
+
+Кеширование значительно ускоряет обработку запросов, особенно при большом количестве маршрутов.
+
+#### Базовое кеширование
+```php
+$router = new Router();
+
+// Включаем кеширование
+$router->enableCache();
+
+// Настраиваем кеш
+$cache = new FileCache('cache/routes', 'app_');
+$router->setCache($cache);
+
+// Настраиваем TTL
+$router->getConfig()->setCacheTtl(3600); // 1 час
+```
+
+#### Управление кешем
+```php
+// Проверяем статус
+if ($router->isCacheEnabled()) {
+    echo "Кеш включен";
+}
+
+// Очищаем кеш
+$router->clearRouteCache();
+
+// Отключаем кеш
+$router->disableCache();
+```
+
+#### Производительность
+- **Без кеша**: ~5-10 мс на запрос
+- **С кешем**: ~0.5-1 мс на запрос (первичное кеширование)
+- **Из кеша**: ~0.1-0.3 мс на запрос
 
 ### 🎯 Группировка роутов
 
@@ -145,6 +185,10 @@ REQUEST_METHOD="POST" REQUEST_URI="/api/users" php rest-api-example.php
 
 # Обработка ошибок
 REQUEST_METHOD="GET" REQUEST_URI="/errors/validation" php error-handling-example.php
+
+# Кеширование
+REQUEST_METHOD="GET" REQUEST_URI="/user/123/profile/settings" php cache-example.php
+REQUEST_METHOD="GET" REQUEST_URI="/api/users/123" php cache-production-example.php
 ```
 
 ## Структура обучения
@@ -156,5 +200,7 @@ REQUEST_METHOD="GET" REQUEST_URI="/errors/validation" php error-handling-example
 5. **Создайте API с `rest-api-example.php`** - CRUD операции
 6. **Освойте `error-handling-example.php`** - обработку ошибок
 7. **Изучите `groups-example.php`** - сложную группировку
+8. **Изучите `cache-example.php`** - базовое кеширование
+9. **Освойте `cache-production-example.php`** - кеширование для продакшн
 
 Каждый пример содержит подробные комментарии и готов для запуска! 

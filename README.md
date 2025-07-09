@@ -128,6 +128,80 @@ class CustomMiddleware implements MiddlewareInterface
 }
 ```
 
+## Кеширование
+
+Роутер поддерживает кеширование результатов матчинга для повышения производительности.
+
+### Включение кеширования
+
+```php
+use FaustVik\Router\Cache\FileCache;
+
+$router = new Router();
+
+// Включаем кеширование
+$router->enableCache();
+
+// Настраиваем кеш (опционально)
+$cache = new FileCache('cache/routes', 'app_');
+$router->setCache($cache);
+
+// Настраиваем TTL через конфигурацию
+$config = $router->getConfig();
+$config->setCacheTtl(3600); // 1 час
+```
+
+### Управление кешем
+
+```php
+// Проверяем статус кеша
+if ($router->isCacheEnabled()) {
+    echo "Кеш включен";
+}
+
+// Получаем кеш-драйвер
+$cache = $router->getCache();
+
+// Очищаем кеш
+$router->clearRouteCache();
+
+// Отключаем кеш
+$router->disableCache();
+```
+
+### Конфигурация кеша
+
+```php
+// Создание кеша с настройками
+$cache = new FileCache(
+    cacheDir: 'cache/routes',  // Папка для кеша
+    prefix: 'my_app_'          // Префикс для файлов
+);
+
+// Настройка TTL
+$config = $router->getConfig();
+$config->setCacheTtl(7200); // 2 часа
+```
+
+### Примеры использования
+
+- **Разработка**: Кеширование обычно отключено для мгновенного отображения изменений
+- **Продакшн**: Кеширование включено для максимальной производительности
+
+```php
+// Настройка для разных окружений
+$isProduction = (getenv('APP_ENV') === 'production');
+
+if ($isProduction) {
+    $router->enableCache();
+    $router->getConfig()->setCacheTtl(3600);
+}
+```
+
+### Производительность
+
+Кеширование может ускорить обработку запросов в 2-10 раз, особенно при большом количестве маршрутов.
+
 ## Статический анализ кода
 
 Проект использует PHPStan для статического анализа кода:
