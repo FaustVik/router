@@ -9,9 +9,9 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 final class Route implements RouteClassInterface
 {
-    private string  $route;
-    private string  $class;
-    private string  $action;
+    private string  $route = '';
+    private string  $class = '';
+    private string  $action = '';
     private array   $methods = [];
     private ?string $alias   = null;
     private array   $arg     = [];

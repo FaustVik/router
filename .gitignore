@@ -2,3 +2,7 @@
 index.php
 
 vendor/
+
+# PHPStan
+phpstan.neon.dist
+phpstan-baseline.neon

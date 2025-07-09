@@ -35,6 +35,18 @@ $router->setCollection($collections);
 $router->run();
 ```
 
+## Статический анализ кода
+
+Проект использует PHPStan для статического анализа кода:
+
+```bash
+# Анализ кода
+composer phpstan
+
+# Создание baseline (если нужно игнорировать существующие ошибки)
+composer phpstan-baseline
+```
+
 ## Параметры в URL
 
 Роутер поддерживает параметры в URL в формате `{parameter_name}`. Примеры:

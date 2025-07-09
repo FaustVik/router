@@ -10,10 +10,15 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 {
-    private string  $route;
+    private string  $route = '';
     private array   $methods = [];
     private ?string $alias   = null;
     private Closure $func;
+    
+    public function __construct()
+    {
+        $this->func = static function() {};
+    }
 
     public static function create(string $route, callable $func, array $methods = [], ?string $alias = null): RouteInterface
     {
