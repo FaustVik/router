@@ -17,7 +17,8 @@ final class RouteGroup implements RouteGroupInterface
 
     public function __construct(
         private readonly RoutesCollection $collection
-    ) {}
+    ) {
+    }
 
     public function prefix(string $prefix): self
     {
@@ -204,9 +205,9 @@ final class RouteGroup implements RouteGroupInterface
         $nestedGroup->prefix = $this->prefix;
         $nestedGroup->middleware = array_merge([], $this->middleware);
         $nestedGroup->validationRules = array_merge([], $this->validationRules);
-        
+
         $callback($nestedGroup);
-        
+
         // Добавляем все маршруты из вложенной группы
         foreach ($nestedGroup->getRoutes() as $route) {
             $this->routes[] = $route;
@@ -217,4 +218,4 @@ final class RouteGroup implements RouteGroupInterface
     {
         return $this->routes;
     }
-} 
+}

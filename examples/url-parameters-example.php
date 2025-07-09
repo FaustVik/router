@@ -9,7 +9,7 @@ use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
 
 // Контроллеры для демонстрации параметров
-class BlogController 
+class BlogController
 {
     public function showPost($id)
     {
@@ -18,8 +18,8 @@ class BlogController
         echo "Title: Sample Post #$id\n";
         echo "Content: This is the content of post $id...\n";
     }
-    
-    public function showCategoryPost($category, $id) 
+
+    public function showCategoryPost($category, $id)
     {
         echo "=== Category Post ===\n";
         echo "Category: $category\n";
@@ -29,7 +29,7 @@ class BlogController
     }
 }
 
-class UserController 
+class UserController
 {
     public function show(Request $request, $id)
     {
@@ -37,13 +37,13 @@ class UserController
         echo "User ID: $id\n";
         echo "Request Method: " . $request->getMethod() . "\n";
         echo "Request URI: " . $request->getUri() . "\n";
-        
+
         // Демонстрируем приоритет параметров URL над query параметрами
         $queryId = $_GET['id'] ?? 'none';
         echo "Query parameter 'id': $queryId\n";
         echo "URL parameter 'id': $id (has priority)\n";
     }
-    
+
     public function showPosts($userId, $postId)
     {
         echo "=== User Posts ===\n";
@@ -51,14 +51,14 @@ class UserController
         echo "Post ID: $postId\n";
         echo "URL pattern: /user/{userId}/posts/{postId}\n";
     }
-    
+
     public function edit($id)
     {
         echo "=== Edit User ===\n";
         echo "Editing user ID: $id\n";
         echo "URL pattern: /user/{id}/edit\n";
     }
-    
+
     public function editSection($id, $section)
     {
         echo "=== Edit User Section ===\n";
@@ -121,10 +121,10 @@ $routes->set(RouteAnonymousFunc::create('/validate/{type}/{value}', static funct
     echo "=== Parameter Validation Demo ===\n";
     echo "Type: $type\n";
     echo "Value: $value\n";
-    
+
     if ($type === 'number') {
         if (is_numeric($value)) {
-            echo "✅ Valid number: " . (int)$value . "\n";
+            echo "✅ Valid number: " . (int) $value . "\n";
         } else {
             echo "❌ Invalid number format\n";
         }
@@ -137,7 +137,7 @@ $routes->set(RouteAnonymousFunc::create('/validate/{type}/{value}', static funct
     } else {
         echo "ℹ️  Unknown validation type\n";
     }
-    
+
     echo "Examples:\n";
     echo "- /validate/number/123\n";
     echo "- /validate/email/test@example.com\n";
@@ -148,52 +148,51 @@ $router = new Router();
 
 try {
     echo "=== URL Parameters Example ===\n\n";
-    
+
     echo "Available routes with parameters:\n\n";
-    
+
     echo "1. Single parameter:\n";
     echo "   /blog/{id} → /blog/123\n\n";
-    
+
     echo "2. Multiple parameters:\n";
     echo "   /blog/{category}/post/{id} → /blog/tech/post/456\n\n";
-    
+
     echo "3. User routes with Request injection:\n";
     echo "   /user/{id} → /user/789\n\n";
-    
+
     echo "4. Three parameters:\n";
     echo "   /user/{userId}/posts/{postId} → /user/100/posts/200\n\n";
-    
+
     echo "5. Optional-like parameters:\n";
     echo "   /user/{id}/edit → /user/123/edit\n";
     echo "   /user/{id}/edit/{section} → /user/123/edit/password\n\n";
-    
+
     echo "6. Product with anonymous function:\n";
     echo "   /product/{id} → /product/555\n\n";
-    
+
     echo "7. Deep nested parameters:\n";
     echo "   /shop/{category}/{subcategory}/{product} → /shop/electronics/phones/iphone\n\n";
-    
+
     echo "8. Parameter priority demo:\n";
     echo "   /priority/{id} → /priority/123?id=456\n\n";
-    
+
     echo "9. Parameter validation demo:\n";
     echo "   /validate/{type}/{value} → /validate/number/123\n";
     echo "   /validate/{type}/{value} → /validate/email/test@example.com\n\n";
-    
+
     echo "Test commands:\n";
     echo "REQUEST_URI=\"/blog/123\" php url-parameters-example.php\n";
     echo "REQUEST_URI=\"/blog/tech/post/456\" php url-parameters-example.php\n";
     echo "REQUEST_URI=\"/user/789\" php url-parameters-example.php\n";
     echo "REQUEST_URI=\"/shop/electronics/phones/iphone\" php url-parameters-example.php\n";
     echo "REQUEST_URI=\"/priority/123?id=456\" php url-parameters-example.php\n\n";
-    
+
     echo "============================================================\n\n";
-    
+
     $router->setCollection($routes)->run();
-    
+
     echo "\n\n=== URL Parameters Example Complete ===\n";
-    
 } catch (Exception $e) {
     echo "\n❌ Error: " . $e->getMessage() . "\n";
     echo "This route might not exist. Try one of the listed routes above.\n";
-} 
+}

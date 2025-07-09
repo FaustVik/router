@@ -55,14 +55,14 @@ class SymfonyContainerAdapter implements RouterContainerInterface
             if ($this->container->has($class)) {
                 return $this->container->get($class);
             }
-            
+
             // Manual instantiation with reflection for non-registered services
             if (class_exists($class)) {
                 return $this->createInstanceWithReflection($class, $parameters);
             }
-            
+
             throw new \RuntimeException("Cannot resolve class: {$class}");
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
     }
@@ -100,21 +100,21 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     private function createInstanceWithReflection(string $class, array $parameters = []): object
     {
         $reflectionClass = new \ReflectionClass($class);
-        
+
         if (!$reflectionClass->isInstantiable()) {
             throw new \RuntimeException("Class {$class} is not instantiable");
         }
-        
+
         $constructor = $reflectionClass->getConstructor();
-        
+
         if (!$constructor) {
             return $reflectionClass->newInstance();
         }
-        
+
         $dependencies = [];
         foreach ($constructor->getParameters() as $parameter) {
             $type = $parameter->getType();
-            
+
             if ($type && $type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
                 $typeName = $type->getName();
                 if ($this->container->has($typeName)) {
@@ -126,11 +126,11 @@ class SymfonyContainerAdapter implements RouterContainerInterface
                 }
             } else {
                 // For built-in types, use provided parameters or default
-                $dependencies[] = $parameters[$parameter->getName()] ?? 
+                $dependencies[] = $parameters[$parameter->getName()] ??
                     ($parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null);
             }
         }
-        
+
         return $reflectionClass->newInstanceArgs($dependencies);
     }
-} 
+}

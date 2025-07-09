@@ -46,7 +46,7 @@ class ContainerAdapterFactory
         }
 
         throw new \InvalidArgumentException(
-            'Unsupported container type: ' . get_class($container) . 
+            'Unsupported container type: ' . get_class($container) .
             '. Container must implement PSR-11 ContainerInterface or be a supported container type.'
         );
     }
@@ -57,7 +57,7 @@ class ContainerAdapterFactory
     private static function isSymfonyContainer(object $container): bool
     {
         $className = get_class($container);
-        
+
         // Check for common Symfony container classes
         $symfonyContainerClasses = [
             'Symfony\Component\DependencyInjection\Container',
@@ -82,7 +82,7 @@ class ContainerAdapterFactory
     private static function isPimpleContainer(object $container): bool
     {
         $className = get_class($container);
-        
+
         // Check for Pimple container classes
         $pimpleContainerClasses = [
             'Pimple\Container',
@@ -136,4 +136,4 @@ class ContainerAdapterFactory
             return false;
         }
     }
-} 
+}

@@ -25,7 +25,7 @@ final class Matching implements MatchingRouteInterface
             if (in_array($uri, [$route->alias(), $route->getRoute()], true)) {
                 return new MatchResult($route, []);
             }
-            
+
             // Проверяем совпадение с параметрами
             $matchResult = $this->matchWithParameters($uri, $route);
             if ($matchResult !== null) {

@@ -12,7 +12,7 @@ final class MiddlewareStack
 {
     /** @var MiddlewareInterface[] */
     private array $middleware = [];
-    
+
     /** @var callable */
     private $finalHandler;
 
@@ -34,7 +34,7 @@ final class MiddlewareStack
                 // Если это строка, создаем экземпляр класса
                 $item = new $item();
             }
-            
+
             if ($item instanceof MiddlewareInterface) {
                 $this->add($item);
             }
@@ -45,13 +45,13 @@ final class MiddlewareStack
     public function execute(Request $request): Response
     {
         $index = 0;
-        
-        $next = function(Request $request) use (&$next, &$index): Response {
+
+        $next = function (Request $request) use (&$next, &$index): Response {
             if ($index >= count($this->middleware)) {
                 // Если все middleware выполнены, выполняем финальный обработчик
                 return call_user_func($this->finalHandler, $request);
             }
-            
+
             $middleware = $this->middleware[$index++];
             return $middleware->handle($request, $next);
         };
@@ -74,4 +74,4 @@ final class MiddlewareStack
         $this->middleware = [];
         return $this;
     }
-} 
+}

@@ -145,19 +145,19 @@ $routes->addGet('/products/{category}/{code}', ProductController::class, 'show')
 $routes->prefix('/api/v1')->validate([
     ParameterValidationRule::for('id')
         ->int(['min' => 1])
-])->group(function($group) {
+])->group(function ($group) {
     $group->get('/users/{id}', UserController::class, 'show');
-    $group->getFunc('/posts/{id}', function(Request $request): Response {
+    $group->getFunc('/posts/{id}', function (Request $request): Response {
         $id = $request->getParam('id');
         return Response::json(['message' => "Post ID: $id (validated by group)"]);
     });
-    
+
     // Дополнительная валидация в подгруппе
     $group->prefix('/admin')->validate([
         ParameterValidationRule::for('token')
             ->regex('/^[a-f0-9]{32}$/', 'Token must be 32 hex characters')
-    ])->group(function($adminGroup) {
-        $adminGroup->getFunc('/users/{id}/token/{token}', function(Request $request): Response {
+    ])->group(function ($adminGroup) {
+        $adminGroup->getFunc('/users/{id}/token/{token}', function (Request $request): Response {
             $id = $request->getParam('id');
             $token = $request->getParam('token');
             return Response::json([
@@ -170,7 +170,7 @@ $routes->prefix('/api/v1')->validate([
 // === 4. ОПЦИОНАЛЬНЫЕ ПАРАМЕТРЫ ===
 
 // Некоторые параметры могут быть опциональными
-$routes->addGetFunc('/search/{query?}', function(Request $request): Response {
+$routes->addGetFunc('/search/{query?}', function (Request $request): Response {
     $query = $request->getParam('query') ?? 'empty';
     return Response::json(['query' => $query]);
 })->validate([
@@ -207,7 +207,7 @@ class PhoneValidator implements \FaustVik\Router\interfaces\Validation\Parameter
     }
 }
 
-$routes->addGetFunc('/contact/phone/{phone}', function(Request $request): Response {
+$routes->addGetFunc('/contact/phone/{phone}', function (Request $request): Response {
     $phone = $request->getParam('phone');
     return Response::json(['message' => "Phone: $phone (custom validation)"]);
 })->validate([
@@ -241,4 +241,4 @@ echo "REQUEST_METHOD=\"GET\" REQUEST_URI=\"/products/electronics/invalid-code\" 
 echo "\n" . str_repeat("=", 50) . "\n";
 
 // Запускаем роутер
-$router->run(); 
+$router->run();

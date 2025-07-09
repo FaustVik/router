@@ -14,7 +14,7 @@ class SlugValidator implements ParameterValidatorInterface
     {
         // Slug pattern: lowercase letters, numbers, hyphens, underscores
         $pattern = '/^[a-z0-9\-_]+$/';
-        
+
         if (!preg_match($pattern, $value)) {
             $this->errorMessage = "Value must be a valid slug (lowercase letters, numbers, hyphens, underscores only)";
             return false;
@@ -44,4 +44,4 @@ class SlugValidator implements ParameterValidatorInterface
     {
         return 'slug';
     }
-} 
+}

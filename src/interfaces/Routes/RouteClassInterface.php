@@ -15,11 +15,11 @@ interface RouteClassInterface extends RouteInterface
      * @return RouteInterface
      */
     public static function create(
-        string  $route,
-        string  $class,
-        string  $action,
-        array   $arg = [],
-        array   $methods = [],
+        string $route,
+        string $class,
+        string $action,
+        array $arg = [],
+        array $methods = [],
         ?string $alias = null
     ): RouteInterface;
 

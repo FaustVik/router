@@ -25,11 +25,11 @@ if ($enableCache) {
     $cache = new FileCache($cacheDir, 'prod_routes_');
     $router->setCache($cache);
     $router->enableCache();
-    
+
     // Настраиваем TTL через конфигурацию
     $config = $router->getConfig();
     $config->setCacheTtl($cacheTtl);
-    
+
     echo "✓ Кеширование включено для продакшена\n";
     echo "✓ Папка кеша: $cacheDir\n";
     echo "✓ TTL: $cacheTtl секунд\n\n";
@@ -56,7 +56,7 @@ $routesCollection->addGet('/blog/{slug}', WebController::class, 'blogPost');
 
 // Группы маршрутов (без middleware для простоты примера)
 $routesCollection->prefix('/admin')
-    ->group(function($group) {
+    ->group(function ($group) {
         $group->get('/dashboard', AdminController::class, 'dashboard');
         $group->get('/users', AdminController::class, 'users');
         $group->get('/settings', AdminController::class, 'settings');
@@ -76,25 +76,24 @@ $testUrls = [
 
 foreach ($testUrls as $url) {
     echo "Обрабатываем: $url\n";
-    
+
     $startTime = microtime(true);
-    
+
     try {
         $router->setUri($url);
         $router->run();
         $endTime = microtime(true);
-        
+
         $time = round(($endTime - $startTime) * 1000, 2);
         echo "✓ Время выполнения: {$time} мс\n";
-        
+
         if ($router->isCacheEnabled()) {
             echo "✓ Результат кеширован\n";
         }
-        
     } catch (Exception $e) {
         echo "✗ Ошибка: " . $e->getMessage() . "\n";
     }
-    
+
     echo "---\n";
 }
 
@@ -105,7 +104,7 @@ if ($cacheInstance) {
     echo "Кеш-драйвер: " . get_class($cacheInstance) . "\n";
     echo "Статус кеша: " . ($router->isCacheEnabled() ? "включен" : "отключен") . "\n";
     echo "TTL: " . $router->getConfig()->getCacheTtl() . " секунд\n";
-    
+
     // Показываем содержимое кеша
     echo "\nФайлы кеша:\n";
     $cacheFiles = glob($cacheDir . '/*.cache');
@@ -135,22 +134,22 @@ class ApiController
     {
         echo "API: Получение всех пользователей\n";
     }
-    
+
     public function getUser(string $id): void
     {
         echo "API: Получение пользователя ID: $id\n";
     }
-    
+
     public function createUser(): void
     {
         echo "API: Создание пользователя\n";
     }
-    
+
     public function updateUser(string $id): void
     {
         echo "API: Обновление пользователя ID: $id\n";
     }
-    
+
     public function deleteUser(string $id): void
     {
         echo "API: Удаление пользователя ID: $id\n";
@@ -163,22 +162,22 @@ class WebController
     {
         echo "Web: Главная страница\n";
     }
-    
+
     public function about(): void
     {
         echo "Web: О нас\n";
     }
-    
+
     public function contact(): void
     {
         echo "Web: Контакты\n";
     }
-    
+
     public function userProfile(string $id): void
     {
         echo "Web: Профиль пользователя ID: $id\n";
     }
-    
+
     public function blogPost(string $slug): void
     {
         echo "Web: Статья блога: $slug\n";
@@ -191,16 +190,16 @@ class AdminController
     {
         echo "Admin: Панель управления\n";
     }
-    
+
     public function users(): void
     {
         echo "Admin: Управление пользователями\n";
     }
-    
+
     public function settings(): void
     {
         echo "Admin: Настройки\n";
     }
 }
 
-echo "\n=== Пример завершен ===\n"; 
+echo "\n=== Пример завершен ===\n";

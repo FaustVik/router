@@ -18,7 +18,7 @@ interface RunnerInterface
      *
      * @return void
      */
-    public function run(RouteInterface $route, array $params= [], ?Request $request = null): void;
+    public function run(RouteInterface $route, array $params = [], ?Request $request = null): void;
 
     /**
      * Run only RouteAnonymousFuncInterface route
@@ -40,5 +40,5 @@ interface RunnerInterface
      *
      * @return void
      */
-    public function runClass(RouteClassInterface $route, array $params= [], ?Request $request = null): void;
+    public function runClass(RouteClassInterface $route, array $params = [], ?Request $request = null): void;
 }

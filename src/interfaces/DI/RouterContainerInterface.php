@@ -14,7 +14,7 @@ interface RouterContainerInterface extends ContainerInterface
      * Check if the container can resolve a given identifier
      *
      * @param string $id Service identifier
-     * @return bool
+     * @return boolean
      */
     public function canResolve(string $id): bool;
 
@@ -49,7 +49,7 @@ interface RouterContainerInterface extends ContainerInterface
      * Check if a service is bound
      *
      * @param string $abstract Service identifier
-     * @return bool
+     * @return boolean
      */
     public function bound(string $abstract): bool;
-} 
+}

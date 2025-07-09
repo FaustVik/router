@@ -11,7 +11,8 @@ final class MatchResult
     public function __construct(
         private RouteInterface $route,
         private array $parameters = []
-    ) {}
+    ) {
+    }
 
     public function getRoute(): RouteInterface
     {
@@ -22,4 +23,4 @@ final class MatchResult
     {
         return $this->parameters;
     }
-} 
+}

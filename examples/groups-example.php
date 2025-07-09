@@ -96,16 +96,16 @@ $routes->addGet('/', HomeController::class, 'index');
 $routes->addGet('/about', HomeController::class, 'about');
 
 // === 2. ГРУППИРОВКА С ПРЕФИКСОМ ===
-$routes->prefix('/api')->group(function($group) {
+$routes->prefix('/api')->group(function ($group) {
     $group->get('/users', ApiController::class, 'users');
     $group->get('/posts', ApiController::class, 'posts');
-    
+
     // Вложенная группа для версионирования API
-    $group->prefix('/v1')->group(function($v1) {
+    $group->prefix('/v1')->group(function ($v1) {
         $v1->get('/users', ApiController::class, 'users');
         $v1->post('/users', ApiController::class, 'createUser');
-        
-        $v1->prefix('/admin')->group(function($admin) {
+
+        $v1->prefix('/admin')->group(function ($admin) {
             $admin->get('/stats', ApiController::class, 'adminStats');
         });
     });
@@ -114,12 +114,12 @@ $routes->prefix('/api')->group(function($group) {
 // === 3. ГРУППИРОВКА С MIDDLEWARE ===
 $routes->middleware([LoggingMiddleware::class])
     ->prefix('/admin')
-    ->group(function($group) {
+    ->group(function ($group) {
         // Эти маршруты будут иметь LoggingMiddleware
         $group->get('/dashboard', AdminController::class, 'dashboard');
-        
+
         // Добавляем еще middleware для защищенных маршрутов
-        $group->middleware([AuthMiddleware::class])->group(function($authGroup) {
+        $group->middleware([AuthMiddleware::class])->group(function ($authGroup) {
             $authGroup->get('/users', AdminController::class, 'users');
             $authGroup->get('/settings', AdminController::class, 'settings');
             $authGroup->delete('/users/{id}', AdminController::class, 'deleteUser');
@@ -127,58 +127,58 @@ $routes->middleware([LoggingMiddleware::class])
     });
 
 // === 4. ГРУППИРОВКА ДЛЯ БЛОГА С АНОНИМНЫМИ ФУНКЦИЯМИ ===
-$routes->prefix('/blog')->group(function($group) {
+$routes->prefix('/blog')->group(function ($group) {
     $group->get('/', BlogController::class, 'index');
     $group->get('/category/{category}', BlogController::class, 'category');
     $group->get('/post/{id}', BlogController::class, 'show');
-    
+
     // Анонимные функции в группе
-    $group->getFunc('/rss', function(Request $request): Response {
+    $group->getFunc('/rss', function (Request $request): Response {
         return Response::create('<?xml version="1.0"?><rss>RSS Feed</rss>')
             ->withHeader('Content-Type', 'application/rss+xml');
     });
-    
-    $group->getFunc('/sitemap.xml', function(): Response {
+
+    $group->getFunc('/sitemap.xml', function (): Response {
         return Response::create('<?xml version="1.0"?><urlset>Sitemap</urlset>')
             ->withHeader('Content-Type', 'application/xml');
     });
 });
 
 // === 5. ГРУППИРОВКА БЕЗ ПРЕФИКСА (ТОЛЬКО MIDDLEWARE) ===
-$routes->middleware([LoggingMiddleware::class])->group(function($group) {
-    $group->getFunc('/health', function(): Response {
+$routes->middleware([LoggingMiddleware::class])->group(function ($group) {
+    $group->getFunc('/health', function (): Response {
         return Response::json(['status' => 'ok', 'timestamp' => time()]);
     });
-    
-    $group->getFunc('/version', function(): Response {
+
+    $group->getFunc('/version', function (): Response {
         return Response::json(['version' => '2.0-alpha', 'build' => date('Y-m-d')]);
     });
 });
 
 // === 6. СЛОЖНАЯ ВЛОЖЕННАЯ ГРУППИРОВКА ===
-$routes->prefix('/api')->group(function($api) {
-    $api->prefix('/v2')->middleware([LoggingMiddleware::class])->group(function($v2) {
-        $v2->getFunc('/info', function(): Response {
+$routes->prefix('/api')->group(function ($api) {
+    $api->prefix('/v2')->middleware([LoggingMiddleware::class])->group(function ($v2) {
+        $v2->getFunc('/info', function (): Response {
             return Response::json(['api_version' => 'v2']);
         });
-        
-        $v2->prefix('/users')->middleware([AuthMiddleware::class])->group(function($users) {
-            $users->getFunc('/', function(): Response {
+
+        $v2->prefix('/users')->middleware([AuthMiddleware::class])->group(function ($users) {
+            $users->getFunc('/', function (): Response {
                 return Response::json(['message' => 'Список пользователей API v2']);
             });
-            
-            $users->getFunc('/{id}', function(Request $request): Response {
+
+            $users->getFunc('/{id}', function (Request $request): Response {
                 $id = $request->getRouteParam('id');
                 return Response::json(['user_id' => $id, 'api_version' => 'v2']);
             });
-            
-            $users->prefix('/{id}')->group(function($userActions) {
-                $userActions->getFunc('/posts', function(Request $request): Response {
+
+            $users->prefix('/{id}')->group(function ($userActions) {
+                $userActions->getFunc('/posts', function (Request $request): Response {
                     $id = $request->getRouteParam('id');
                     return Response::json(['user_id' => $id, 'posts' => []]);
                 });
-                
-                $userActions->getFunc('/comments', function(Request $request): Response {
+
+                $userActions->getFunc('/comments', function (Request $request): Response {
                     $id = $request->getRouteParam('id');
                     return Response::json(['user_id' => $id, 'comments' => []]);
                 });
@@ -209,7 +209,7 @@ foreach ($routes->get() as $index => $route) {
         $index + 1,
         implode('|', $route->getMethods()),
         $route->getRoute(),
-        $route instanceof \FaustVik\Router\Route\Route 
+        $route instanceof \FaustVik\Router\Route\Route
             ? $route->getClass() . '@' . $route->getAction()
             : 'Anonymous Function'
     );
@@ -232,4 +232,4 @@ echo "\n=== КОМАНДЫ ДЛЯ ТЕСТИРОВАНИЯ ===\n";
 echo 'REQUEST_METHOD="GET" REQUEST_URI="/" php ' . __FILE__ . "\n";
 echo 'REQUEST_METHOD="GET" REQUEST_URI="/api/users" php ' . __FILE__ . "\n";
 echo 'REQUEST_METHOD="GET" REQUEST_URI="/admin/dashboard" php ' . __FILE__ . "\n";
-echo 'REQUEST_METHOD="GET" REQUEST_URI="/blog/post/123" php ' . __FILE__ . "\n"; 
+echo 'REQUEST_METHOD="GET" REQUEST_URI="/blog/post/123" php ' . __FILE__ . "\n";

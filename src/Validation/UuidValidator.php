@@ -14,7 +14,7 @@ class UuidValidator implements ParameterValidatorInterface
     {
         // UUID v4 pattern
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
-        
+
         if (!preg_match($pattern, $value)) {
             $this->errorMessage = "Value must be a valid UUID";
             return false;
@@ -32,4 +32,4 @@ class UuidValidator implements ParameterValidatorInterface
     {
         return 'uuid';
     }
-} 
+}

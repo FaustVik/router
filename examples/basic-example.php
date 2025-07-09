@@ -8,14 +8,14 @@ use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
 
 // Простые контроллеры
-class HomeController 
+class HomeController
 {
     public function index()
     {
         echo "Welcome to the Home Page!\n";
         echo "This is a simple router example.\n";
     }
-    
+
     public function about()
     {
         echo "About Page\n";
@@ -23,7 +23,7 @@ class HomeController
     }
 }
 
-class UserController 
+class UserController
 {
     public function list()
     {
@@ -32,7 +32,7 @@ class UserController
         echo "- Jane Smith (ID: 2)\n";
         echo "- Bob Johnson (ID: 3)\n";
     }
-    
+
     public function show($id)
     {
         echo "User Profile\n";
@@ -40,7 +40,7 @@ class UserController
         echo "Name: John Doe\n";
         echo "Email: john.doe@example.com\n";
     }
-    
+
     public function create()
     {
         echo "Create User Form\n";
@@ -93,7 +93,7 @@ $router = new Router();
 
 try {
     echo "=== Basic Router Example ===\n\n";
-    
+
     echo "Available routes:\n";
     echo "- / (Home page)\n";
     echo "- /about (About page)\n";
@@ -104,19 +104,18 @@ try {
     echo "- /hello/{name} (Personal greeting, e.g., /hello/John)\n";
     echo "- /greet/{greeting}/{name} (Custom greeting, e.g., /greet/Hi/Alice)\n";
     echo "- /contact (Contact form - supports GET and POST)\n\n";
-    
+
     echo "To test different routes, use:\n";
     echo "REQUEST_URI=\"/users\" php basic-example.php\n";
     echo "REQUEST_URI=\"/users/123\" php basic-example.php\n";
     echo "REQUEST_URI=\"/hello/World\" php basic-example.php\n\n";
-    
+
     echo "==================================================\n\n";
-    
+
     $router->setCollection($routes)->run();
-    
+
     echo "\n\n=== Basic Example Complete ===\n";
-    
 } catch (Exception $e) {
     echo "\n❌ Error: " . $e->getMessage() . "\n";
     echo "This route might not exist or might use a different HTTP method.\n";
-} 
+}

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<ruleset name="FaustVik Router">
+    <description>Coding standards for FaustVik Router</description>
+
+    <!-- Файлы для проверки -->
+    <file>src</file>
+    <file>examples</file>
+
+    <!-- Исключения -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/cache/*</exclude-pattern>
+    <exclude-pattern>*/custom_cache/*</exclude-pattern>
+
+    <!-- Основной стандарт - PSR-12 -->
+    <rule ref="PSR12">
+        <!-- Исключения для более гибкого стиля -->
+        <exclude name="PSR12.Files.FileHeader.IncorrectOrder"/>
+        <exclude name="PSR12.Files.FileHeader.SpacingAfterBlock"/>
+    </rule>
+
+    <!-- Дополнительные правила -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    <rule ref="Generic.Formatting.SpaceAfterCast"/>
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
+    <rule ref="Squiz.Classes.LowercaseClassKeywords"/>
+
+    <!-- Настройки отступов -->
+    <arg name="tab-width" value="4"/>
+    <arg name="encoding" value="utf-8"/>
+
+    <!-- Показать прогресс -->
+    <arg value="p"/>
+    
+    <!-- Использовать цвета -->
+    <arg name="colors"/>
+    
+    <!-- Показать все нарушения -->
+    <arg value="s"/>
+
+    <!-- Максимальная длина строки -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="140"/>
+        </properties>
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+    <!-- Исключения для примеров -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+    
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+    
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+    <!-- Настройки для комментариев -->
+    <rule ref="Squiz.Commenting.FunctionComment">
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
+        <!-- Отключить требование комментариев для примеров -->
+        <exclude-pattern>*/examples/*</exclude-pattern>
+    </rule>
+
+</ruleset> 

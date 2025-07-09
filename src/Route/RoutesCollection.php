@@ -16,7 +16,7 @@ final class RoutesCollection implements RoutesCollectionInterface
 
     public function set(RouteInterface ...$routes): void
     {
-        foreach ($routes as $route){
+        foreach ($routes as $route) {
             $this->collections[] = $route;
         }
     }

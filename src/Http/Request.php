@@ -6,7 +6,7 @@ namespace FaustVik\Router\Http;
 
 /**
  * Класс для представления HTTP запроса
- * 
+ *
  * Инкапсулирует данные HTTP запроса:
  * - HTTP метод (GET, POST, PUT, DELETE и т.д.)
  * - URI пути
@@ -15,35 +15,35 @@ namespace FaustVik\Router\Http;
  * - HTTP заголовки
  * - Серверные переменные
  * - Атрибуты (для передачи данных через middleware)
- * 
+ *
  * @package FaustVik\Router\Http
  */
 final class Request
 {
     /** @var string HTTP метод (GET, POST, PUT, DELETE и т.д.) */
     private string $method;
-    
+
     /** @var string URI пути запроса */
     private string $uri;
-    
+
     /** @var array Параметры маршрута (извлеченные из URI) */
     private array $params;
-    
+
     /** @var array Query параметры (из query string) */
     private array $query;
-    
+
     /** @var array HTTP заголовки */
     private array $headers;
-    
+
     /** @var array Серверные переменные ($_SERVER) */
     private array $server;
-    
+
     /** @var array Атрибуты запроса (для передачи данных через middleware) */
     private array $attributes = [];
 
     /**
      * Конструктор HTTP запроса
-     * 
+     *
      * @param string $method HTTP метод (GET, POST, PUT, DELETE и т.д.)
      * @param string $uri URI пути запроса
      * @param array $params Параметры маршрута
@@ -69,9 +69,9 @@ final class Request
 
     /**
      * Создает запрос из глобальных переменных PHP
-     * 
+     *
      * Использует $_SERVER, $_GET и getallheaders() для создания объекта запроса
-     * 
+     *
      * @return self Экземпляр запроса
      */
     public static function createFromGlobals(): self
@@ -87,7 +87,7 @@ final class Request
 
     /**
      * Получает HTTP метод запроса
-     * 
+     *
      * @return string HTTP метод (GET, POST, PUT, DELETE и т.д.)
      */
     public function getMethod(): string
@@ -97,7 +97,7 @@ final class Request
 
     /**
      * Получает URI запроса
-     * 
+     *
      * @return string URI пути запроса
      */
     public function getUri(): string
@@ -107,7 +107,7 @@ final class Request
 
     /**
      * Получает все параметры маршрута
-     * 
+     *
      * @return array Параметры маршрута
      */
     public function getParams(): array
@@ -117,7 +117,7 @@ final class Request
 
     /**
      * Получает конкретный параметр маршрута
-     * 
+     *
      * @param string $key Ключ параметра
      * @param mixed $default Значение по умолчанию если параметр не найден
      * @return mixed Значение параметра или значение по умолчанию
@@ -129,7 +129,7 @@ final class Request
 
     /**
      * Получает все query параметры
-     * 
+     *
      * @return array Query параметры
      */
     public function getQuery(): array
@@ -139,7 +139,7 @@ final class Request
 
     /**
      * Получает конкретный query параметр
-     * 
+     *
      * @param string $key Ключ параметра
      * @param mixed $default Значение по умолчанию если параметр не найден
      * @return mixed Значение параметра или значение по умолчанию
@@ -151,7 +151,7 @@ final class Request
 
     /**
      * Получает все HTTP заголовки
-     * 
+     *
      * @return array HTTP заголовки
      */
     public function getHeaders(): array
@@ -161,7 +161,7 @@ final class Request
 
     /**
      * Получает конкретный HTTP заголовок
-     * 
+     *
      * @param string $key Название заголовка
      * @param mixed $default Значение по умолчанию если заголовок не найден
      * @return mixed Значение заголовка или значение по умолчанию
@@ -173,7 +173,7 @@ final class Request
 
     /**
      * Получает все серверные переменные
-     * 
+     *
      * @return array Серверные переменные
      */
     public function getServer(): array
@@ -183,7 +183,7 @@ final class Request
 
     /**
      * Получает конкретную серверную переменную
-     * 
+     *
      * @param string $key Ключ переменной
      * @param mixed $default Значение по умолчанию если переменная не найдена
      * @return mixed Значение переменной или значение по умолчанию
@@ -195,10 +195,10 @@ final class Request
 
     /**
      * Получает атрибут запроса
-     * 
+     *
      * Атрибуты используются для передачи данных между middleware.
      * Например, аутентификация может сохранить пользователя в атрибуте.
-     * 
+     *
      * @param string $key Ключ атрибута
      * @param mixed $default Значение по умолчанию если атрибут не найден
      * @return mixed Значение атрибута или значение по умолчанию
@@ -210,10 +210,10 @@ final class Request
 
     /**
      * Создает новый экземпляр запроса с добавленным атрибутом
-     * 
+     *
      * Используется immutable pattern - возвращает новый экземпляр,
      * не изменяя текущий.
-     * 
+     *
      * @param string $key Ключ атрибута
      * @param mixed $value Значение атрибута
      * @return self Новый экземпляр запроса с атрибутом
@@ -227,7 +227,7 @@ final class Request
 
     /**
      * Создает новый экземпляр запроса с измененными параметрами
-     * 
+     *
      * @param array $params Новые параметры маршрута
      * @return self Новый экземпляр запроса с параметрами
      */
@@ -240,7 +240,7 @@ final class Request
 
     /**
      * Создает новый экземпляр запроса с измененным URI
-     * 
+     *
      * @param string $uri Новый URI
      * @return self Новый экземпляр запроса с URI
      */
@@ -250,4 +250,4 @@ final class Request
         $clone->uri = $uri;
         return $clone;
     }
-} 
+}

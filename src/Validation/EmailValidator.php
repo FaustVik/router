@@ -29,4 +29,4 @@ class EmailValidator implements ParameterValidatorInterface
     {
         return 'email';
     }
-} 
+}

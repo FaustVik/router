@@ -76,7 +76,7 @@ class ProductController
     public function index(): void
     {
         $products = $this->productService->getAllProducts();
-        
+
         echo json_encode([
             'status' => 'success',
             'data' => $products
@@ -86,7 +86,7 @@ class ProductController
     public function show(int $id): void
     {
         $product = $this->productService->getProduct($id);
-        
+
         echo json_encode([
             'status' => 'success',
             'data' => $product
@@ -99,10 +99,10 @@ $containerBuilder = new ContainerBuilder();
 
 // Настройка контейнера с помощью конфигурационного массива
 $containerBuilder->addDefinitions([
-    DatabaseInterface::class => function() {
+    DatabaseInterface::class => function () {
         return new Database('mysql:host=localhost;dbname=myapp');
     },
-    ProductService::class => function(DatabaseInterface $database) {
+    ProductService::class => function (DatabaseInterface $database) {
         return new ProductService($database);
     },
     // Автоматическая настройка контроллера через autowiring
@@ -157,4 +157,4 @@ echo "\n=== Поддерживаемые типы контейнеров ===\n";
 $supportedTypes = \FaustVik\Router\DI\ContainerAdapterFactory::getSupportedTypes();
 foreach ($supportedTypes as $type => $adapterClass) {
     echo "- {$type}: {$adapterClass}\n";
-} 
+}

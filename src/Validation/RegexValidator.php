@@ -18,7 +18,7 @@ class RegexValidator implements ParameterValidatorInterface
         }
 
         $pattern = $options['pattern'];
-        
+
         // Проверяем валидность регулярного выражения
         if (@preg_match($pattern, '') === false) {
             $this->errorMessage = "Invalid regex pattern";
@@ -43,4 +43,4 @@ class RegexValidator implements ParameterValidatorInterface
     {
         return 'regex';
     }
-} 
+}

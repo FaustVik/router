@@ -11,16 +11,17 @@ use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 {
-    private string    $route = '';
-    private Closure   $func;
-    private array     $methods = [];
-    private ?string   $alias   = null;
-    private array     $middleware = [];
-    private array     $validationRules = [];
+    private string $route = '';
+    private Closure $func;
+    private array $methods = [];
+    private ?string $alias   = null;
+    private array $middleware = [];
+    private array $validationRules = [];
 
     public function __construct()
     {
-        $this->func = static function() {};
+        $this->func = static function () {
+        };
     }
 
     public static function create(string $route, callable $func, array $methods = [], ?string $alias = null): RouteInterface

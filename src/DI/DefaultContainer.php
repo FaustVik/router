@@ -29,20 +29,20 @@ class DefaultContainer implements RouterContainerInterface
     public static function withConfig(array $config = []): self
     {
         $instance = new self();
-        
+
         // Apply configuration if provided
         if (isset($config['bindings'])) {
             foreach ($config['bindings'] as $abstract => $concrete) {
                 $instance->bind($abstract, $concrete);
             }
         }
-        
+
         if (isset($config['singletons'])) {
             foreach ($config['singletons'] as $abstract => $concrete) {
                 $instance->singleton($abstract, $concrete);
             }
         }
-        
+
         return $instance;
     }
 
@@ -90,7 +90,7 @@ class DefaultContainer implements RouterContainerInterface
                 return $this->container->make($class, $parameters);
             }
             return $this->container->get($class);
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
     }
@@ -179,4 +179,4 @@ class DefaultContainer implements RouterContainerInterface
     {
         $this->singleton($abstract, $factory);
     }
-} 
+}

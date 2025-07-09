@@ -1,0 +1,81 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop, v2.0-alpha ]
+  pull_request:
+    branches: [ main, develop, v2.0-alpha ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, dom, curl, libxml, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+        coverage: none
+    
+    - name: Validate composer.json
+      run: composer validate --strict
+    
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.composer/cache
+        key: php-${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          php-${{ matrix.php-version }}-composer-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run PHPStan
+      run: composer run phpstan
+    
+    - name: Run PHP CodeSniffer
+      run: composer run cs-check
+    
+    - name: Check for security vulnerabilities
+      run: composer audit
+
+  examples-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, curl, libxml, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Test examples syntax
+      run: |
+        find examples -name "*.php" -exec php -l {} \;
+    
+    - name: Test basic example
+      run: |
+        cd examples
+        php -f basic-example.php
+    
+    - name: Test DI examples
+      run: |
+        cd examples
+        php -f di-basic-example.php
+        php -f di-external-container-example.php
+        php -f di-middleware-example.php 

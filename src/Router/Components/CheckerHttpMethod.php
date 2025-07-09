@@ -12,7 +12,7 @@ final class CheckerHttpMethod implements CheckHttpMethodInterface
     /**
      * @param array $methods
      *
-     * @return bool
+     * @return boolean
      * @throws NotAllowedHttpMethod
      */
     public static function isAllow(array $methods): bool

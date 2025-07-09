@@ -47,7 +47,7 @@ class AuthMiddleware implements MiddlewareInterface
     public function handle(Request $request, callable $next): Response
     {
         $token = $request->getHeader('Authorization') ?? $request->getQueryParam('token');
-        
+
         if (!$token) {
             return new Response('Unauthorized: No token provided', 401);
         }
@@ -117,24 +117,24 @@ class AdminController
 $router = new Router();
 
 // Настройка DI контейнера
-$router->enableDI(function($container) {
+$router->enableDI(function ($container) {
     // Сингleton для аутентификации
-    $container->singleton(AuthServiceInterface::class, function() {
+    $container->singleton(AuthServiceInterface::class, function () {
         return new AuthService();
     });
-    
+
     // Сингleton для логгера аудита
-    $container->singleton(AuditLogger::class, function() {
+    $container->singleton(AuditLogger::class, function () {
         return new AuditLogger();
     });
-    
+
     // Middleware будет создан через DI
-    $container->bind(AuthMiddleware::class, function($container) {
+    $container->bind(AuthMiddleware::class, function ($container) {
         return new AuthMiddleware($container->get(AuthServiceInterface::class));
     });
-    
+
     // Контроллер будет создан через DI
-    $container->bind(AdminController::class, function($container) {
+    $container->bind(AdminController::class, function ($container) {
         return new AdminController(
             $container->get(AuthServiceInterface::class),
             $container->get(AuditLogger::class)
@@ -190,4 +190,4 @@ $router->run();
 echo "\n\n=== Информация о DI ===\n";
 echo "DI включен: " . ($router->isDIEnabled() ? 'Да' : 'Нет') . "\n";
 echo "Может создать AuthMiddleware: " . ($router->getContainer()->canResolve(AuthMiddleware::class) ? 'Да' : 'Нет') . "\n";
-echo "Может создать AdminController: " . ($router->getContainer()->canResolve(AdminController::class) ? 'Да' : 'Нет') . "\n"; 
+echo "Может создать AdminController: " . ($router->getContainer()->canResolve(AdminController::class) ? 'Да' : 'Нет') . "\n";

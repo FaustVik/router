@@ -84,11 +84,11 @@ echo "3. Управление кешем:\n";
 $cacheInstance = $router->getCache();
 if ($cacheInstance) {
     echo "Кеш-драйвер: " . get_class($cacheInstance) . "\n";
-    
+
     // Проверяем существование в кеше
     $cacheKey = $router->getCacheKey();
     echo "Кеш-ключ: " . $cacheKey . "\n";
-    
+
     // Очищаем кеш
     echo "Очищаем кеш роутов...\n";
     $router->clearRouteCache();
@@ -117,16 +117,16 @@ class UserController
     {
         echo "Вызван метод profile с параметрами: id=$id, section=$section\n";
     }
-    
+
     public function getUser(string $id): void
     {
         echo "Вызван метод getUser с параметрами: id=$id\n";
     }
-    
+
     public function getUserPosts(string $id): void
     {
         echo "Вызван метод getUserPosts с параметрами: id=$id\n";
     }
 }
 
-echo "\n=== Пример завершен ===\n"; 
+echo "\n=== Пример завершен ===\n";

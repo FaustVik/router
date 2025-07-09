@@ -33,19 +33,19 @@ final class CorsMiddleware implements MiddlewareInterface
     public function handle(Request $request, callable $next): Response
     {
         $origin = $request->getHeader('Origin');
-        
+
         // Для OPTIONS запросов возвращаем preflight response
         if ($request->getMethod() === 'OPTIONS') {
             return $this->createPreflightResponse($origin);
         }
-        
+
         // Выполняем следующий middleware
         $response = $next($request);
-        
+
         // Добавляем CORS заголовки к ответу
         return $this->addCorsHeaders($response, $origin);
     }
-    
+
     private function createPreflightResponse(?string $origin): Response
     {
         $headers = [
@@ -53,39 +53,39 @@ final class CorsMiddleware implements MiddlewareInterface
             'Access-Control-Allow-Headers' => implode(', ', $this->allowedHeaders),
             'Access-Control-Max-Age' => (string) $this->maxAge,
         ];
-        
+
         if ($this->isOriginAllowed($origin)) {
             $headers['Access-Control-Allow-Origin'] = $origin ?: '*';
         }
-        
+
         if ($this->allowCredentials) {
             $headers['Access-Control-Allow-Credentials'] = 'true';
         }
-        
+
         return new Response('', 200, $headers);
     }
-    
+
     private function addCorsHeaders(Response $response, ?string $origin): Response
     {
         $headers = [];
-        
+
         if ($this->isOriginAllowed($origin)) {
             $headers['Access-Control-Allow-Origin'] = $origin ?: '*';
         }
-        
+
         if ($this->allowCredentials) {
             $headers['Access-Control-Allow-Credentials'] = 'true';
         }
-        
+
         return $response->withHeaders($headers);
     }
-    
+
     private function isOriginAllowed(?string $origin): bool
     {
         if (in_array('*', $this->allowedOrigins, true)) {
             return true;
         }
-        
+
         return $origin && in_array($origin, $this->allowedOrigins, true);
     }
-} 
+}

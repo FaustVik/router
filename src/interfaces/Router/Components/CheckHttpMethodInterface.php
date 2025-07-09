@@ -11,7 +11,7 @@ interface CheckHttpMethodInterface
      *
      * @param array $methods
      *
-     * @return bool
+     * @return boolean
      *
      * @throws NotAllowedHttpMethod
      */

@@ -70,7 +70,7 @@ class UserController
     {
         $this->logger->log("UserController::index called");
         $users = $this->userService->getAllUsers();
-        
+
         echo json_encode([
             'status' => 'success',
             'data' => $users
@@ -81,7 +81,7 @@ class UserController
     {
         $this->logger->log("UserController::show called with ID: {$id}");
         $user = $this->userService->getUser($id);
-        
+
         echo json_encode([
             'status' => 'success',
             'data' => $user
@@ -99,24 +99,25 @@ class UserController
 }
 
 // Функция для создания настроенного роутера
-function createRouter(): Router {
+function createRouter(): Router
+{
     $router = new Router();
-    
+
     // Включаем DI с конфигурацией
-    $router->enableDI(function($container) {
+    $router->enableDI(function ($container) {
         // Настройка зависимостей
-        $container->singleton(Logger::class, function() {
+        $container->singleton(Logger::class, function () {
             return new Logger('app.log');
         });
-        
-        $container->bind(UserService::class, function($container) {
+
+        $container->bind(UserService::class, function ($container) {
             return new UserService($container->get(Logger::class));
         });
     });
-    
+
     // Создание коллекции маршрутов
     $routes = new RoutesCollection();
-    
+
     // Добавляем маршруты - контроллеры будут автоматически созданы через DI
     $routes->addGet('/users', UserController::class, 'index');
     $routes->addGet('/users/{id}', UserController::class, 'show')
@@ -124,10 +125,10 @@ function createRouter(): Router {
             ParameterValidationRule::for('id')->regex('/^\d+$/')
         ]);
     $routes->addPost('/users', UserController::class, 'create');
-    
+
     // Настройка роутера
     $router->setCollection($routes);
-    
+
     return $router;
 }
 
@@ -159,4 +160,4 @@ try {
 
 echo "\n\n=== Информация о DI контейнере ===\n";
 echo "DI включен: " . ($router->isDIEnabled() ? 'Да' : 'Нет') . "\n";
-echo "Контейнер: " . get_class($router->getContainer()) . "\n"; 
+echo "Контейнер: " . get_class($router->getContainer()) . "\n";

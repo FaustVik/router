@@ -14,14 +14,14 @@ final class AuthMiddleware implements MiddlewareInterface
     {
         // Проверяем наличие токена авторизации
         $authHeader = $request->getHeader('Authorization');
-        
+
         if (!$authHeader) {
             return Response::json(
                 ['error' => 'Authorization header is required'],
                 401
             );
         }
-        
+
         // Простая проверка токена (в реальном приложении должна быть более сложная логика)
         if (!str_starts_with($authHeader, 'Bearer ')) {
             return Response::json(
@@ -29,9 +29,9 @@ final class AuthMiddleware implements MiddlewareInterface
                 401
             );
         }
-        
+
         $token = substr($authHeader, 7); // Убираем "Bearer "
-        
+
         // Простая проверка токена
         if (empty($token) || $token === 'invalid') {
             return Response::json(
@@ -39,15 +39,15 @@ final class AuthMiddleware implements MiddlewareInterface
                 401
             );
         }
-        
+
         // Добавляем информацию о пользователе в запрос
         $request = $request->withAttribute('user_id', $this->getUserIdFromToken($token));
         $request = $request->withAttribute('authenticated', true);
-        
+
         // Передаем управление следующему middleware
         return $next($request);
     }
-    
+
     private function getUserIdFromToken(string $token): int
     {
         // Простая заглушка для демонстрации
@@ -58,4 +58,4 @@ final class AuthMiddleware implements MiddlewareInterface
             default => 0
         };
     }
-} 
+}

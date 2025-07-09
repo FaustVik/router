@@ -7,14 +7,14 @@ use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 
 /**
  * Интерфейс конфигурации роутера
- * 
+ *
  * Определяет методы для настройки компонентов роутера:
  * - Настройка выполнения маршрутов (Runner)
  * - Проверка HTTP методов
  * - Поиск маршрутов (Matching)
  * - Настройка кеширования
  * - Настройка Dependency Injection
- * 
+ *
  * @package FaustVik\Router\interfaces\Router\Components
  */
 interface ConfigInterface
@@ -97,7 +97,7 @@ interface ConfigInterface
     /**
      * Проверяет, включено ли кеширование
      *
-     * @return bool true если кеширование включено
+     * @return boolean true если кеширование включено
      */
     public function isCacheEnabled(): bool;
 
@@ -119,7 +119,7 @@ interface ConfigInterface
     /**
      * Устанавливает время жизни кеша (TTL)
      *
-     * @param int $ttl Время жизни кеша в секундах
+     * @param integer $ttl Время жизни кеша в секундах
      * @return void
      */
     public function setCacheTtl(int $ttl): void;
@@ -127,14 +127,14 @@ interface ConfigInterface
     /**
      * Получает время жизни кеша (TTL)
      *
-     * @return int Время жизни кеша в секундах
+     * @return integer Время жизни кеша в секундах
      */
     public function getCacheTtl(): int;
 
     /**
      * Очищает кеш маршрутов
      *
-     * @return bool true если кеш успешно очищен
+     * @return boolean true если кеш успешно очищен
      */
     public function clearCache(): bool;
 

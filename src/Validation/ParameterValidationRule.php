@@ -46,7 +46,7 @@ class ParameterValidationRule
         if ($message) {
             $options['message'] = $message;
         }
-        
+
         $this->validators[] = [
             'validator' => new RegexValidator(),
             'options' => $options
@@ -116,4 +116,4 @@ class ParameterValidationRule
     {
         return $this->required;
     }
-} 
+}

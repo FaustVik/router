@@ -55,7 +55,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
                 return $this->container->make($class, $parameters);
             }
             return $this->container->get($class);
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
     }
@@ -84,4 +84,4 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     {
         return $this->container->has($abstract);
     }
-} 
+}

@@ -10,7 +10,7 @@ use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
 
 // Контроллеры для демонстрации Response типов
-class ApiController 
+class ApiController
 {
     public function getUserJson(Request $request, $id): Response
     {
@@ -24,10 +24,10 @@ class ApiController
                 'request_uri' => $request->getUri()
             ]
         ];
-        
+
         return Response::json($userData);
     }
-    
+
     public function getUsersList(): Response
     {
         $users = [
@@ -35,10 +35,10 @@ class ApiController
             ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com'],
             ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com']
         ];
-        
+
         return Response::json($users, 200);
     }
-    
+
     public function errorDemo(): Response
     {
         return Response::json([
@@ -47,7 +47,7 @@ class ApiController
             'timestamp' => date('c')
         ], 500);
     }
-    
+
     public function notFoundDemo(): Response
     {
         return Response::json([
@@ -58,7 +58,7 @@ class ApiController
     }
 }
 
-class PageController 
+class PageController
 {
     public function homepage(): Response
     {
@@ -92,17 +92,17 @@ class PageController
     </div>
 </body>
 </html>';
-        
+
         return Response::html($html);
     }
-    
+
     public function aboutPage(): Response
     {
         $html = '<h1>About Page</h1>
 <p>This is a simple HTML response from the router.</p>
 <p>Current time: ' . date('Y-m-d H:i:s') . '</p>
 <a href="/">← Back to Home</a>';
-        
+
         return Response::html($html);
     }
 }
@@ -139,12 +139,12 @@ $routes->set(RouteAnonymousFunc::create('/custom-headers', static function (): R
         'message' => 'Response with custom headers',
         'timestamp' => date('c')
     ];
-    
+
     $response = Response::json($data);
     $response->header('X-Custom-Header', 'MyCustomValue');
     $response->header('X-API-Version', '1.0');
     $response->header('X-Rate-Limit', '1000');
-    
+
     return $response;
 }, ['GET']));
 
@@ -160,10 +160,10 @@ $routes->set(RouteAnonymousFunc::create('/status/{code}', static function ($code
         404 => 'Not Found',
         500 => 'Internal Server Error'
     ];
-    
-    $statusCode = (int)$code;
+
+    $statusCode = (int) $code;
     $message = $statusMessages[$statusCode] ?? 'Unknown Status';
-    
+
     return Response::json([
         'status' => $statusCode,
         'message' => $message,
@@ -174,12 +174,12 @@ $routes->set(RouteAnonymousFunc::create('/status/{code}', static function ($code
 // === File Download Simulation ===
 $routes->set(RouteAnonymousFunc::create('/download', static function (): Response {
     $content = "This is a sample file content.\nGenerated at: " . date('Y-m-d H:i:s');
-    
+
     $response = Response::create($content, 200);
     $response->header('Content-Type', 'application/octet-stream');
     $response->header('Content-Disposition', 'attachment; filename="sample.txt"');
-    $response->header('Content-Length', (string)strlen($content));
-    
+    $response->header('Content-Length', (string) strlen($content));
+
     return $response;
 }, ['GET']));
 
@@ -196,10 +196,10 @@ $routes->set(RouteAnonymousFunc::create('/xml', static function (): Response {
         </users>
     </data>
 </response>';
-    
+
     $response = Response::create($xml, 200);
     $response->header('Content-Type', 'application/xml');
-    
+
     return $response;
 }, ['GET']));
 
@@ -210,10 +210,10 @@ $routes->set(RouteAnonymousFunc::create('/text', static function (): Response {
     $text .= "This is a simple text response.\n";
     $text .= "Generated at: " . date('Y-m-d H:i:s') . "\n";
     $text .= "Content-Type: text/plain\n";
-    
+
     $response = Response::create($text, 200);
     $response->header('Content-Type', 'text/plain');
-    
+
     return $response;
 }, ['GET']));
 
@@ -225,12 +225,12 @@ $routes->set(RouteAnonymousFunc::create('/cors', static function (): Response {
         'allowed_origins' => ['*'],
         'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE']
     ];
-    
+
     $response = Response::json($data);
     $response->header('Access-Control-Allow-Origin', '*');
     $response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     $response->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
+
     return $response;
 }, ['GET']));
 
@@ -239,56 +239,55 @@ $router = new Router();
 
 try {
     echo "=== Response Types Example ===\n\n";
-    
+
     echo "Available response types:\n\n";
-    
+
     echo "1. JSON Responses:\n";
     echo "   /api/users - List of users (JSON)\n";
     echo "   /api/users/{id} - Single user (JSON with Request data)\n";
     echo "   /api/error - Error response (500 status)\n";
     echo "   /api/not-found - Not found response (404 status)\n\n";
-    
+
     echo "2. HTML Responses:\n";
     echo "   / - Homepage (full HTML document)\n";
     echo "   /about - About page (simple HTML)\n\n";
-    
+
     echo "3. Redirects:\n";
     echo "   /redirect-demo - Redirect to /about (302)\n";
     echo "   /redirect-external - Redirect to GitHub (302)\n";
     echo "   /redirect-permanent - Permanent redirect (301)\n\n";
-    
+
     echo "4. Custom Headers:\n";
     echo "   /custom-headers - Response with custom headers\n\n";
-    
+
     echo "5. Status Codes:\n";
     echo "   /status/{code} - Custom status codes (e.g., /status/201)\n\n";
-    
+
     echo "6. File Download:\n";
     echo "   /download - File download simulation\n\n";
-    
+
     echo "7. XML Response:\n";
     echo "   /xml - XML formatted response\n\n";
-    
+
     echo "8. Plain Text:\n";
     echo "   /text - Plain text response\n\n";
-    
+
     echo "9. CORS Response:\n";
     echo "   /cors - Response with CORS headers\n\n";
-    
+
     echo "Test commands:\n";
     echo "REQUEST_URI=\"/api/users\" php response-types-example.php\n";
     echo "REQUEST_URI=\"/api/users/123\" php response-types-example.php\n";
     echo "REQUEST_URI=\"/status/404\" php response-types-example.php\n";
     echo "REQUEST_URI=\"/custom-headers\" php response-types-example.php\n";
     echo "REQUEST_URI=\"/\" php response-types-example.php\n\n";
-    
+
     echo "============================================================\n\n";
-    
+
     $router->setCollection($routes)->run();
-    
+
     echo "\n\n=== Response Types Example Complete ===\n";
-    
 } catch (Exception $e) {
     echo "\n❌ Error: " . $e->getMessage() . "\n";
     echo "This route might not exist. Try one of the listed routes above.\n";
-} 
+}

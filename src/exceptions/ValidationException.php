@@ -17,7 +17,7 @@ class ValidationException extends Exception
         $this->parameter = $parameter;
         $this->value = $value;
         $this->errors = $errors;
-        
+
         $message = "Validation failed for parameter '{$parameter}' with value '{$value}': " . implode(', ', $errors);
         parent::__construct($message, $code);
     }
@@ -36,9 +36,9 @@ class ValidationException extends Exception
     {
         return $this->errors;
     }
-    
+
     public function getErrorsAsString(): string
     {
         return implode(', ', $this->errors);
     }
-} 
+}

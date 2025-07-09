@@ -10,14 +10,14 @@ use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class Route implements RouteClassInterface
 {
-    private string  $route = '';
-    private string  $class = '';
-    private string  $action = '';
-    private array   $methods = [];
+    private string $route = '';
+    private string $class = '';
+    private string $action = '';
+    private array $methods = [];
     private ?string $alias   = null;
-    private array   $arg     = [];
-    private array   $middleware = [];
-    private array   $validationRules = [];
+    private array $arg     = [];
+    private array $middleware = [];
+    private array $validationRules = [];
 
     public static function create(string $route, string $class, string $action, array $arg = [], array $methods = [], ?string $alias = null): RouteInterface
     {

@@ -24,14 +24,14 @@ final class LoggingMiddleware implements MiddlewareInterface
         $uri = $request->getUri();
         $userAgent = $request->getHeader('User-Agent', 'Unknown');
         $ip = $request->getServerParam('REMOTE_ADDR', 'Unknown');
-        
+
         // Выполняем следующий middleware
         $response = $next($request);
-        
+
         $endTime = microtime(true);
         $duration = round(($endTime - $startTime) * 1000, 2); // в миллисекундах
         $statusCode = $response->getStatusCode();
-        
+
         // Формируем лог сообщение
         $logMessage = sprintf(
             "[%s] %s %s %s %s - %d - %s ms - %s\n",
@@ -44,20 +44,20 @@ final class LoggingMiddleware implements MiddlewareInterface
             $duration,
             $this->getStatusText($statusCode)
         );
-        
+
         // Записываем в лог
         $this->writeToLog($logMessage);
-        
+
         return $response;
     }
-    
+
     private function writeToLog(string $message): void
     {
         // Простая запись в файл
         // В реальном приложении лучше использовать PSR-3 логгер
         file_put_contents($this->logFile, $message, FILE_APPEND | LOCK_EX);
     }
-    
+
     private function getStatusText(int $statusCode): string
     {
         return match ($statusCode) {
@@ -75,4 +75,4 @@ final class LoggingMiddleware implements MiddlewareInterface
             default => 'Unknown'
         };
     }
-} 
+}

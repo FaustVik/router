@@ -75,13 +75,13 @@ final class Runner implements RunnerInterface
     public function runAnonymousFunc(RouteAnonymousFuncInterface $route, array $params = [], ?Request $request = null): void
     {
         $reflection = new ReflectionFunction($route->getFunc());
-        
+
         $args = [];
         if (!empty($reflection->getParameters())) {
             foreach ($reflection->getParameters() as $reflection_parameter) {
                 $paramName = $reflection_parameter->getName();
                 $paramType = $reflection_parameter->getType();
-                
+
                 // Если параметр типа Request, используем переданный Request или создаем новый
                 if ($paramType && $paramType instanceof ReflectionNamedType && $paramType->getName() === 'FaustVik\Router\Http\Request') {
                     if ($request) {
@@ -120,7 +120,7 @@ final class Runner implements RunnerInterface
         }
 
         $reflection_class = new ReflectionClass($route->getClass());
-        
+
         // Use DI container if available
         if ($this->container && $this->container->canResolve($route->getClass())) {
             $controller = $this->container->resolve($route->getClass(), $route->getArg());
@@ -135,7 +135,7 @@ final class Runner implements RunnerInterface
             foreach ($method->getParameters() as $reflection_parameter) {
                 $paramName = $reflection_parameter->getName();
                 $paramType = $reflection_parameter->getType();
-                
+
                 // Если параметр типа Request, используем переданный Request или создаем новый
                 if ($paramType && $paramType instanceof ReflectionNamedType && $paramType->getName() === 'FaustVik\Router\Http\Request') {
                     if ($request) {

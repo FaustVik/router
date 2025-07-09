@@ -49,4 +49,4 @@ class StringValidator implements ParameterValidatorInterface
     {
         return 'string';
     }
-} 
+}
