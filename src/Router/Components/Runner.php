@@ -14,6 +14,7 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionNamedType;
 
 final class Runner implements RunnerInterface
 {
@@ -52,8 +53,19 @@ final class Runner implements RunnerInterface
         $args = [];
         if (!empty($reflection->getParameters())) {
             foreach ($reflection->getParameters() as $reflection_parameter) {
-                if (isset($params[$reflection_parameter->getName()])) {
-                    $args[] = $params[$reflection_parameter->getName()];
+                $paramName = $reflection_parameter->getName();
+                $paramType = $reflection_parameter->getType();
+                
+                // Если параметр типа Request, создаем Request объект
+                if ($paramType && $paramType instanceof ReflectionNamedType && $paramType->getName() === 'FaustVik\Router\Http\Request') {
+                    $request = \FaustVik\Router\Http\Request::createFromGlobals();
+                    $request = $request->withParams($params);
+                    $args[] = $request;
+                } elseif (isset($params[$paramName])) {
+                    $args[] = $params[$paramName];
+                } elseif (!$reflection_parameter->isOptional()) {
+                    // Если параметр не опциональный и не найден, добавляем null
+                    $args[] = null;
                 }
             }
         }
@@ -85,8 +97,19 @@ final class Runner implements RunnerInterface
         $atr = [];
         if (!empty($method->getParameters())) {
             foreach ($method->getParameters() as $reflection_parameter) {
-                if (isset($params[$reflection_parameter->getName()])) {
-                    $atr[] = $params[$reflection_parameter->getName()];
+                $paramName = $reflection_parameter->getName();
+                $paramType = $reflection_parameter->getType();
+                
+                // Если параметр типа Request, создаем Request объект
+                if ($paramType && $paramType instanceof ReflectionNamedType && $paramType->getName() === 'FaustVik\Router\Http\Request') {
+                    $request = \FaustVik\Router\Http\Request::createFromGlobals();
+                    $request = $request->withParams($params);
+                    $atr[] = $request;
+                } elseif (isset($params[$paramName])) {
+                    $atr[] = $params[$paramName];
+                } elseif (!$reflection_parameter->isOptional()) {
+                    // Если параметр не опциональный и не найден, добавляем null
+                    $atr[] = null;
                 }
             }
         }
