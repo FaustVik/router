@@ -17,12 +17,10 @@ final class Matching implements MatchingRouteInterface
     public function match(string $uri, RoutesCollectionInterface $collections): MatchResult
     {
         foreach ($collections->get() as $route) {
-            // Сначала проверяем точное совпадение (обратная совместимость)
-            if (in_array($uri, [$route->alias(), $route->getRoute()], true)) {
+            if ($uri === $route->getRoute() || $uri === $route->alias()) {
                 return new MatchResult($route, []);
             }
 
-            // Проверяем совпадение с параметрами
             $matchResult = $this->matchWithParameters($uri, $route);
             if ($matchResult !== null) {
                 return $matchResult;
@@ -34,13 +32,11 @@ final class Matching implements MatchingRouteInterface
 
     private function matchWithParameters(string $uri, RouteInterface $route): ?MatchResult
     {
-        // Проверяем основной маршрут
         $result = $this->matchPattern($uri, $route->getRoute());
         if ($result !== null) {
             return new MatchResult($route, $result);
         }
 
-        // Проверяем алиас если он есть
         if ($route->alias() !== null) {
             $result = $this->matchPattern($uri, $route->alias());
             if ($result !== null) {
@@ -53,31 +49,24 @@ final class Matching implements MatchingRouteInterface
 
     private function matchPattern(string $uri, string $pattern): ?array
     {
-        // Разбиваем URI и паттерн на сегменты
         $uriSegments = $this->getSegments($uri);
         $patternSegments = $this->getSegments($pattern);
 
-        // Количество сегментов должно совпадать
         if (count($uriSegments) !== count($patternSegments)) {
             return null;
         }
 
         $parameters = [];
 
-        // Сравниваем каждый сегмент
         for ($i = 0; $i < count($patternSegments); $i++) {
             $patternSegment = $patternSegments[$i];
             $uriSegment = $uriSegments[$i];
 
-            // Если сегмент в фигурных скобках - это параметр
             if ($this->isParameter($patternSegment)) {
                 $parameterName = $this->getParameterName($patternSegment);
                 $parameters[$parameterName] = $uriSegment;
-            } else {
-                // Иначе должно быть точное совпадение
-                if ($patternSegment !== $uriSegment) {
-                    return null;
-                }
+            } elseif ($patternSegment !== $uriSegment) {
+                return null;
             }
         }
 
@@ -86,7 +75,6 @@ final class Matching implements MatchingRouteInterface
 
     private function getSegments(string $path): array
     {
-        // Используем array_values для пересоздания индексов
         return array_values(array_filter(explode('/', $path), fn($segment) => $segment !== ''));
     }
 

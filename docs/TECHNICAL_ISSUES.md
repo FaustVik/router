@@ -617,7 +617,7 @@ final class Response implements ResponseInterface { }
 ### 9. Неэффективный матчинг маршрутов O(n)
 
 **Приоритет:** СРЕДНИЙ  
-**Файл:** `src/Router/Components/Matching.php:17-33`
+**Файл:** `src/Router/Components/matching/Matching.php:17-33`
 
 **Проблема:**
 ```php
