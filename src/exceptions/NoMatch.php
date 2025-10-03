@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\exceptions;
 
-class NoMatch extends Exception
+final class NoMatch extends Exception
 {
     public function __construct(string $uri)
     {

@@ -43,6 +43,16 @@
    - Roadmap к stable release
    - ~2,000 слов, время чтения: ~10 минут
 
+### 🔮 Будущее
+
+5. **[FUTURE_PLANS.md](FUTURE_PLANS.md)** - Планы на будущее
+   - ErrorHandler для кастомной обработки ошибок
+   - Events System для хуков
+   - Named Routes и Resource Routes
+   - Auto Type Casting параметров
+   - PSR-7/PSR-15 поддержка
+   - ~2,500 слов, время чтения: ~12 минут
+
 ---
 
 ## 🎯 Быстрый старт

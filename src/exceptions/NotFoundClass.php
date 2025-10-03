@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\exceptions;
 
-class NotFoundClass extends Exception
+final class NotFoundClass extends Exception
 {
     public function __construct(string $class)
     {

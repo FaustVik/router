@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\exceptions;
 
-use Exception;
-
-class ValidationException extends Exception
+final class ValidationException extends Exception
 {
     private string $parameter;
     private string $value;

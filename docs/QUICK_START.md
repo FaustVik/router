@@ -414,6 +414,131 @@ $app->run();
 
 ---
 
+## ⚠️ Обработка ошибок
+
+**Важно:** Роутер только роутит и пробрасывает исключения. Вы должны сами обработать их!
+
+### Базовая обработка
+
+```php
+use FaustVik\Router\Router\QuickRouter;
+use FaustVik\Router\exceptions\NoMatch;
+use FaustVik\Router\exceptions\ValidationException;
+use FaustVik\Router\exceptions\NotAllowedHttpMethod;
+use FaustVik\Router\Http\Response;
+
+$app = new QuickRouter();
+
+$app->get('/', fn() => "Home");
+$app->get('/users/{id}', fn($id) => "User #$id")
+    ->validate([
+        ParameterValidationRule::create('id')
+            ->required()
+            ->addValidator(new IntValidator())
+    ]);
+
+try {
+    $app->run();
+} catch (ValidationException $e) {
+    // Ошибка валидации параметров
+    Response::json([
+        'error' => 'Validation failed',
+        'parameter' => $e->getParameter(),
+        'details' => $e->getErrors()
+    ], 400)->send();
+} catch (NoMatch $e) {
+    // Маршрут не найден
+    Response::html('<h1>404 - Page Not Found</h1>', 404)->send();
+} catch (NotAllowedHttpMethod $e) {
+    // HTTP метод не разрешён
+    Response::json([
+        'error' => 'Method not allowed',
+        'message' => $e->getMessage()
+    ], 405)->send();
+} catch (\Throwable $e) {
+    // Любая другая ошибка
+    Response::json([
+        'error' => 'Internal Server Error',
+        'message' => $e->getMessage()
+    ], 500)->send();
+}
+```
+
+### JSON API обработка
+
+```php
+$app = new QuickRouter();
+
+// ... роуты
+
+try {
+    $app->run();
+} catch (\Throwable $e) {
+    $statusCode = match(true) {
+        $e instanceof ValidationException => 400,
+        $e instanceof NoMatch => 404,
+        $e instanceof NotAllowedHttpMethod => 405,
+        default => 500
+    };
+    
+    Response::json([
+        'success' => false,
+        'error' => [
+            'type' => get_class($e),
+            'message' => $e->getMessage(),
+            'code' => $statusCode
+        ]
+    ], $statusCode)->send();
+}
+```
+
+### Кастомная страница ошибок
+
+```php
+try {
+    $app->run();
+} catch (NoMatch $e) {
+    // Красивая 404 страница
+    $html = file_get_contents('views/errors/404.html');
+    Response::html($html, 404)->send();
+} catch (\Throwable $e) {
+    // Страница 500
+    $html = file_get_contents('views/errors/500.html');
+    Response::html($html, 500)->send();
+}
+```
+
+### Логирование ошибок
+
+```php
+try {
+    $app->run();
+} catch (\Throwable $e) {
+    // Логируем ошибку
+    error_log(sprintf(
+        "[%s] %s: %s in %s:%d",
+        date('Y-m-d H:i:s'),
+        get_class($e),
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine()
+    ));
+    
+    // Показываем пользователю
+    if (getenv('APP_ENV') === 'production') {
+        Response::html('<h1>Oops! Something went wrong</h1>', 500)->send();
+    } else {
+        // В dev режиме показываем детали
+        Response::html(
+            '<pre>' . $e->__toString() . '</pre>',
+            500
+        )->send();
+    }
+}
+```
+
+---
+
 ## 🔧 Конфигурация
 
 ### Включить кеширование (для production)

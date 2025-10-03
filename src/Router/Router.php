@@ -149,9 +149,6 @@ final class Router implements RouterInterface, CacheableRouterInterface
     /**
      * Валидирует параметры маршрута
      *
-     * Проверяет параметры согласно правилам валидации, определенным в маршруте.
-     * При ошибке валидации возвращает HTTP 400 и завершает выполнение.
-     *
      * @throws ValidationException Если параметры не прошли валидацию
      */
     private function validateParameters(RouteInterface $route, array $parameters): void
@@ -161,15 +158,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             return;
         }
 
-        try {
-            $this->parameterValidator->validate($parameters, $validationRules);
-        } catch (ValidationException $e) {
-            // Здесь можно настроить обработку ошибок валидации
-            // Пока просто выводим ошибку и завершаем выполнение
-            http_response_code(400);
-            echo "Validation Error: " . $e->getMessage();
-            exit;
-        }
+        $this->parameterValidator->validate($parameters, $validationRules);
     }
 
     /**
