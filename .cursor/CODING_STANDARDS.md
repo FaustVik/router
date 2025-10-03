@@ -151,7 +151,24 @@ public function validate(array $parameters, array $rules): void
 - **Переменные**: camelCase (`$routeCollection`, `$parameterValidator`)
 - **Константы**: UPPER_CASE (`MAX_ROUTE_LENGTH`)
 
-### 4. Структура классов
+### 4. Структура файлов
+
+Каждый PHP файл должен начинаться со следующей структуры (согласно PSR-12):
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace FaustVik\Router\Example;
+```
+
+**Важно:**
+- После открывающего тега `<?php` обязательна **пустая строка**
+- После `declare(strict_types=1);` обязательна **пустая строка**
+- Затем следует объявление `namespace`
+
+### 5. Структура классов
 
 ```php
 <?php
@@ -196,20 +213,20 @@ final class Example implements ExampleInterface
 }
 ```
 
-### 5. Типизация
+### 6. Типизация
 
 - Всегда используйте `declare(strict_types=1)`
 - Указывайте типы для всех параметров и возвращаемых значений
 - Используйте nullable типы (`?string`) вместо `string|null`
 - Для массивов используйте `array` в сигнатуре, `Type[]` в PHPDoc
 
-### 6. Исключения
+### 7. Исключения
 
 - Создавайте специфические исключения для разных типов ошибок
 - Наследуйте от базового `Exception` или специфических исключений
 - Используйте `@throws` в PHPDoc для документирования исключений
 
-### 7. Примеры
+### 8. Примеры
 
 Файлы в папке `examples/` имеют более мягкие требования:
 - Не требуется `declare(strict_types=1)`

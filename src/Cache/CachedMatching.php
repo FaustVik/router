@@ -32,7 +32,7 @@ final class CachedMatching implements MatchingRouteInterface
         }
 
         $cacheKey = $this->generateCacheKey($uri, $collection);
-        
+
         // Пытаемся получить результат из кеша
         $cachedResult = $this->cache->get($cacheKey);
         if ($cachedResult !== null) {
@@ -41,10 +41,10 @@ final class CachedMatching implements MatchingRouteInterface
 
         // Если в кеше нет, выполняем обычный матчинг
         $result = $this->originalMatcher->match($uri, $collection);
-        
+
         // Сохраняем результат в кеш
         $this->cache->set($cacheKey, $result, $this->cacheTtl);
-        
+
         return $result;
     }
 
@@ -98,28 +98,28 @@ final class CachedMatching implements MatchingRouteInterface
     {
         $routes = $collection->get();
         $routesData = [];
-        
+
         foreach ($routes as $route) {
             $routeData = [
                 'pattern' => $route->getRoute(),
                 'methods' => $route->getMethods(),
                 'middleware' => $route->getMiddleware()
             ];
-            
+
             // Добавляем специфичные для RouteClassInterface данные
             if ($route instanceof RouteClassInterface) {
                 $routeData['class'] = $route->getClass();
                 $routeData['action'] = $route->getAction();
             }
-            
+
             // Добавляем специфичные для RouteAnonymousFuncInterface данные
             if ($route instanceof RouteAnonymousFuncInterface) {
                 $routeData['func_hash'] = spl_object_hash($route->getFunc());
             }
-            
+
             $routesData[] = $routeData;
         }
-        
+
         return md5(serialize($routesData));
     }
 }

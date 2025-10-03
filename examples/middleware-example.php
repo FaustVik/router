@@ -13,18 +13,18 @@ use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
 
 // Пример контроллера
-class UserController 
+class UserController
 {
     public function index(Request $request)
     {
         $userId = $request->getAttribute('user_id', 'Guest');
         $isAuthenticated = $request->getAttribute('authenticated', false);
-        
+
         echo "User ID: " . $userId . "\n";
         echo "Authenticated: " . ($isAuthenticated ? 'Yes' : 'No') . "\n";
         echo "Users list here...";
     }
-    
+
     public function show(Request $request, $id)
     {
         $userId = $request->getAttribute('user_id', 'Guest');
@@ -68,7 +68,7 @@ $collections->set(
 
 // API маршрут с анонимной функцией
 $collections->set(
-    RouteAnonymousFunc::create('/api/status', function(Request $request) {
+    RouteAnonymousFunc::create('/api/status', function (Request $request) {
         return Response::json([
             'status' => 'ok',
             'timestamp' => time(),
@@ -99,4 +99,4 @@ echo "- / (no middleware)\n";
 echo "- /users (with logging and CORS)\n";
 echo "- /admin/users (with auth and logging - needs Authorization header)\n";
 echo "- /users/123 (with logging)\n";
-echo "- /api/status (JSON response with CORS and logging)\n"; 
+echo "- /api/status (JSON response with CORS and logging)\n";

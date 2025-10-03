@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FaustVik\Router\Cache;
 
 use FaustVik\Router\interfaces\Cache\CacheInterface;
+
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -26,7 +27,7 @@ final class FileCache implements CacheInterface
     {
         $this->cacheDir = rtrim($cacheDir, '/');
         $this->prefix = $prefix;
-        
+
         if (!is_dir($this->cacheDir)) {
             mkdir($this->cacheDir, 0755, true);
         }
@@ -35,7 +36,7 @@ final class FileCache implements CacheInterface
     public function get(string $key): mixed
     {
         $filename = $this->getFilename($key);
-        
+
         if (!file_exists($filename)) {
             return null;
         }
@@ -46,7 +47,7 @@ final class FileCache implements CacheInterface
         }
 
         $data = unserialize($content);
-        
+
         // Проверяем TTL
         if ($data['ttl'] > 0 && time() > $data['ttl']) {
             $this->delete($key);
@@ -59,7 +60,7 @@ final class FileCache implements CacheInterface
     public function set(string $key, mixed $value, int $ttl = 0): bool
     {
         $filename = $this->getFilename($key);
-        
+
         $data = [
             'value' => $value,
             'ttl' => $ttl > 0 ? time() + $ttl : 0,
@@ -67,7 +68,7 @@ final class FileCache implements CacheInterface
         ];
 
         $serialized = serialize($data);
-        
+
         return file_put_contents($filename, $serialized, LOCK_EX) !== false;
     }
 
@@ -79,7 +80,7 @@ final class FileCache implements CacheInterface
     public function delete(string $key): bool
     {
         $filename = $this->getFilename($key);
-        
+
         if (file_exists($filename)) {
             return unlink($filename);
         }
@@ -91,7 +92,7 @@ final class FileCache implements CacheInterface
     {
         $pattern = $this->cacheDir . '/' . $this->prefix . '*';
         $files = glob($pattern);
-        
+
         if ($files === false) {
             return true;
         }
@@ -108,7 +109,7 @@ final class FileCache implements CacheInterface
     public function getMultiple(array $keys): array
     {
         $result = [];
-        
+
         foreach ($keys as $key) {
             $result[$key] = $this->get($key);
         }
@@ -119,7 +120,7 @@ final class FileCache implements CacheInterface
     public function setMultiple(array $values, int $ttl = 0): bool
     {
         $success = true;
-        
+
         foreach ($values as $key => $value) {
             if (!$this->set($key, $value, $ttl)) {
                 $success = false;
@@ -132,7 +133,7 @@ final class FileCache implements CacheInterface
     public function deleteMultiple(array $keys): bool
     {
         $success = true;
-        
+
         foreach ($keys as $key) {
             if (!$this->delete($key)) {
                 $success = false;

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace FaustVik\Router\interfaces\Router;
 
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;

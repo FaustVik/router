@@ -20,6 +20,7 @@ use FaustVik\Router\interfaces\Cache\CacheInterface;
 use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\DI\DefaultContainer;
 use FaustVik\Router\DI\ContainerAdapterFactory;
+
 use function str_contains;
 
 /**
