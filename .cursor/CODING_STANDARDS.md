@@ -151,7 +151,58 @@ public function validate(array $parameters, array $rules): void
 - **Переменные**: camelCase (`$routeCollection`, `$parameterValidator`)
 - **Константы**: UPPER_CASE (`MAX_ROUTE_LENGTH`)
 
-### 4. Структура файлов
+### 4. Named Arguments (PHP 8.0+)
+
+**Используйте named arguments для улучшения читаемости кода** в следующих случаях:
+
+✅ **При создании объектов с несколькими параметрами:**
+```php
+// ✅ Хорошо - понятно что включено
+$app = new QuickRouter(cache: true, di: false);
+
+// ❌ Плохо - непонятно что означают булевы значения
+$app = new QuickRouter(true, false);
+```
+
+✅ **При вызове статических фабричных методов:**
+```php
+// ✅ Хорошо
+$route = Route::create(
+    route: '/users',
+    class: UserController::class,
+    action: 'index',
+    arg: [],
+    methods: ['GET']
+);
+
+// ❌ Плохо - порядок параметров неочевиден
+$route = Route::create('/users', UserController::class, 'index', [], ['GET']);
+```
+
+✅ **В приватных/внутренних методах для self-documenting кода:**
+```php
+private function addRoute(string|array $methods, string $uri, callable|array $handler): RouteInterface
+{
+    return $this->createRoute(
+        methods: $methods,
+        uri: $uri,
+        handler: $handler
+    );
+}
+```
+
+❌ **НЕ используйте в простых очевидных случаях:**
+```php
+// ❌ Избыточно
+$app->get(uri: '/', handler: fn() => "Hello!");
+
+// ✅ Достаточно просто
+$app->get('/', fn() => "Hello!");
+```
+
+**Принцип:** Named arguments улучшают читаемость, когда параметры не очевидны из контекста.
+
+### 5. Структура файлов
 
 Каждый PHP файл должен начинаться со следующей структуры (согласно PSR-12):
 
@@ -168,7 +219,7 @@ namespace FaustVik\Router\Example;
 - После `declare(strict_types=1);` обязательна **пустая строка**
 - Затем следует объявление `namespace`
 
-### 5. Структура классов
+### 6. Структура классов
 
 ```php
 <?php
