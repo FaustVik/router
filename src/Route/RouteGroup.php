@@ -6,7 +6,6 @@ namespace FaustVik\Router\Route;
 
 use FaustVik\Router\interfaces\Routes\RouteGroupInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
-use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class RouteGroup implements RouteGroupInterface
 {
@@ -25,7 +24,7 @@ final class RouteGroup implements RouteGroupInterface
         // Если уже есть префикс, добавляем к нему
         $newPrefix = rtrim($prefix, '/');
         if ($this->prefix !== '') {
-            $this->prefix = $this->prefix . $newPrefix;
+            $this->prefix .= $newPrefix;
         } else {
             $this->prefix = $newPrefix;
         }

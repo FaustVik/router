@@ -6,7 +6,6 @@ namespace FaustVik\Router\Route;
 
 use FaustVik\Router\interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
-use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class Route implements RouteClassInterface
 {

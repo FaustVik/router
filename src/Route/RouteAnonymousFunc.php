@@ -7,14 +7,13 @@ namespace FaustVik\Router\Route;
 use Closure;
 use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
-use FaustVik\Router\Validation\ParameterValidationRule;
 
 final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 {
     private string $route = '';
     private Closure $func;
     private array $methods = [];
-    private ?string $alias   = null;
+    private ?string $alias = null;
     private array $middleware = [];
     private array $validationRules = [];
 
@@ -30,11 +29,11 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         array $methods = [],
         ?string $alias = null
     ): RouteInterface {
-        $self          = new self();
-        $self->route   = $route;
-        $self->func    = $func(...);
+        $self = new self();
+        $self->route = $route;
+        $self->func = $func(...);
         $self->methods = $methods;
-        $self->alias   = $alias;
+        $self->alias = $alias;
 
         return $self;
     }
