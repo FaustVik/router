@@ -9,20 +9,18 @@ use FaustVik\Router\exceptions\NotAllowedHttpMethod;
 interface CheckHttpMethodInterface
 {
     /**
-     * Adding routes
+     * Проверяет, разрешён ли текущий HTTP метод для маршрута
      *
-     * @param array $methods
-     *
-     * @return boolean
-     *
+     * @param array<string> $methods Разрешённые HTTP методы
+     * @return void
      * @throws NotAllowedHttpMethod
      */
-    public static function isAllow(array $methods): bool;
+    public function isAllow(array $methods): void;
 
     /**
-     * Get which method was used
+     * Получает текущий HTTP метод запроса
      *
      * @return string
      */
-    public static function getRequestMethod(): string;
+    public function getRequestMethod(): string;
 }

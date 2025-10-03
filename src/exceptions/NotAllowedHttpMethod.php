@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\exceptions;
 
-class NotAllowedHttpMethod extends Exception
+final class NotAllowedHttpMethod extends Exception
 {
     public function __construct(string $method)
     {

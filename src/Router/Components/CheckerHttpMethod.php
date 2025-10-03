@@ -10,23 +10,28 @@ use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
 final class CheckerHttpMethod implements CheckHttpMethodInterface
 {
     /**
+     * @param array<string> $methods
+     * @return void
      * @throws NotAllowedHttpMethod
      */
-    public static function isAllow(array $methods): bool
+    public function isAllow(array $methods): void
     {
         if (empty($methods)) {
-            return true;
+            return;
         }
 
-        if (!in_array(self::getRequestMethod(), $methods, true)) {
-            throw new NotAllowedHttpMethod(self::getRequestMethod());
+        $currentMethod = $this->getRequestMethod();
+
+        if (in_array($currentMethod, $methods, true)) {
+            return;
         }
 
-        return true;
+        throw new NotAllowedHttpMethod($currentMethod);
     }
 
-    public static function getRequestMethod(): string
+    public function getRequestMethod(): string
     {
-        return $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        return strtoupper($method);
     }
 }

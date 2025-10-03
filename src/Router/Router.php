@@ -259,7 +259,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      */
     protected function check(RouteInterface $route): void
     {
-        $this->getConfig()->getCheckerHttpMethod()::isAllow($route->getMethods());
+        $this->getConfig()->getCheckerHttpMethod()->isAllow($route->getMethods());
     }
 
     /**
