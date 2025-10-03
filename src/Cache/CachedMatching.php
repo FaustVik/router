@@ -7,10 +7,10 @@ namespace FaustVik\Router\Cache;
 use FaustVik\Router\interfaces\Cache\CacheInterface;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
-use FaustVik\Router\interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
-use FaustVik\Router\Router\Components\MatchResult;
-use FaustVik\Router\Router\Components\Matching;
+use FaustVik\Router\interfaces\Routes\RouteClassInterface;
+use FaustVik\Router\Router\Components\matching\Matching;
+use FaustVik\Router\Router\Components\matching\MatchResult;
 
 final class CachedMatching implements MatchingRouteInterface
 {

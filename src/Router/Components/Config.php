@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router\Components;
 
+use FaustVik\Router\Cache\CachedMatching;
+use FaustVik\Router\Cache\FileCache;
+use FaustVik\Router\interfaces\Cache\CacheInterface;
+use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
-use FaustVik\Router\Cache\CachedMatching;
-use FaustVik\Router\Cache\FileCache;
+use FaustVik\Router\Router\Components\matching\Matching;
 
 final class Config implements ConfigInterface
 {

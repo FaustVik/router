@@ -6,7 +6,7 @@ namespace FaustVik\Router\interfaces\Router\Components;
 
 use FaustVik\Router\exceptions\NoMatch;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\Router\Components\MatchResult;
+use FaustVik\Router\Router\Components\matching\MatchResult;
 
 interface MatchingRouteInterface
 {
