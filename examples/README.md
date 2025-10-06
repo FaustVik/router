@@ -13,6 +13,8 @@
 
 ### Для продвинутых
 - **`rest-api-example.php`** - Полноценный REST API с CRUD операциями
+- **`post-data-example.php`** - ✨ **НОВОЕ!** Работа с POST/PUT/PATCH данными, JSON body, загрузка файлов
+- **`cookies-and-security-example.php`** - ✨ **НОВОЕ!** Cookies, IP detection, HTTPS check, Method Override
 - **`error-handling-example.php`** - Обработка ошибок, исключения, HTTP коды
 - **`cache-example.php`** - Базовое кеширование маршрутов
 - **`cache-production-example.php`** - Кеширование для продакшн окружения

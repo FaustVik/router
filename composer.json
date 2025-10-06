@@ -1,12 +1,21 @@
 {
   "name": "faustvik/router",
-  "description": "Router php",
+  "description": "Lightweight PHP Router with built-in HTTP abstraction, Middleware support, Request/Response handling, Parameter Validation, and Route Caching for modern web applications",
   "keywords": [
     "php",
     "router",
     "routing",
-    "http"
+    "http",
+    "middleware",
+    "request",
+    "response",
+    "validation",
+    "cache",
+    "rest-api",
+    "url-parameters",
+    "dependency-injection"
   ],
+  "type": "library",
   "license": "MIT",
   "authors": [
     {
