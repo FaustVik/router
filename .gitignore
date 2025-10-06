@@ -3,6 +3,11 @@ index.php
 
 vendor/
 
+# Temporary files and caches
+.var/*
+!.var/.gitkeep
+!.var/README.md
+
 # PHPStan
 phpstan.neon.dist
 phpstan-baseline.neon

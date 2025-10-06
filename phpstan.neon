@@ -2,6 +2,7 @@ parameters:
     level: 5
     paths:
         - src
+    tmpDir: .var/phpstan
     
     # Полезные правила для улучшения кода
     checkTooWideReturnTypesInProtectedAndPublicMethods: true
