@@ -16,7 +16,6 @@ final class Route implements RouteClassInterface
     private ?string $alias = null;
     private array $arg = [];
     private array $middleware = [];
-    private array $validationRules = [];
 
     public static function create(
         string $route,
@@ -75,17 +74,6 @@ final class Route implements RouteClassInterface
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
-        return $this;
-    }
-
-    public function getValidationRules(): array
-    {
-        return $this->validationRules;
-    }
-
-    public function validate(array $rules): self
-    {
-        $this->validationRules = $rules;
         return $this;
     }
 }

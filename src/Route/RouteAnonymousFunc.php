@@ -15,7 +15,6 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     private array $methods = [];
     private ?string $alias = null;
     private array $middleware = [];
-    private array $validationRules = [];
 
     public function __construct()
     {
@@ -66,17 +65,6 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
-        return $this;
-    }
-
-    public function getValidationRules(): array
-    {
-        return $this->validationRules;
-    }
-
-    public function validate(array $rules): self
-    {
-        $this->validationRules = $rules;
         return $this;
     }
 }

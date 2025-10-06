@@ -8,7 +8,6 @@ use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
-use FaustVik\Router\Validation\ParameterValidationRule;
 
 // Интерфейс для демонстрации
 interface DatabaseInterface
@@ -125,10 +124,7 @@ $routes = new RoutesCollection();
 
 // Добавляем маршруты - контроллеры будут созданы через внешний контейнер
 $routes->addGet('/products', ProductController::class, 'index');
-$routes->addGet('/products/{id}', ProductController::class, 'show')
-    ->validate([
-        ParameterValidationRule::for('id')->regex('/^\d+$/')
-    ]);
+$routes->addGet('/products/{id}', ProductController::class, 'show');
 
 // Настройка роутера
 $router->setCollection($routes);

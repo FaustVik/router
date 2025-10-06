@@ -12,7 +12,6 @@ final class RouteGroup implements RouteGroupInterface
     private string $prefix = '';
     private array $middleware = [];
     private array $routes = [];
-    private array $validationRules = [];
 
     public function __construct(
         private readonly RoutesCollection $collection
@@ -37,18 +36,11 @@ final class RouteGroup implements RouteGroupInterface
         return $this;
     }
 
-    public function validate(array $rules): self
-    {
-        $this->validationRules = array_merge($this->validationRules, $rules);
-        return $this;
-    }
-
     public function get(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, ['GET']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -59,7 +51,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, ['POST']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -70,7 +61,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, ['PUT']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -81,7 +71,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, ['DELETE']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -92,7 +81,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, ['PATCH']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -103,7 +91,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -114,7 +101,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = Route::create($fullRoute, $class, $action, $arg, $methods);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -125,7 +111,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['GET']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -136,7 +121,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['POST']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -147,7 +131,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['PUT']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -158,7 +141,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['DELETE']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -169,7 +151,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['PATCH']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -180,7 +161,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -191,7 +171,6 @@ final class RouteGroup implements RouteGroupInterface
         $fullRoute = $this->prefix . $route;
         $routeObject = RouteAnonymousFunc::create($fullRoute, $func, $methods);
         $routeObject->middleware($this->middleware);
-        $routeObject->validate($this->validationRules);
         $this->collection->set($routeObject);
         $this->routes[] = $routeObject;
         return $routeObject;
@@ -203,7 +182,6 @@ final class RouteGroup implements RouteGroupInterface
         // Копируем текущее состояние для вложенной группы
         $nestedGroup->prefix = $this->prefix;
         $nestedGroup->middleware = array_merge([], $this->middleware);
-        $nestedGroup->validationRules = array_merge([], $this->validationRules);
 
         $callback($nestedGroup);
 

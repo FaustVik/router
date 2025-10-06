@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\interfaces\Routes;
 
-use FaustVik\Router\Validation\ParameterValidationRule;
-
 interface RouteGroupInterface
 {
     public function prefix(string $prefix): self;
 
     public function middleware(array $middleware): self;
-
-    public function validate(array $rules): self;
 
     public function get(string $route, string $class, string $action, array $arg = []): RouteInterface;
 

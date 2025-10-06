@@ -6,7 +6,6 @@ namespace FaustVik\Router\Router;
 
 use FaustVik\Router\DI\ContainerAdapterFactory;
 use FaustVik\Router\DI\DefaultContainer;
-use FaustVik\Router\exceptions\ValidationException;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\interfaces\Cache\CacheableRouterInterface;
@@ -19,7 +18,6 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\Middleware\MiddlewareStack;
 use FaustVik\Router\Router\Components\Config;
 use FaustVik\Router\Router\Components\matching\MatchResult;
-use FaustVik\Router\Validation\ParameterValidator;
 
 use function str_contains;
 
@@ -29,7 +27,6 @@ use function str_contains;
  * Обеспечивает:
  * - Маршрутизацию HTTP запросов
  * - Обработку параметров URL и query string
- * - Валидацию параметров
  * - Поддержку middleware
  * - Кеширование результатов маршрутизации
  * - Dependency Injection контейнер
@@ -44,18 +41,16 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?array $params = null;
     private ConfigInterface $config;
     private ?RoutesCollectionInterface $collections = null;
-    private ?ParameterValidator $parameterValidator = null;
     private ?RouterContainerInterface $container = null;
 
     /**
      * Конструктор роутера
      *
-     * Инициализирует базовую конфигурацию и валидатор параметров
+     * Инициализирует базовую конфигурацию роутера
      */
     public function __construct()
     {
         $this->config = new Config();
-        $this->parameterValidator = new ParameterValidator();
     }
 
     /**
@@ -89,14 +84,12 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Выполняет следующие шаги:
      * 1. Парсит URI запроса
      * 2. Находит подходящий маршрут
-     * 3. Валидирует параметры
-     * 4. Проверяет HTTP метод
-     * 5. Создает объект запроса
-     * 6. Выполняет middleware stack
-     * 7. Запускает контроллер
-     * 8. Отправляет ответ
+     * 3. Проверяет HTTP метод
+     * 4. Создает объект запроса
+     * 5. Выполняет middleware stack
+     * 6. Запускает контроллер
+     * 7. Отправляет ответ
      *
-     * @throws \FaustVik\Router\exceptions\ValidationException Если параметры не прошли валидацию
      * @throws \FaustVik\Router\exceptions\NoMatch Если маршрут не найден
      * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
      */
@@ -113,9 +106,6 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Параметры из URL имеют приоритет над query параметрами
         $urlParams = $matchResult->getParameters();
         $allParams = array_merge($this->params ?? [], $urlParams);
-
-        // Валидируем параметры маршрута
-        $this->validateParameters($route, $urlParams);
 
         // Проверяем разрешенные HTTP методы
         $this->check($route);
@@ -144,21 +134,6 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         // Отправляем ответ клиенту
         $response->send();
-    }
-
-    /**
-     * Валидирует параметры маршрута
-     *
-     * @throws ValidationException Если параметры не прошли валидацию
-     */
-    private function validateParameters(RouteInterface $route, array $parameters): void
-    {
-        $validationRules = $route->getValidationRules();
-        if (empty($validationRules)) {
-            return;
-        }
-
-        $this->parameterValidator->validate($parameters, $validationRules);
     }
 
     /**

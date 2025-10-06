@@ -6,7 +6,6 @@ use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
-use FaustVik\Router\Validation\ParameterValidationRule;
 
 // Простой сервис для демонстрации
 class Logger
@@ -124,10 +123,7 @@ function createRouter(): Router
 
     // Добавляем маршруты - контроллеры будут автоматически созданы через DI
     $routes->addGet('/users', UserController::class, 'index');
-    $routes->addGet('/users/{id}', UserController::class, 'show')
-        ->validate([
-            ParameterValidationRule::for('id')->regex('/^\d+$/')
-        ]);
+    $routes->addGet('/users/{id}', UserController::class, 'show');
     $routes->addPost('/users', UserController::class, 'create');
 
     // Настройка роутера

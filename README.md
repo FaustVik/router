@@ -329,7 +329,7 @@ Comprehensive examples demonstrating router capabilities from basic to advanced:
 
 ### 🟢 Beginner Level
 - **[basic-example.php](examples/basic-example.php)** - Router introduction with controllers and URL parameters
-- **[url-parameters-example.php](examples/url-parameters-example.php)** - Advanced URL parameter handling and validation
+- **[url-parameters-example.php](examples/url-parameters-example.php)** - Advanced URL parameter handling
 
 ### 🟡 Intermediate Level  
 - **[response-types-example.php](examples/response-types-example.php)** - JSON, HTML, redirects, custom headers, XML, CORS
