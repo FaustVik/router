@@ -11,13 +11,14 @@
 | Категория | Критических | Высоких | Средних | Всего |
 |-----------|-------------|---------|---------|-------|
 | Безопасность | ~~2~~ **0** ✅ | 0 | 0 | **0** ✅ |
-| Архитектура | 0 | ~~3~~ **2** | 2 | **4** |
+| Архитектура | 0 | ~~3~~ **1** | 2 | **3** |
 | Производительность | 0 | 1 | 1 | **2** |
 | Тестирование | 0 | 1 | 0 | **1** |
-| **ИТОГО** | ~~2~~ **0** ✅ | ~~5~~ **4** | **3** | **7** |
+| **ИТОГО** | ~~2~~ **0** ✅ | ~~5~~ **3** | **3** | **6** |
 
 **Прогресс:** 
 - ✅ Критические проблемы безопасности **РЕШЕНЫ** (6 октября 2025)
+- ✅ DI в MiddlewareStack **РЕАЛИЗОВАНО** с опциональным контейнером (7 октября 2025)
 - ❌ ErrorHandler **ОТКЛОНЕНО** - Router остается простой библиотекой
 
 ---
@@ -66,6 +67,29 @@ public function hasFile(string $key): bool
 - `getClientIp(bool $trustProxy)` - с поддержкой прокси
 - `getPath()`, `getScheme()`, `getHost()`, `getFullUrl()`
 - Cookies методы: `getCookies()`, `getCookie()`, `hasCookie()`
+
+### 5. ✅ DI контейнер в MiddlewareStack (7 октября 2025)
+**Файл:** `src/Middleware/MiddlewareStack.php`
+
+Реализовано:
+- ✅ Опциональный DI контейнер в конструкторе
+- ✅ Автоматическое разрешение middleware с зависимостями
+- ✅ Graceful degradation - работает как с DI, так и без него
+- ✅ Понятные сообщения об ошибках
+- ✅ Обратная совместимость сохранена
+
+Теперь middleware с зависимостями работают через DI:
+```php
+$container->bind(RateLimitMiddleware::class, function($c) {
+    return new RateLimitMiddleware(
+        cache: $c->resolve(CacheInterface::class),
+        maxAttempts: 100
+    );
+});
+
+// ✅ Работает!
+$route->middleware([RateLimitMiddleware::class]);
+```
 
 ---
 
@@ -341,114 +365,108 @@ class ErrorHandlerMiddleware {
 
 ---
 
-### 4. MiddlewareStack не использует DI контейнер
+### 4. ~~MiddlewareStack не использует DI контейнер~~ ✅ ИСПРАВЛЕНО
 
-**Приоритет:** ВЫСОКИЙ  
-**Файл:** `src/Middleware/MiddlewareStack.php:93-106`
+**Приоритет:** ~~ВЫСОКИЙ~~ → **РЕШЕНО**  
+**Файл:** `src/Middleware/MiddlewareStack.php`  
+**Дата исправления:** 7 октября 2025
 
-**Проблема:**
+**Что было:**
 ```php
 public function addFromArray(array $middleware): self
 {
     foreach ($middleware as $item) {
         if (is_string($item) && class_exists($item)) {
-            // Прямая инстанциация БЕЗ DI!
-            $item = new $item();
+            $item = new $item(); // ❌ Прямая инстанциация БЕЗ DI!
         }
         // ...
     }
 }
 ```
 
-**Что не работает:**
+Middleware с зависимостями в конструкторе не работали:
 ```php
-// Middleware с зависимостями упадет с ошибкой
 class RateLimitMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        private CacheInterface $cache,  // Откуда взять?
+        private CacheInterface $cache,  // ❌ ArgumentCountError!
         private int $maxAttempts = 60
     ) {}
 }
 
-// Это вызовет ArgumentCountError
+$route->middleware([RateLimitMiddleware::class]); // ❌ Падает!
+```
+
+**Что исправлено:**
+
+1. **DI контейнер теперь опциональный** - библиотека остается простой для новичков:
+   ```php
+   public function __construct(
+       callable $finalHandler, 
+       ?RouterContainerInterface $container = null  // ✅ Опциональный!
+   )
+   ```
+
+2. **Graceful degradation** - работает как с DI, так и без него:
+   - Простые middleware без зависимостей → создаются напрямую
+   - Сложные middleware с зависимостями → разрешаются через DI контейнер
+
+3. **Понятные сообщения об ошибках** - если middleware требует зависимости, но DI нет:
+   ```
+   Middleware RateLimitMiddleware requires constructor dependencies, 
+   but no DI container is available. Either register it in the DI 
+   container or pass an instance instead of class name.
+   ```
+
+**Использование для новичков (без DI):**
+```php
+// Простой middleware без зависимостей - работает "из коробки"
+class SimpleAuthMiddleware implements MiddlewareInterface
+{
+    public function handle(Request $request, callable $next): Response
+    {
+        if (!isset($_SESSION['user'])) {
+            return Response::json(['error' => 'Unauthorized'], 401);
+        }
+        return $next($request);
+    }
+}
+
+// ✅ Работает без DI контейнера
+$route->middleware([SimpleAuthMiddleware::class]);
+```
+
+**Использование для опытных разработчиков (с DI):**
+```php
+// Middleware с зависимостями
+class RateLimitMiddleware implements MiddlewareInterface
+{
+    public function __construct(
+        private CacheInterface $cache,
+        private int $maxAttempts = 60
+    ) {}
+}
+
+// Регистрируем в DI
+$container->bind(RateLimitMiddleware::class, function($c) {
+    return new RateLimitMiddleware(
+        cache: $c->resolve(CacheInterface::class),
+        maxAttempts: 100
+    );
+});
+
+// ✅ Работает через DI!
 $route->middleware([RateLimitMiddleware::class]);
 ```
 
-**Решение:**
-```php
-// src/Middleware/MiddlewareStack.php
+**Изменения в коде:**
+- ✅ `MiddlewareStack::__construct()` принимает опциональный `$container`
+- ✅ Добавлен метод `resolveMiddleware()` с умной логикой разрешения
+- ✅ `Router::run()` передает контейнер в `MiddlewareStack`
+- ✅ Детальная обработка ошибок с понятными сообщениями
+- ✅ Обратная совместимость сохранена (опциональный параметр)
 
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
-
-final class MiddlewareStack
-{
-    private array $middleware = [];
-    private $finalHandler;
-    private ?RouterContainerInterface $container = null; // Добавить!
-    
-    public function __construct(callable $finalHandler, ?RouterContainerInterface $container = null)
-    {
-        $this->finalHandler = $finalHandler;
-        $this->container = $container;
-    }
-    
-    public function addFromArray(array $middleware): self
-    {
-        foreach ($middleware as $item) {
-            if (is_string($item)) {
-                // Сначала пытаемся разрешить через DI контейнер
-                if ($this->container && $this->container->canResolve($item)) {
-                    try {
-                        $item = $this->container->resolve($item);
-                    } catch (\Throwable $e) {
-                        throw new \RuntimeException(
-                            "Failed to resolve middleware {$item} from container: " . $e->getMessage(),
-                            0,
-                            $e
-                        );
-                    }
-                } 
-                // Если контейнера нет или он не может разрешить, пытаемся создать напрямую
-                elseif (class_exists($item)) {
-                    try {
-                        $item = new $item();
-                    } catch (\ArgumentCountError $e) {
-                        throw new \RuntimeException(
-                            "Middleware {$item} requires constructor arguments. " .
-                            "Register it in DI container or pass as instance.",
-                            0,
-                            $e
-                        );
-                    }
-                } else {
-                    throw new \RuntimeException("Middleware class not found: {$item}");
-                }
-            }
-            
-            if (!$item instanceof MiddlewareInterface) {
-                throw new \InvalidArgumentException(
-                    'Middleware must implement MiddlewareInterface, got: ' . get_debug_type($item)
-                );
-            }
-            
-            $this->add($item);
-        }
-        return $this;
-    }
-}
-```
-
-```php
-// В Router.php изменить:
-public function run(): void
-{
-    // ...
-    $middlewareStack = new MiddlewareStack($finalHandler, $this->container); // Передаем контейнер!
-    $middlewareStack->addFromArray($route->getMiddleware());
-    // ...
-}
-```
+**См. пример:** `examples/middleware-di-example.php`
 
 ---
 
@@ -1179,8 +1197,8 @@ $globalMiddleware = new LoggingMiddleware($logger);
 3. ✅ **Issue #3:** Добавить ErrorHandler в Router
 
 ### Краткосрочно (1-2 недели):
-4. ✅ **Issue #4:** Исправить DI в MiddlewareStack
-5. ✅ **Issue #6:** Написать тесты для Router и компонентов (покрытие 60%+)
+4. ✅ **Issue #4:** ~~Исправить DI в MiddlewareStack~~ **ВЫПОЛНЕНО** (7 октября 2025)
+5. ❌ **Issue #6:** Написать тесты для Router и компонентов (покрытие 60%+)
 
 ### Среднесрочно (3-4 недели):
 6. ✅ **Issue #7:** Оптимизировать Matching (Radix Tree или улучшенное кеширование)

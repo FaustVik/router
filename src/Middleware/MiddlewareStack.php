@@ -6,6 +6,7 @@ namespace FaustVik\Router\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
+use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 /**
@@ -34,6 +35,15 @@ use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
  * $response = $stack->execute($request);
  * ```
  *
+ * Пример с DI контейнером для middleware с зависимостями:
+ * ```php
+ * $stack = new MiddlewareStack($finalHandler, $container);
+ * $stack->addFromArray([
+ *     RateLimitMiddleware::class, // Будет разрешен через контейнер
+ *     AuthMiddleware::class
+ * ]);
+ * ```
+ *
  * @package FaustVik\Router\Middleware
  */
 final class MiddlewareStack
@@ -49,11 +59,18 @@ final class MiddlewareStack
     private $finalHandler;
 
     /**
-     * @param callable $finalHandler Функция обработки запроса: fn(Request): Response
+     * @var RouterContainerInterface|null DI контейнер для разрешения зависимостей middleware
      */
-    public function __construct(callable $finalHandler)
+    private ?RouterContainerInterface $container = null;
+
+    /**
+     * @param callable $finalHandler Функция обработки запроса: fn(Request): Response
+     * @param RouterContainerInterface|null $container Опциональный DI контейнер для middleware с зависимостями
+     */
+    public function __construct(callable $finalHandler, ?RouterContainerInterface $container = null)
     {
         $this->finalHandler = $finalHandler;
+        $this->container = $container;
     }
 
     /**
@@ -85,24 +102,128 @@ final class MiddlewareStack
      *
      * Массив может содержать:
      * - Экземпляры MiddlewareInterface
-     * - Имена классов middleware (будут автоматически созданы)
+     * - Имена классов middleware (будут разрешены через DI контейнер или созданы напрямую)
+     *
+     * Для middleware с зависимостями в конструкторе необходимо:
+     * 1. Передать DI контейнер в конструктор MiddlewareStack
+     * 2. Зарегистрировать middleware в контейнере
+     * 3. Передать имя класса в массиве
+     *
+     * Для простых middleware без зависимостей можно просто передать имя класса.
      *
      * @param array<MiddlewareInterface|class-string<MiddlewareInterface>> $middleware
      * @return self Для fluent interface
+     * @throws \RuntimeException Если middleware не удалось разрешить
+     * @throws \InvalidArgumentException Если элемент не является middleware
      */
     public function addFromArray(array $middleware): self
     {
         foreach ($middleware as $item) {
-            if (is_string($item) && class_exists($item)) {
-                // Если это строка с именем класса, создаем экземпляр
-                $item = new $item();
+            if (is_string($item)) {
+                // Если это строка с именем класса, пытаемся его разрешить
+                $item = $this->resolveMiddleware($item);
             }
 
-            if ($item instanceof MiddlewareInterface) {
-                $this->add($item);
+            if (!$item instanceof MiddlewareInterface) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Middleware must implement MiddlewareInterface, got: %s',
+                        get_debug_type($item)
+                    )
+                );
             }
+
+            $this->add($item);
         }
         return $this;
+    }
+
+    /**
+     * Разрешает middleware по имени класса
+     *
+     * Алгоритм разрешения:
+     * 1. Если передан DI контейнер и он может разрешить класс - используем контейнер
+     * 2. Иначе пытаемся создать экземпляр напрямую (для middleware без зависимостей)
+     * 3. Если конструктор требует параметры - выбрасываем понятную ошибку
+     *
+     * @param string $className Имя класса middleware
+     * @return MiddlewareInterface Разрешенный middleware
+     * @throws \RuntimeException Если не удалось разрешить middleware
+     */
+    private function resolveMiddleware(string $className): MiddlewareInterface
+    {
+        // Проверяем существование класса
+        if (!class_exists($className)) {
+            throw new \RuntimeException(
+                sprintf('Middleware class not found: %s', $className)
+            );
+        }
+
+        // Пытаемся разрешить через DI контейнер
+        if ($this->container !== null && $this->container->canResolve($className)) {
+            try {
+                $instance = $this->container->resolve($className);
+                
+                if (!$instance instanceof MiddlewareInterface) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Container resolved %s, but it does not implement MiddlewareInterface',
+                            $className
+                        )
+                    );
+                }
+                
+                return $instance;
+            } catch (\Throwable $e) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Failed to resolve middleware %s from DI container: %s',
+                        $className,
+                        $e->getMessage()
+                    ),
+                    0,
+                    $e
+                );
+            }
+        }
+
+        // Fallback: пытаемся создать напрямую (для middleware без зависимостей)
+        try {
+            $instance = new $className();
+            
+            if (!$instance instanceof MiddlewareInterface) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Class %s does not implement MiddlewareInterface',
+                        $className
+                    )
+                );
+            }
+            
+            return $instance;
+        } catch (\ArgumentCountError $e) {
+            // Конструктор требует параметры, но DI контейнер не доступен
+            throw new \RuntimeException(
+                sprintf(
+                    'Middleware %s requires constructor dependencies, but no DI container is available. ' .
+                    'Either register it in the DI container and pass the container to MiddlewareStack, ' .
+                    'or pass an instance of the middleware instead of class name.',
+                    $className
+                ),
+                0,
+                $e
+            );
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Failed to instantiate middleware %s: %s',
+                    $className,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
     }
 
     /**

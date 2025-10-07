@@ -126,7 +126,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
             return new Response($content ?: '');
         };
 
-        $middlewareStack = new MiddlewareStack($finalHandler);
+        // Передаем DI контейнер в middleware stack для разрешения зависимостей
+        $middlewareStack = new MiddlewareStack($finalHandler, $this->container);
         $middlewareStack->addFromArray($route->getMiddleware());
 
         // Выполняем middleware stack
