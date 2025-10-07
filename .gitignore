@@ -1,4 +1,6 @@
 .idea/
+.vscode/
+.cursor/
 index.php
 
 vendor/
@@ -8,9 +10,25 @@ vendor/
 !.var/.gitkeep
 !.var/README.md
 
+# Cache directories
+/cache/
+/custom_cache/
+*.cache
+
 # PHPStan
 phpstan.neon.dist
 phpstan-baseline.neon
 
 # Log files
 *.log
+/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
