@@ -11,12 +11,14 @@
 | Категория | Критических | Высоких | Средних | Всего |
 |-----------|-------------|---------|---------|-------|
 | Безопасность | ~~2~~ **0** ✅ | 0 | 0 | **0** ✅ |
-| Архитектура | 0 | 3 | 2 | **5** |
+| Архитектура | 0 | ~~3~~ **2** | 2 | **4** |
 | Производительность | 0 | 1 | 1 | **2** |
 | Тестирование | 0 | 1 | 0 | **1** |
-| **ИТОГО** | ~~2~~ **0** ✅ | **5** | **3** | **8** |
+| **ИТОГО** | ~~2~~ **0** ✅ | ~~5~~ **4** | **3** | **7** |
 
-**Прогресс:** Критические проблемы безопасности **РЕШЕНЫ** ✅ (6 октября 2025)
+**Прогресс:** 
+- ✅ Критические проблемы безопасности **РЕШЕНЫ** (6 октября 2025)
+- ❌ ErrorHandler **ОТКЛОНЕНО** - Router остается простой библиотекой
 
 ---
 
@@ -305,130 +307,36 @@ private function protectCacheDirectory(): void
 
 ## 🟠 ВЫСОКИЕ проблемы
 
-### 3. Отсутствие централизованной обработки ошибок
+### 3. ~~Централизованная обработка ошибок~~ (ОТКЛОНЕНО)
 
-**Приоритет:** ВЫСОКИЙ  
-**Файл:** `src/Router/Router.php`
+**Статус:** ❌ НЕ БУДЕТ РЕАЛИЗОВАНО  
+**Причина:** Усложнение библиотеки
 
-**Проблема:**
-Исключения из `Router::run()` не обрабатываются. Если происходит ошибка:
-- Пользователь видит PHP stack trace
-- Раскрывается внутренняя структура приложения
-- Нет единого формата ошибок для API
+**Решение:** Router - это библиотека для маршрутизации, не фреймворк. 
+- ✅ Router выбрасывает понятные исключения (NoMatch, NotAllowedHttpMethod и др.)
+- ✅ Приложение само решает как их обрабатывать (через try-catch, middleware, или обработчик уровня приложения)
+- ✅ Это дает максимальную гибкость разработчику
 
-**Текущее поведение:**
+**Примеры обработки в приложении:**
 ```php
-public function run(): void
-{
-    $this->parse();
-    $matchResult = $this->match(); // Может выбросить NoMatch
-    $route = $matchResult->getRoute();
-    // ... дальнейший код без try-catch
+// Вариант 1: В index.php
+try {
+    $router->run();
+} catch (NoMatch $e) {
+    http_response_code(404);
+    echo json_encode(['error' => 'Not found']);
 }
-```
 
-**Решение - создать ErrorHandler:**
-
-```php
-// src/ErrorHandling/ErrorHandlerInterface.php
-<?php
-
-namespace FaustVik\Router\ErrorHandling;
-
-use FaustVik\Router\Http\Response;
-
-interface ErrorHandlerInterface
-{
-    public function handle(\Throwable $exception): Response;
-}
-```
-
-```php
-// src/ErrorHandling/JsonErrorHandler.php
-<?php
-
-namespace FaustVik\Router\ErrorHandling;
-
-use FaustVik\Router\exceptions\NoMatch;
-use FaustVik\Router\exceptions\NotAllowedHttpMethod;
-use FaustVik\Router\Http\Response;
-
-final class JsonErrorHandler implements ErrorHandlerInterface
-{
-    public function __construct(private bool $debug = false) {}
-    
-    public function handle(\Throwable $exception): Response
-    {
-        $statusCode = $this->getStatusCode($exception);
-        
-        $data = [
-            'error' => true,
-            'message' => $exception->getMessage(),
-            'code' => $exception->getCode(),
-        ];
-        
-        // В режиме отладки показываем stack trace
-        if ($this->debug) {
-            $data['debug'] = [
-                'exception' => get_class($exception),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'trace' => $exception->getTrace(),
-            ];
+// Вариант 2: Через middleware приложения
+class ErrorHandlerMiddleware {
+    public function handle($request, $next) {
+        try {
+            return $next($request);
+        } catch (\Throwable $e) {
+            return Response::json(['error' => $e->getMessage()], 500);
         }
-        
-        return Response::json($data, $statusCode);
-    }
-    
-    private function getStatusCode(\Throwable $exception): int
-    {
-        return match(true) {
-            $exception instanceof NoMatch => 404,
-            $exception instanceof NotAllowedHttpMethod => 405,
-            default => 500,
-        };
     }
 }
-```
-
-```php
-// В Router.php добавить:
-private ?ErrorHandlerInterface $errorHandler = null;
-
-public function setErrorHandler(ErrorHandlerInterface $handler): self
-{
-    $this->errorHandler = $handler;
-    return $this;
-}
-
-public function run(): void
-{
-    try {
-        // Весь существующий код метода run()
-        $this->parse();
-        $matchResult = $this->match();
-        // ... и т.д.
-    } catch (\Throwable $e) {
-        // Используем ErrorHandler если установлен
-        $handler = $this->errorHandler ?? new JsonErrorHandler();
-        $response = $handler->handle($e);
-        $response->send();
-        return;
-    }
-}
-```
-
-**Использование:**
-```php
-$router = new Router();
-
-// Production
-$router->setErrorHandler(new JsonErrorHandler(debug: false));
-
-// Development
-$router->setErrorHandler(new JsonErrorHandler(debug: true));
-
-$router->run();
 ```
 
 ---

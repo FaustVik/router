@@ -540,34 +540,69 @@ public function addFromArray(array $middleware): self
 
 ---
 
-### 7. Жесткая связанность и нарушение SRP
+### 7. ~~Централизованная обработка ошибок (ErrorHandler)~~ (ОТКЛОНЕНО) ✅
 
-**Приоритет:** СРЕДНИЙ  
-**Файл:** `src/Router/Router.php:157-173`
+**Приоритет:** ~~СРЕДНИЙ~~ → **НЕ БУДЕТ РЕАЛИЗОВАНО**  
+**Статус:** ❌ ОТКЛОНЕНО (6 октября 2025)
 
-**Проблема:**
+**Причина отказа:**
+Router - это **библиотека для маршрутизации**, а не фреймворк. Добавление ErrorHandler:
+- Усложняет библиотеку
+- Навязывает определенный подход к обработке ошибок
+- Ограничивает гибкость приложения
+
+**Принятое решение:**
+- ✅ Router выбрасывает понятные исключения (`NoMatch`, `NotAllowedHttpMethod` и др.)
+- ✅ Приложение **само решает** как их обрабатывать
+- ✅ Максимальная гибкость для разработчика
+
+**Примеры обработки в приложении:**
+```php
+// Вариант 1: В index.php
+try {
+    $router->run();
+} catch (NoMatch $e) {
+    http_response_code(404);
+    echo json_encode(['error' => 'Route not found']);
+} catch (NotAllowedHttpMethod $e) {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+}
+
+// Вариант 2: Через middleware приложения
+class AppErrorHandler implements MiddlewareInterface {
+    public function handle(Request $request, callable $next): Response {
+        try {
+            return $next($request);
+        } catch (\Throwable $e) {
+            return Response::json(['error' => $e->getMessage()], 500);
+        }
+    }
+}
+```
+
+---
+
+### ~~7-old. Решение с ErrorHandler (архивная версия)~~
+
+<details>
+<summary>Старое предложение (не будет реализовано)</summary>
+
+**Старая проблема:**
 ```php
 private function validateParameters(RouteInterface $route, array $parameters): void
 {
     try {
         $this->parameterValidator->validate($parameters, $validationRules);
     } catch (ValidationException $e) {
-        // Router НЕ должен заниматься выводом ошибок!
         http_response_code(400);
         echo "Validation Error: " . $e->getMessage();
-        exit; // Жесткое завершение
+        exit;
     }
 }
 ```
 
-**Нарушения:**
-1. **Single Responsibility Principle** - Router занимается выводом ошибок
-2. Невозможно переопределить обработку ошибок
-3. `exit` прерывает тесты и нормальный flow
-4. Нет возможности залогировать ошибку
-5. Нет централизованной обработки исключений
-
-**Решение - ErrorHandler:**
+**Старое решение - ErrorHandler (отклонено):**
 ```php
 // src/ErrorHandling/ErrorHandler.php
 interface ErrorHandlerInterface
@@ -2020,15 +2055,16 @@ Thumbs.db
 #### Неделя 4-5: PSR и интерфейсы
 - [ ] **Issue #5:** Реализовать PSR-7
 - [ ] **Issue #5:** Реализовать PSR-15
-- [ ] **Issue #8:** Добавить интерфейсы для Request/Response
-- [ ] **Issue #7:** Создать ErrorHandler
-- [ ] **Issue #7:** Централизованная обработка исключений
+- [x] **Issue #8:** ✅ Добавить интерфейсы для Request/Response (ВЫПОЛНЕНО)
+- [x] **Issue #7:** ~~Создать ErrorHandler~~ (ОТКЛОНЕНО)
+- [x] **Issue #7:** ~~Централизованная обработка исключений~~ (ОТКЛОНЕНО)
 
 #### Неделя 6-7: DI и производительность
 - [ ] **Issue #6:** Исправить DI в Middleware
 - [ ] **Issue #9:** Оптимизация матчинга (Radix Tree)
 - [ ] **Issue #10:** Добавить Redis/APCu кеш драйверы
 - [ ] **Issue #4:** Интеграция composer audit
+- [x] **Issue #7:** ~~ErrorHandler~~ (ОТКЛОНЕНО - усложнение)
 
 ### Sprint 3: Функциональность (4-5 недель)
 
@@ -2109,11 +2145,13 @@ Thumbs.db
 
 ### Краткосрочные цели (1 месяц):
 
-1. Покрытие тестами 50%+
-2. Исправить все критические проблемы безопасности
-3. Добавить обработку POST/PUT body
-4. Создать ErrorHandler
+1. ✅ Покрытие тестами 40%+ (Http, Middleware)
+2. ✅ Исправить все критические проблемы безопасности
+3. ✅ Добавить обработку POST/PUT body
+4. ❌ ~~Создать ErrorHandler~~ (отклонено - усложнение)
 5. Написать CHANGELOG.md
+6. Исправить DI в MiddlewareStack
+7. Тесты для Router компонентов
 
 ### Среднесрочные цели (3 месяца):
 
