@@ -57,6 +57,18 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         return $this->alias;
     }
 
+    /**
+     * Устанавливает alias для маршрута
+     * 
+     * @param string $alias Альтернативный путь к маршруту
+     * @return self Для fluent interface
+     */
+    public function setAlias(string $alias): self
+    {
+        $this->alias = $alias;
+        return $this;
+    }
+
     public function getMiddleware(): array
     {
         return $this->middleware;
