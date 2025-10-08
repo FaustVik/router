@@ -45,9 +45,16 @@ class PhpDiContainerAdapter implements RouterContainerInterface
     {
         try {
             if (!empty($parameters)) {
-                return $this->container->make($class, $parameters);
+                $result = $this->container->make($class, $parameters);
+            } else {
+                $result = $this->container->get($class);
             }
-            return $this->container->get($class);
+            
+            if (!is_object($result)) {
+                throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+            }
+            
+            return $result;
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }

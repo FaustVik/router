@@ -59,7 +59,7 @@ final class AuthMiddleware implements MiddlewareInterface
     {
         $authHeader = $request->getHeader('Authorization');
 
-        if (!$authHeader) {
+        if (!$authHeader || !is_string($authHeader)) {
             return $this->unauthorizedResponse('Authorization header is required');
         }
 

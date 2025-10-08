@@ -108,9 +108,22 @@ final class Response implements ResponseInterface
         return $this->statusCode;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getHeaders(): array
     {
-        return $this->headers;
+        $stringHeaders = [];
+        foreach ($this->headers as $key => $value) {
+            if (is_string($value)) {
+                $stringHeaders[$key] = $value;
+            } elseif (is_scalar($value)) {
+                $stringHeaders[$key] = (string) $value;
+            } else {
+                $stringHeaders[$key] = '';
+            }
+        }
+        return $stringHeaders;
     }
 
     /**
@@ -218,15 +231,22 @@ final class Response implements ResponseInterface
         if (is_int($options)) {
             $cookie = new Cookie(name: $name, value: $value, expires: $options);
         } else {
+            $expires = $options['expires'] ?? 0;
+            $path = $options['path'] ?? '/';
+            $domain = $options['domain'] ?? '';
+            $secure = $options['secure'] ?? false;
+            $httpOnly = $options['httpOnly'] ?? true;
+            $sameSite = $options['sameSite'] ?? 'Lax';
+            
             $cookie = new Cookie(
                 name: $name,
                 value: $value,
-                expires: $options['expires'] ?? 0,
-                path: $options['path'] ?? '/',
-                domain: $options['domain'] ?? '',
-                secure: $options['secure'] ?? false,
-                httpOnly: $options['httpOnly'] ?? true,
-                sameSite: $options['sameSite'] ?? 'Lax'
+                expires: is_int($expires) ? $expires : 0,
+                path: is_string($path) ? $path : '/',
+                domain: is_string($domain) ? $domain : '',
+                secure: is_bool($secure) ? $secure : false,
+                httpOnly: is_bool($httpOnly) ? $httpOnly : true,
+                sameSite: in_array($sameSite, ['Lax', 'Strict', 'None'], true) ? $sameSite : 'Lax'
             );
         }
 

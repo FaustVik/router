@@ -96,7 +96,8 @@ final class LoggingMiddleware implements MiddlewareInterface
         // Собираем данные запроса
         $method = $request->getMethod();
         $uri = $request->getUri();
-        $userAgent = $this->includeUserAgent ? $request->getHeader('User-Agent', 'Unknown') : null;
+        $userAgentRaw = $this->includeUserAgent ? $request->getHeader('User-Agent', 'Unknown') : null;
+        $userAgent = $userAgentRaw !== null && is_string($userAgentRaw) ? $userAgentRaw : ($userAgentRaw !== null ? 'Unknown' : null);
         $ip = $this->includeIp ? $request->getClientIp() : null;
 
         // Выполняем следующий middleware

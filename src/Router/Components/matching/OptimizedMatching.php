@@ -43,8 +43,12 @@ final class OptimizedMatching implements MatchingRouteInterface
      *
      * @throws NoMatch
      */
-    public function match(string $uri, RoutesCollectionInterface $collections): MatchResult
+    public function match(string $uri, ?RoutesCollectionInterface $collections): MatchResult
     {
+        if ($collections === null) {
+            throw new NoMatch($uri);
+        }
+        
         // Строим индекс при первом вызове
         if (!$this->indexed) {
             $this->buildIndex($collections);

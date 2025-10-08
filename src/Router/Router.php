@@ -287,6 +287,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
      */
     protected function match(): MatchResult
     {
+        // После вызова parse() $this->uri всегда инициализирован
+        assert($this->uri !== null);
+        
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
     }
 
@@ -476,15 +479,21 @@ final class Router implements RouterInterface, CacheableRouterInterface
         }
 
         // Обрабатываем обычные привязки
-        if (isset($config['bindings'])) {
+        if (isset($config['bindings']) && is_array($config['bindings'])) {
             foreach ($config['bindings'] as $abstract => $concrete) {
+                if (!is_string($abstract)) {
+                    throw new \InvalidArgumentException('Binding key must be a string');
+                }
                 $this->container->bind($abstract, $concrete);
             }
         }
 
         // Обрабатываем singleton привязки
-        if (isset($config['singletons'])) {
+        if (isset($config['singletons']) && is_array($config['singletons'])) {
             foreach ($config['singletons'] as $abstract => $concrete) {
+                if (!is_string($abstract)) {
+                    throw new \InvalidArgumentException('Singleton key must be a string');
+                }
                 $this->container->singleton($abstract, $concrete);
             }
         }
@@ -619,7 +628,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             $escapedValue = rawurlencode((string) $value);
 
             // Заменяем все варианты параметра
-            $uri = preg_replace(
+            $replaced = preg_replace(
                 [
                     '/\{' . preg_quote($key, '/') . '\?\}/',
                 // {param?}
@@ -633,11 +642,24 @@ final class Router implements RouterInterface, CacheableRouterInterface
                 $escapedValue,
                 $uri
             );
+            
+            // preg_replace может вернуть null при ошибке
+            if ($replaced === null) {
+                throw new \RuntimeException("Failed to replace parameter '{$key}' in URI");
+            }
+            $uri = $replaced;
         }
 
         // Удаляем оставшиеся опциональные параметры
         $uri = preg_replace('/\{[^}]+\?\}/', '', $uri);
+        if ($uri === null) {
+            throw new \RuntimeException("Failed to process optional parameters in URI");
+        }
+        
         $uri = preg_replace('/\{[^}]+:[^}]+\?\}/', '', $uri);
+        if ($uri === null) {
+            throw new \RuntimeException("Failed to process optional parameters in URI");
+        }
 
         // Проверяем, что все обязательные параметры были заполнены
         if (preg_match('/\{([^}?:]+)(?::[^}]+)?\}/', $uri, $matches)) {
@@ -648,6 +670,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         // Очищаем двойные слеши и trailing slash
         $uri = preg_replace('#/{2,}#', '/', $uri);
+        if ($uri === null) {
+            throw new \RuntimeException("Failed to clean up URI slashes");
+        }
+        
         $uri = rtrim($uri, '/');
 
         // Возвращаем корневой путь если URI пустой

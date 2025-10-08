@@ -187,20 +187,23 @@ final class CsrfMiddleware implements MiddlewareInterface
     {
         // Проверяем POST данные
         $token = $request->input(self::TOKEN_FIELD_NAME);
-        if ($token !== null) {
+        if ($token !== null && (is_string($token) || is_numeric($token))) {
             return (string) $token;
         }
 
         // Проверяем заголовки
         $token = $request->getHeader(self::TOKEN_HEADER_NAME);
-        if ($token !== null) {
+        if ($token !== null && (is_string($token) || is_numeric($token))) {
             return (string) $token;
         }
 
         // Проверяем query параметры
         $query = $request->getQuery();
         if (isset($query[self::TOKEN_FIELD_NAME])) {
-            return (string) $query[self::TOKEN_FIELD_NAME];
+            $queryToken = $query[self::TOKEN_FIELD_NAME];
+            if (is_string($queryToken) || is_numeric($queryToken)) {
+                return (string) $queryToken;
+            }
         }
 
         return null;

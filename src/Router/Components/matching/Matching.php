@@ -14,8 +14,12 @@ final class Matching implements MatchingRouteInterface
     /**
      * @throws NoMatch
      */
-    public function match(string $uri, RoutesCollectionInterface $collections): MatchResult
+    public function match(string $uri, ?RoutesCollectionInterface $collections): MatchResult
     {
+        if ($collections === null) {
+            throw new NoMatch($uri);
+        }
+        
         foreach ($collections->get() as $route) {
             if ($uri === $route->getRoute() || $uri === $route->alias()) {
                 return new MatchResult($route, []);

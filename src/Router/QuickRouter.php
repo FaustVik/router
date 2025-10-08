@@ -422,6 +422,11 @@ final class QuickRouter
         // Если handler - массив [ControllerClass::class, 'method']
         if (is_array($handler) && count($handler) === 2) {
             [$class, $method] = $handler;
+            
+            if (!is_string($class) || !is_string($method)) {
+                throw new \InvalidArgumentException('Handler array must contain [string $class, string $method]');
+            }
+            
             $route = Route::create(
                 route: $uri,
                 class: $class,

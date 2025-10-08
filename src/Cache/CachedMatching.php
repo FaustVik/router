@@ -27,7 +27,7 @@ final class CachedMatching implements MatchingRouteInterface
 
     public function match(string $uri, ?RoutesCollectionInterface $collection): MatchResult
     {
-        if (!$this->cacheEnabled || !$collection) {
+        if (!$this->cacheEnabled || $collection === null) {
             return $this->originalMatcher->match($uri, $collection);
         }
 
@@ -35,7 +35,7 @@ final class CachedMatching implements MatchingRouteInterface
 
         // Пытаемся получить результат из кеша
         $cachedResult = $this->cache->get($cacheKey);
-        if ($cachedResult !== null) {
+        if ($cachedResult instanceof MatchResult) {
             return $cachedResult;
         }
 

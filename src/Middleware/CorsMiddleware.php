@@ -96,7 +96,8 @@ final class CorsMiddleware implements MiddlewareInterface
      */
     public function handle(Request $request, callable $next): Response
     {
-        $origin = $request->getHeader('Origin');
+        $originRaw = $request->getHeader('Origin');
+        $origin = is_string($originRaw) ? $originRaw : null;
 
         // Для OPTIONS запросов (preflight) возвращаем специальный ответ
         if ($request->getMethod() === 'OPTIONS') {

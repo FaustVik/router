@@ -45,7 +45,11 @@ class PimpleContainerAdapter implements RouterContainerInterface
     {
         try {
             if ($this->container->has($class)) {
-                return $this->container->get($class);
+                $result = $this->container->get($class);
+                if (!is_object($result)) {
+                    throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+                }
+                return $result;
             }
 
             // Manual instantiation with reflection for non-registered services

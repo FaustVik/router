@@ -37,14 +37,20 @@ class DefaultContainer implements RouterContainerInterface
         $instance = new self();
 
         // Apply configuration if provided
-        if (isset($config['bindings'])) {
+        if (isset($config['bindings']) && is_array($config['bindings'])) {
             foreach ($config['bindings'] as $abstract => $concrete) {
+                if (!is_string($abstract)) {
+                    throw new \InvalidArgumentException('Binding key must be a string');
+                }
                 $instance->bind($abstract, $concrete);
             }
         }
 
-        if (isset($config['singletons'])) {
+        if (isset($config['singletons']) && is_array($config['singletons'])) {
             foreach ($config['singletons'] as $abstract => $concrete) {
+                if (!is_string($abstract)) {
+                    throw new \InvalidArgumentException('Singleton key must be a string');
+                }
                 $instance->singleton($abstract, $concrete);
             }
         }
@@ -84,9 +90,16 @@ class DefaultContainer implements RouterContainerInterface
     {
         try {
             if (!empty($parameters)) {
-                return $this->container->make($class, $parameters);
+                $result = $this->container->make($class, $parameters);
+            } else {
+                $result = $this->container->get($class);
             }
-            return $this->container->get($class);
+            
+            if (!is_object($result)) {
+                throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+            }
+            
+            return $result;
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }

@@ -47,7 +47,11 @@ class SymfonyContainerAdapter implements RouterContainerInterface
             // Symfony container doesn't support parameters in get() method
             // We'll try to get the service or create it manually
             if ($this->container->has($class)) {
-                return $this->container->get($class);
+                $result = $this->container->get($class);
+                if (!is_object($result)) {
+                    throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+                }
+                return $result;
             }
 
             // Manual instantiation with reflection for non-registered services

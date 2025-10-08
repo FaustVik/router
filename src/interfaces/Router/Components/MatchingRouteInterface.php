@@ -11,11 +11,11 @@ use FaustVik\Router\Router\Components\matching\MatchResult;
 interface MatchingRouteInterface
 {
     /**
-     * @param string                    $uri
-     * @param RoutesCollectionInterface $collections
+     * @param string                         $uri
+     * @param RoutesCollectionInterface|null $collections
      *
      * @return MatchResult
      * @throws NoMatch
      */
-    public function match(string $uri, RoutesCollectionInterface $collections): MatchResult;
+    public function match(string $uri, ?RoutesCollectionInterface $collections): MatchResult;
 }

@@ -192,9 +192,22 @@ final class Request implements RequestInterface
         return $this->query[$key] ?? $default;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getHeaders(): array
     {
-        return $this->headers;
+        $stringHeaders = [];
+        foreach ($this->headers as $key => $value) {
+            if (is_string($value)) {
+                $stringHeaders[$key] = $value;
+            } elseif (is_scalar($value)) {
+                $stringHeaders[$key] = (string) $value;
+            } else {
+                $stringHeaders[$key] = '';
+            }
+        }
+        return $stringHeaders;
     }
 
     /**
@@ -350,7 +363,8 @@ final class Request implements RequestInterface
      */
     public function file(string $key): ?array
     {
-        return $this->files[$key] ?? null;
+        $file = $this->files[$key] ?? null;
+        return is_array($file) ? $file : null;
     }
 
     /**
@@ -374,7 +388,8 @@ final class Request implements RequestInterface
     public function isJson(): bool
     {
         $contentType = $this->getHeader('Content-Type', '');
-        return str_contains(strtolower($contentType), 'application/json');
+        $contentTypeStr = is_string($contentType) ? $contentType : '';
+        return str_contains(strtolower($contentTypeStr), 'application/json');
     }
 
     /**
@@ -384,7 +399,9 @@ final class Request implements RequestInterface
      */
     public function isAjax(): bool
     {
-        return strtolower($this->getHeader('X-Requested-With', '')) === 'xmlhttprequest';
+        $header = $this->getHeader('X-Requested-With', '');
+        $headerStr = is_string($header) ? $header : '';
+        return strtolower($headerStr) === 'xmlhttprequest';
     }
 
     /**
@@ -394,7 +411,17 @@ final class Request implements RequestInterface
      */
     public function getCookies(): array
     {
-        return $this->cookies;
+        $stringCookies = [];
+        foreach ($this->cookies as $key => $value) {
+            if (is_string($value)) {
+                $stringCookies[$key] = $value;
+            } elseif (is_scalar($value)) {
+                $stringCookies[$key] = (string) $value;
+            } else {
+                $stringCookies[$key] = '';
+            }
+        }
+        return $stringCookies;
     }
 
     /**
@@ -431,13 +458,25 @@ final class Request implements RequestInterface
     public function isSecure(): bool
     {
         // Стандартная проверка HTTPS
-        if (isset($this->server['HTTPS']) && $this->server['HTTPS'] !== 'off') {
-            return true;
+        if (isset($this->server['HTTPS'])) {
+            $https = $this->server['HTTPS'];
+            if (is_string($https) && $https !== 'off') {
+                return true;
+            }
+            if (is_int($https) && $https !== 0) {
+                return true;
+            }
         }
 
         // Проверка через порт
-        if (isset($this->server['SERVER_PORT']) && (int) $this->server['SERVER_PORT'] === 443) {
-            return true;
+        if (isset($this->server['SERVER_PORT'])) {
+            $port = $this->server['SERVER_PORT'];
+            if (is_int($port) && $port === 443) {
+                return true;
+            }
+            if (is_string($port) && (int) $port === 443) {
+                return true;
+            }
         }
 
         // Проверка через заголовки прокси
@@ -471,7 +510,8 @@ final class Request implements RequestInterface
     {
         // Если не доверяем прокси, возвращаем REMOTE_ADDR
         if (!$trustProxy) {
-            return $this->server['REMOTE_ADDR'] ?? '0.0.0.0';
+            $remoteAddr = $this->server['REMOTE_ADDR'] ?? '0.0.0.0';
+            return is_string($remoteAddr) ? $remoteAddr : '0.0.0.0';
         }
 
         // Проверяем заголовки прокси в порядке приоритета
@@ -492,6 +532,10 @@ final class Request implements RequestInterface
         foreach ($headers as $header) {
             if (!empty($this->server[$header])) {
                 $ip = $this->server[$header];
+                
+                if (!is_string($ip)) {
+                    continue;
+                }
 
                 // X-Forwarded-For может содержать несколько IP через запятую
                 // Берем первый (клиентский)
@@ -508,7 +552,8 @@ final class Request implements RequestInterface
         }
 
         // Fallback на REMOTE_ADDR
-        return $this->server['REMOTE_ADDR'] ?? '0.0.0.0';
+        $remoteAddr = $this->server['REMOTE_ADDR'] ?? '0.0.0.0';
+        return is_string($remoteAddr) ? $remoteAddr : '0.0.0.0';
     }
 
     /**
@@ -543,7 +588,10 @@ final class Request implements RequestInterface
      */
     public function getHost(): string
     {
-        return $this->getHeader('Host', $this->server['SERVER_NAME'] ?? 'localhost');
+        $serverName = $this->server['SERVER_NAME'] ?? 'localhost';
+        $defaultHost = is_string($serverName) ? $serverName : 'localhost';
+        $host = $this->getHeader('Host', $defaultHost);
+        return is_string($host) ? $host : $defaultHost;
     }
 
     /**
