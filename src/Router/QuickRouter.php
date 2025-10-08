@@ -270,6 +270,79 @@ final class QuickRouter
     }
 
     /**
+     * Добавляет глобальный middleware для всех маршрутов
+     *
+     * Глобальные middleware выполняются перед middleware конкретного маршрута.
+     * Это удобно для CORS, логирования, аутентификации и других общих задач.
+     *
+     * @param string|object|callable $middleware Middleware класс, объект или callable
+     * @return self
+     *
+     * @example
+     * use FaustVik\Router\Middleware\CorsMiddleware;
+     * use FaustVik\Router\Middleware\LoggingMiddleware;
+     *
+     * $app = new QuickRouter();
+     *
+     * // Добавление одного middleware
+     * $app->addMiddleware(CorsMiddleware::class);
+     *
+     * // Добавление нескольких middleware
+     * $app->addMiddleware(CorsMiddleware::class)
+     *     ->addMiddleware(LoggingMiddleware::class);
+     *
+     * // Теперь все маршруты будут проходить через эти middleware
+     * $app->get('/', fn() => "Hello World!");
+     * $app->run();
+     */
+    public function addMiddleware(string|object|callable $middleware): self
+    {
+        $this->router->addGlobalMiddleware($middleware);
+        return $this;
+    }
+
+    /**
+     * Устанавливает массив глобальных middleware
+     *
+     * Заменяет все существующие глобальные middleware на новые.
+     *
+     * @param array $middleware Массив middleware
+     * @return self
+     *
+     * @example
+     * $app->setMiddleware([
+     *     CorsMiddleware::class,
+     *     LoggingMiddleware::class,
+     * ]);
+     */
+    public function setMiddleware(array $middleware): self
+    {
+        $this->router->setGlobalMiddleware($middleware);
+        return $this;
+    }
+
+    /**
+     * Получает все глобальные middleware
+     *
+     * @return array
+     */
+    public function getMiddleware(): array
+    {
+        return $this->router->getGlobalMiddleware();
+    }
+
+    /**
+     * Очищает все глобальные middleware
+     *
+     * @return self
+     */
+    public function clearMiddleware(): self
+    {
+        $this->router->clearGlobalMiddleware();
+        return $this;
+    }
+
+    /**
      * Запускает роутер
      *
      * Обрабатывает текущий HTTP запрос и выполняет соответствующий маршрут.

@@ -43,6 +43,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?RoutesCollectionInterface $collections = null;
     private ?RouterContainerInterface $container = null;
     private array $namedRoutes = [];
+    private array $globalMiddleware = [];
 
     /**
      * Конструктор роутера
@@ -140,6 +141,11 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         // Передаем DI контейнер в middleware stack для разрешения зависимостей
         $middlewareStack = new MiddlewareStack($finalHandler, $this->container);
+        
+        // Сначала добавляем глобальные middleware (применяются ко всем маршрутам)
+        $middlewareStack->addFromArray($this->globalMiddleware);
+        
+        // Затем добавляем middleware конкретного маршрута
         $middlewareStack->addFromArray($route->getMiddleware());
 
         // Выполняем middleware stack
@@ -585,5 +591,78 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function getRouteByName(string $name): ?RouteInterface
     {
         return $this->namedRoutes[$name] ?? null;
+    }
+
+    // ============================================================================
+    // Global Middleware - Глобальные middleware для всех маршрутов
+    // ============================================================================
+
+    /**
+     * Добавляет глобальный middleware для всех маршрутов
+     *
+     * Глобальные middleware выполняются перед middleware конкретного маршрута.
+     * Это удобно для CORS, логирования, аутентификации и других общих задач.
+     *
+     * @param string|object|callable $middleware Middleware класс, объект или callable
+     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     *
+     * @example
+     * // Добавление middleware класса
+     * $router->addGlobalMiddleware(CorsMiddleware::class);
+     *
+     * // Добавление middleware объекта
+     * $router->addGlobalMiddleware(new LoggingMiddleware($logger));
+     *
+     * // Добавление нескольких middleware
+     * $router->addGlobalMiddleware(CorsMiddleware::class)
+     *        ->addGlobalMiddleware(LoggingMiddleware::class)
+     *        ->addGlobalMiddleware(RateLimitMiddleware::class);
+     */
+    public function addGlobalMiddleware(string|object|callable $middleware): self
+    {
+        $this->globalMiddleware[] = $middleware;
+        return $this;
+    }
+
+    /**
+     * Устанавливает массив глобальных middleware
+     *
+     * Заменяет все существующие глобальные middleware на новые.
+     *
+     * @param array $middleware Массив middleware
+     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     *
+     * @example
+     * $router->setGlobalMiddleware([
+     *     CorsMiddleware::class,
+     *     LoggingMiddleware::class,
+     *     RateLimitMiddleware::class,
+     * ]);
+     */
+    public function setGlobalMiddleware(array $middleware): self
+    {
+        $this->globalMiddleware = $middleware;
+        return $this;
+    }
+
+    /**
+     * Получает все глобальные middleware
+     *
+     * @return array Массив глобальных middleware
+     */
+    public function getGlobalMiddleware(): array
+    {
+        return $this->globalMiddleware;
+    }
+
+    /**
+     * Очищает все глобальные middleware
+     *
+     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     */
+    public function clearGlobalMiddleware(): self
+    {
+        $this->globalMiddleware = [];
+        return $this;
     }
 }

@@ -16,6 +16,7 @@
 - **`post-data-example.php`** - ✨ **НОВОЕ!** Работа с POST/PUT/PATCH данными, JSON body, загрузка файлов
 - **`cookies-and-security-example.php`** - ✨ **НОВОЕ!** Cookies, IP detection, HTTPS check, Method Override
 - **`middleware-di-example.php`** - ✨ **НОВОЕ!** DI в Middleware - как работать с middleware с зависимостями
+- **`global-middleware-example.php`** - ✨ **НОВОЕ!** Глобальные middleware для всех маршрутов
 - **`error-handling-example.php`** - Обработка ошибок, исключения, HTTP коды
 - **`cache-example.php`** - Базовое кеширование маршрутов
 - **`cache-production-example.php`** - Кеширование для продакшн окружения
@@ -155,6 +156,29 @@ REQUEST_METHOD="GET" REQUEST_URI="/api/users" php rest-api-example.php
 ### 🛡️ Middleware
 Middleware обрабатывает запросы до/после контроллеров: аутентификация, логирование, CORS
 
+#### Глобальные middleware (новое в v2.0-alpha!)
+Применяются ко всем маршрутам автоматически:
+```php
+// Router
+$router->addGlobalMiddleware(CorsMiddleware::class)
+       ->addGlobalMiddleware(LoggingMiddleware::class);
+
+// QuickRouter
+$app = new QuickRouter();
+$app->addMiddleware(CorsMiddleware::class)
+    ->addMiddleware(LoggingMiddleware::class);
+
+// Теперь все маршруты будут проходить через эти middleware
+```
+
+#### Middleware маршрута
+Применяются к конкретному маршруту:
+```php
+$route->middleware([AuthMiddleware::class]);
+```
+
+**Порядок выполнения**: глобальные → middleware маршрута → контроллер
+
 ### 📊 Request/Response
 - `Request` объект содержит данные запроса, параметры маршрута, заголовки
 - `Response` объект позволяет создавать JSON, HTML, редиректы с заголовками
@@ -192,6 +216,9 @@ REQUEST_METHOD="GET" REQUEST_URI="/errors/validation" php error-handling-example
 # Кеширование
 REQUEST_METHOD="GET" REQUEST_URI="/user/123/profile/settings" php cache-example.php
 REQUEST_METHOD="GET" REQUEST_URI="/api/users/123" php cache-production-example.php
+
+# Глобальные middleware
+php global-middleware-example.php
 ```
 
 ## Структура обучения
