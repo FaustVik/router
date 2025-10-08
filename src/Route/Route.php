@@ -16,6 +16,8 @@ final class Route implements RouteClassInterface
     private ?string $alias = null;
     private array $arg = [];
     private array $middleware = [];
+    private ?string $name = null;
+    private array $constraints = [];
 
     public static function create(
         string $route,
@@ -86,6 +88,28 @@ final class Route implements RouteClassInterface
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function name(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getConstraints(): array
+    {
+        return $this->constraints;
+    }
+
+    public function where(string $param, string $pattern): self
+    {
+        $this->constraints[$param] = $pattern;
         return $this;
     }
 }

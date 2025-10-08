@@ -15,6 +15,8 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     private array $methods = [];
     private ?string $alias = null;
     private array $middleware = [];
+    private ?string $name = null;
+    private array $constraints = [];
 
     public function __construct()
     {
@@ -77,6 +79,28 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function name(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getConstraints(): array
+    {
+        return $this->constraints;
+    }
+
+    public function where(string $param, string $pattern): self
+    {
+        $this->constraints[$param] = $pattern;
         return $this;
     }
 }

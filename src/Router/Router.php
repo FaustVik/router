@@ -42,6 +42,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ConfigInterface $config;
     private ?RoutesCollectionInterface $collections = null;
     private ?RouterContainerInterface $container = null;
+    private array $namedRoutes = [];
 
     /**
      * Конструктор роутера
@@ -71,10 +72,21 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
     /**
      * Устанавливает коллекцию маршрутов
+     *
+     * Автоматически индексирует именованные маршруты для быстрого доступа
      */
     public function setCollection(RoutesCollectionInterface $collections): self
     {
         $this->collections = $collections;
+
+        // Индексируем именованные маршруты для быстрого доступа через url()
+        $this->namedRoutes = [];
+        foreach ($collections->get() as $route) {
+            if ($route->getName()) {
+                $this->namedRoutes[$route->getName()] = $route;
+            }
+        }
+
         return $this;
     }
 
@@ -455,5 +467,125 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         $this->container->singleton($abstract, $concrete);
         return $this;
+    }
+
+    // ============================================================================
+    // Named Routes & URL Generation - Именованные маршруты и генерация URL
+    // ============================================================================
+
+    /**
+     * Генерирует URL по имени маршрута
+     *
+     * Заменяет параметры в URL и удаляет опциональные параметры,
+     * которые не были предоставлены.
+     *
+     * @param string $name Имя маршрута
+     * @param array $params Параметры для подстановки
+     * @return string Сгенерированный URL
+     * @throws \InvalidArgumentException Если маршрут не найден или не все обязательные параметры переданы
+     *
+     * @example
+     * // Маршрут: /users/{id}
+     * $router->url('users.show', ['id' => 123]); // => /users/123
+     *
+     * // Маршрут: /posts/{id?}
+     * $router->url('posts.index'); // => /posts
+     * $router->url('posts.index', ['id' => 456]); // => /posts/456
+     */
+    public function url(string $name, array $params = []): string
+    {
+        if (!isset($this->namedRoutes[$name])) {
+            throw new \InvalidArgumentException("Route '{$name}' not found");
+        }
+
+        $route = $this->namedRoutes[$name];
+        $uri = $route->getRoute();
+        $constraints = $route->getConstraints();
+
+        // Валидируем параметры по constraints перед генерацией URL
+        foreach ($params as $key => $value) {
+            if (isset($constraints[$key])) {
+                $pattern = '#^' . $constraints[$key] . '$#';
+                if (!preg_match($pattern, (string)$value)) {
+                    throw new \InvalidArgumentException(
+                        "Parameter '{$key}' with value '{$value}' does not match constraint pattern '{$constraints[$key]}' for route '{$name}'"
+                    );
+                }
+            }
+        }
+
+        // Заменяем параметры в URI
+        // Поддерживаем форматы: {param}, {param?}, {param:pattern}, {param:pattern?}
+        foreach ($params as $key => $value) {
+            // Экранируем значение для безопасности
+            $escapedValue = rawurlencode((string)$value);
+
+            // Заменяем все варианты параметра
+            $uri = preg_replace(
+                [
+                    '/\{' . preg_quote($key, '/') . '\?\}/',           // {param?}
+                    '/\{' . preg_quote($key, '/') . ':[^}]+\?\}/',     // {param:pattern?}
+                    '/\{' . preg_quote($key, '/') . '\}/',             // {param}
+                    '/\{' . preg_quote($key, '/') . ':[^}]+\}/',       // {param:pattern}
+                ],
+                $escapedValue,
+                $uri
+            );
+        }
+
+        // Удаляем оставшиеся опциональные параметры
+        $uri = preg_replace('/\{[^}]+\?\}/', '', $uri);
+        $uri = preg_replace('/\{[^}]+:[^}]+\?\}/', '', $uri);
+
+        // Проверяем, что все обязательные параметры были заполнены
+        if (preg_match('/\{([^}?:]+)(?::[^}]+)?\}/', $uri, $matches)) {
+            throw new \InvalidArgumentException(
+                "Missing required parameter '{$matches[1]}' for route '{$name}'"
+            );
+        }
+
+        // Очищаем двойные слеши и trailing slash
+        $uri = preg_replace('#/{2,}#', '/', $uri);
+        $uri = rtrim($uri, '/');
+
+        // Возвращаем корневой путь если URI пустой
+        return $uri === '' ? '/' : $uri;
+    }
+
+    /**
+     * Проверяет существование именованного маршрута
+     *
+     * @param string $name Имя маршрута
+     * @return bool True если маршрут существует
+     *
+     * @example
+     * if ($router->has('users.show')) {
+     *     $url = $router->url('users.show', ['id' => 123]);
+     * }
+     */
+    public function has(string $name): bool
+    {
+        return isset($this->namedRoutes[$name]);
+    }
+
+    /**
+     * Получает все именованные маршруты
+     *
+     * @return array Массив именованных маршрутов [name => RouteInterface]
+     */
+    public function getNamedRoutes(): array
+    {
+        return $this->namedRoutes;
+    }
+
+    /**
+     * Получает маршрут по имени
+     *
+     * @param string $name Имя маршрута
+     * @return RouteInterface|null Маршрут или null если не найден
+     */
+    public function getRouteByName(string $name): ?RouteInterface
+    {
+        return $this->namedRoutes[$name] ?? null;
     }
 }

@@ -202,6 +202,119 @@ if ($isProduction) {
 
 Кеширование может ускорить обработку запросов в 2-10 раз, особенно при большом количестве маршрутов.
 
+## Named Routes и URL Generation
+
+Роутер поддерживает именование маршрутов и генерацию URL по имени маршрута.
+
+### Именование маршрутов
+
+```php
+use FaustVik\Router\Route\Route;
+
+// Именование маршрута
+$route = Route::create('/users/{id}', UserController::class, 'show', [], ['GET'])
+    ->name('users.show');
+
+// С группами
+$collection->prefix('/api')->group(function($api) {
+    $api->get('/users/{id}', UserController::class, 'show')
+        ->name('api.users.show');
+});
+```
+
+### Генерация URL
+
+```php
+// Простой маршрут
+$url = $router->url('home'); // => /
+
+// С параметрами
+$url = $router->url('users.show', ['id' => 123]); // => /users/123
+
+// С множественными параметрами
+$url = $router->url('posts.show', [
+    'year' => 2025,
+    'slug' => 'my-post'
+]); // => /posts/2025/my-post
+```
+
+### Опциональные параметры
+
+```php
+// Маршрут с опциональными параметрами
+Route::create('/posts/{year?}/{month?}', PostController::class, 'index', [], ['GET'])
+    ->name('posts.archive');
+
+// Генерация URL
+$router->url('posts.archive'); // => /posts
+$router->url('posts.archive', ['year' => 2025]); // => /posts/2025
+$router->url('posts.archive', ['year' => 2025, 'month' => 10]); // => /posts/2025/10
+```
+
+### Constraints для параметров
+
+```php
+// Добавление constraints
+Route::create('/users/{id}', UserController::class, 'show', [], ['GET'])
+    ->where('id', '\d+')  // Только цифры
+    ->name('users.show');
+
+Route::create('/posts/{slug}', PostController::class, 'show', [], ['GET'])
+    ->where('slug', '[a-z0-9\-]+')  // Буквы, цифры и дефисы
+    ->name('posts.show');
+
+// Генерация URL с валидацией
+$router->url('users.show', ['id' => 123]); // OK
+$router->url('users.show', ['id' => 'abc']); // InvalidArgumentException
+```
+
+### Проверка существования маршрута
+
+```php
+if ($router->has('users.show')) {
+    $url = $router->url('users.show', ['id' => 123]);
+}
+
+// Получить маршрут по имени
+$route = $router->getRouteByName('users.show');
+
+// Получить все именованные маршруты
+$namedRoutes = $router->getNamedRoutes();
+```
+
+### Пример использования в контроллере
+
+```php
+class UserController
+{
+    public function __construct(private Router $router)
+    {
+    }
+
+    public function index(): void
+    {
+        echo '<h1>Пользователи</h1>';
+        
+        // Генерируем URL для каждого пользователя
+        for ($i = 1; $i <= 10; $i++) {
+            $url = $this->router->url('users.show', ['id' => $i]);
+            echo "<a href='{$url}'>Пользователь #{$i}</a><br>";
+        }
+    }
+    
+    public function show($id): void
+    {
+        echo "<h1>Пользователь #{$id}</h1>";
+        
+        // Ссылка на редактирование
+        $editUrl = $this->router->url('users.edit', ['id' => $id]);
+        echo "<a href='{$editUrl}'>Редактировать</a>";
+    }
+}
+```
+
+Подробный пример: [examples/named-routes-example.php](examples/named-routes-example.php)
+
 ## Статический анализ кода
 
 Проект использует PHPStan для статического анализа кода:
