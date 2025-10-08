@@ -179,7 +179,12 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Парсит URI запроса
      *
      * Разделяет URI на путь и параметры query string.
-     * Декодирует URI и извлекает параметры в массив.
+     * Использует parse_url() и parse_str() для правильной обработки сложных URL.
+     *
+     * Поддерживает:
+     * - Массивы в query string: ?ids[]=1&ids[]=2
+     * - Вложенные параметры: ?user[name]=John&user[age]=30
+     * - Специальные символы в параметрах
      *
      * Например: "/users/123?name=John&age=30" ->
      * - $this->uri = "/users/123"
@@ -187,29 +192,22 @@ final class Router implements RouterInterface, CacheableRouterInterface
      */
     protected function parse(): void
     {
-        $decodeUri = urldecode($this->getUri());
-
-        // Разделяем URI на путь и параметры
-        if (str_contains($decodeUri, '?')) {
-            [$this->uri, $this->paramsString] = explode('?', $decodeUri);
-        } else {
-            $this->uri = $decodeUri;
-        }
-
-        // Парсим параметры query string
+        $uri = $this->getUri();
+        
+        // Используем parse_url() для корректного разбора URI
+        // Это быстрее и надежнее ручного парсинга
+        $parsed = parse_url($uri);
+        
+        // Извлекаем путь и декодируем его
+        $this->uri = isset($parsed['path']) ? urldecode($parsed['path']) : '/';
+        
+        // Сохраняем строку параметров для обратной совместимости
+        $this->paramsString = $parsed['query'] ?? null;
+        
+        // Парсим query string с помощью parse_str()
+        // Это правильно обрабатывает массивы и вложенные параметры
         if ($this->paramsString) {
-            $params = explode('&', $this->paramsString);
-
-            $arr = [];
-
-            foreach ($params as $str) {
-                if (str_contains($str, '=')) {
-                    [$name, $value] = explode('=', $str);
-                    $arr[$name] = $value;
-                }
-            }
-
-            $this->params = $arr;
+            parse_str($this->paramsString, $this->params);
         }
     }
 
