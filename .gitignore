@@ -1,6 +1,9 @@
 .idea/
 .vscode/
 .cursor/
+!.cursor/rules/
+!.cursor/rules/code_style.mdc
+!.cursor/rules/main.mdc
 index.php
 
 vendor/
