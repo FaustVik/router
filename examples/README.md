@@ -13,6 +13,8 @@
 
 ### Для продвинутых
 - **`rest-api-example.php`** - Полноценный REST API с CRUD операциями
+- **`named-routes-example.php`** - Named Routes и генерация URL
+- **`named-routes-advanced-example.php`** - ✨ **НОВОЕ!** Продвинутая генерация URL с query параметрами и якорями
 - **`post-data-example.php`** - ✨ **НОВОЕ!** Работа с POST/PUT/PATCH данными, JSON body, загрузка файлов
 - **`cookies-and-security-example.php`** - ✨ **НОВОЕ!** Cookies, IP detection, HTTPS check, Method Override
 - **`middleware-di-example.php`** - ✨ **НОВОЕ!** DI в Middleware - как работать с middleware с зависимостями
@@ -22,6 +24,59 @@
 - **`cache-production-example.php`** - Кеширование для продакшн окружения
 
 ## Новые возможности v.2.0-alpha
+
+### 🏷️ Named Routes и URL Generation
+
+#### Базовая генерация URL
+```php
+// Создание именованного маршрута
+Route::create('/users/{id}', UserController::class, 'show')
+    ->name('users.show')
+    ->where('id', '\d+');
+
+// Генерация URL
+$router->url('users.show', ['id' => 123]); // => /users/123
+```
+
+#### Query параметры (новое!)
+```php
+$router->url('users.index', [], ['page' => 2, 'sort' => 'name']);
+// => /users?page=2&sort=name
+```
+
+#### Якоря/фрагменты (новое!)
+```php
+$router->url('posts.show', ['id' => 456], [], 'comments');
+// => /posts/456#comments
+```
+
+#### Полный пример (новое!)
+```php
+$router->url(
+    name: 'posts.show',
+    params: ['id' => 456],
+    query: ['ref' => 'home'],
+    fragment: 'comments'
+);
+// => /posts/456?ref=home#comments
+```
+
+#### Практическое использование
+```php
+// Пагинация
+$prevUrl = $router->url('products.index', [], ['page' => $page - 1]);
+$nextUrl = $router->url('products.index', [], ['page' => $page + 1]);
+
+// Фильтрация
+$filterUrl = $router->url('products.index', [], [
+    'category' => 'electronics',
+    'price_min' => 100,
+    'price_max' => 500
+]);
+
+// Навигация по документации с якорями
+$docUrl = $router->url('docs.show', ['section' => 'api'], [], 'authentication');
+```
 
 ### 🚀 Кеширование маршрутов
 
@@ -219,6 +274,9 @@ REQUEST_METHOD="GET" REQUEST_URI="/api/users/123" php cache-production-example.p
 
 # Глобальные middleware
 php global-middleware-example.php
+
+# Named Routes с query параметрами и якорями
+php named-routes-advanced-example.php
 ```
 
 ## Структура обучения

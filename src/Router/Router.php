@@ -481,22 +481,37 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Генерирует URL по имени маршрута
      *
      * Заменяет параметры в URL и удаляет опциональные параметры,
-     * которые не были предоставлены.
+     * которые не были предоставлены. Поддерживает query параметры и якоря.
      *
      * @param string $name Имя маршрута
-     * @param array $params Параметры для подстановки
+     * @param array $params Параметры пути для подстановки в {placeholders}
+     * @param array $query Query параметры для добавления в URL (?key=value)
+     * @param string|null $fragment Якорь/фрагмент для добавления в URL (#fragment)
      * @return string Сгенерированный URL
      * @throws \InvalidArgumentException Если маршрут не найден или не все обязательные параметры переданы
      *
      * @example
      * // Маршрут: /users/{id}
-     * $router->url('users.show', ['id' => 123]); // => /users/123
+     * $router->url('users.show', ['id' => 123]); 
+     * // => /users/123
+     *
+     * // С query параметрами
+     * $router->url('users.index', [], ['page' => 2, 'sort' => 'name']); 
+     * // => /users?page=2&sort=name
+     *
+     * // С якорем
+     * $router->url('posts.show', ['id' => 456], [], 'comments'); 
+     * // => /posts/456#comments
+     *
+     * // Полный пример
+     * $router->url('posts.show', ['id' => 456], ['ref' => 'home'], 'comments'); 
+     * // => /posts/456?ref=home#comments
      *
      * // Маршрут: /posts/{id?}
      * $router->url('posts.index'); // => /posts
      * $router->url('posts.index', ['id' => 456]); // => /posts/456
      */
-    public function url(string $name, array $params = []): string
+    public function url(string $name, array $params = [], array $query = [], ?string $fragment = null): string
     {
         if (!isset($this->namedRoutes[$name])) {
             throw new \InvalidArgumentException("Route '{$name}' not found");
@@ -553,7 +568,19 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $uri = rtrim($uri, '/');
 
         // Возвращаем корневой путь если URI пустой
-        return $uri === '' ? '/' : $uri;
+        $uri = $uri === '' ? '/' : $uri;
+
+        // Добавляем query параметры если есть
+        if (!empty($query)) {
+            $uri .= '?' . http_build_query($query);
+        }
+
+        // Добавляем якорь/фрагмент если есть
+        if ($fragment !== null && $fragment !== '') {
+            $uri .= '#' . rawurlencode($fragment);
+        }
+
+        return $uri;
     }
 
     /**
