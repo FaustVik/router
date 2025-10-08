@@ -40,6 +40,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
 
     /**
      * @param array<string, mixed> $parameters
+     * @throws \RuntimeException If resolved value is not an object or container operation fails
      */
     public function resolve(string $class, array $parameters = []): object
     {
@@ -49,11 +50,11 @@ class PhpDiContainerAdapter implements RouterContainerInterface
             } else {
                 $result = $this->container->get($class);
             }
-            
+
             if (!is_object($result)) {
                 throw new \RuntimeException("Resolved value for '{$class}' is not an object");
             }
-            
+
             return $result;
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);

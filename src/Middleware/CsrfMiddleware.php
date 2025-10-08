@@ -51,13 +51,10 @@ final class CsrfMiddleware implements MiddlewareInterface
     private string $sessionKey;
 
     /**
-     * @param int $tokenLength Длина CSRF токена в байтах (будет удвоена в hex)
-     * @param string $sessionKey Ключ для хранения токена в сессии
-     * @param array<int, string> $excludePaths Пути, которые не требуют CSRF проверки
-     */
-    /**
-     * @param int<1, max> $tokenLength
-     * @param array<int, string> $excludePaths
+     * @param int<1, max> $tokenLength Token length in bytes (will be doubled in hex)
+     * @param string|null $sessionKey Key for storing token in session
+     * @param array<int, string> $excludePaths Paths that don't require CSRF check
+     * @throws \InvalidArgumentException If token length is less than 1
      */
     public function __construct(
         private readonly int $tokenLength = self::DEFAULT_TOKEN_LENGTH,
@@ -65,10 +62,11 @@ final class CsrfMiddleware implements MiddlewareInterface
         private readonly array $excludePaths = []
     ) {
         // Validation is redundant due to PHPDoc type, but kept for runtime safety
-        if ($tokenLength < 1) { // @phpstan-ignore-line
+        // @phpstan-ignore-next-line
+        if ($tokenLength < 1) {
             throw new \InvalidArgumentException('Token length must be at least 1');
         }
-        
+
         $this->sessionKey = $sessionKey ?? self::DEFAULT_SESSION_KEY;
     }
 

@@ -98,7 +98,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
         if (!class_exists($class)) {
             throw new \RuntimeException("Class {$class} does not exist");
         }
-        
+
         $reflectionClass = new \ReflectionClass($class);
 
         if (!$reflectionClass->isInstantiable()) {

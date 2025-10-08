@@ -46,6 +46,7 @@ class DefaultContainer implements RouterContainerInterface
      *         DatabaseConnection::class => DatabaseConnection::class
      *     ]
      * ]);
+     * @throws \InvalidArgumentException If binding/singleton key is not a string
      */
     public static function withConfig(array $config = []): self
     {
@@ -151,6 +152,7 @@ class DefaultContainer implements RouterContainerInterface
      * @example
      * // With parameters
      * $service = $container->resolve(EmailService::class, ['config' => $config]);
+     * @throws \Exception|\RuntimeException If class cannot be resolved or resolved value is not an object
      */
     public function resolve(string $class, array $parameters = []): object
     {
@@ -160,11 +162,11 @@ class DefaultContainer implements RouterContainerInterface
             } else {
                 $result = $this->container->get($class);
             }
-            
+
             if (!is_object($result)) {
                 throw new \RuntimeException("Resolved value for '{$class}' is not an object");
             }
-            
+
             return $result;
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);

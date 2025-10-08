@@ -39,7 +39,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?string $uri = null;
     private ?string $paramsString = null;
 
-    /** 
+    /**
      * @var array<string, mixed>|null Query parameters from URI
      * @phpstan-ignore-next-line property.onlyWritten
      */
@@ -272,7 +272,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if ($this->paramsString) {
             $parsedParams = [];
             parse_str($this->paramsString, $parsedParams);
-            /** @var array<string, mixed> $parsedParams */
+            // @var array<string, mixed> $parsedParams
+
             $this->params = $parsedParams;
         }
     }
@@ -289,7 +290,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         // After parse() call $this->uri is always initialized
         assert($this->uri !== null);
-        
+
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
     }
 
@@ -301,6 +302,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
      */
+
     /**
      * Checks if HTTP method is allowed for route
      *
@@ -468,8 +470,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *         DatabaseConnection::class => DatabaseConnection::class,
      *     ]
      * ]);
-     * 
+     *
      * @param array<string, mixed> $config
+     * @throws \InvalidArgumentException If binding/singleton key is not a string
      */
     public function configureContainer(array $config): self
     {
@@ -567,6 +570,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * @param string|null $fragment Anchor/fragment to add to URL (#fragment)
      * @return string Generated URL
      * @throws \InvalidArgumentException If route not found or not all required parameters provided
+     * @throws \RuntimeException If URL generation fails
      *
      * @example
      * // Basic example
@@ -642,7 +646,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
                 $escapedValue,
                 $uri
             );
-            
+
             // preg_replace can return null on error
             if ($replaced === null) {
                 throw new \RuntimeException("Failed to replace parameter '{$key}' in URI");
@@ -655,7 +659,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if ($uri === null) {
             throw new \RuntimeException("Failed to process optional parameters in URI");
         }
-        
+
         $uri = preg_replace('/\{[^}]+:[^}]+\?\}/', '', $uri);
         if ($uri === null) {
             throw new \RuntimeException("Failed to process optional parameters in URI");
@@ -673,7 +677,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if ($uri === null) {
             throw new \RuntimeException("Failed to clean up URI slashes");
         }
-        
+
         $uri = rtrim($uri, '/');
 
         // Return root path if URI is empty

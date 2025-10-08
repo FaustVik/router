@@ -122,7 +122,8 @@ final class Runner implements RunnerInterface
         if ($this->container && $this->container->canResolve($route->getClass())) {
             // Преобразуем индексированный массив в ассоциативный для совместимости с контейнером
             $args = $route->getArg();
-            /** @var array<string, mixed> $namedArgs */
+            // @var array<string, mixed> $namedArgs
+
             $namedArgs = [];
             foreach ($args as $key => $value) {
                 // Используем только строковые ключи для PHPStan
@@ -170,7 +171,7 @@ final class Runner implements RunnerInterface
         if (!is_callable($callable)) {
             throw new NotFoundMethod($route->getAction(), $route->getClass());
         }
-        
+
         call_user_func_array($callable, $atr);
     }
 }

@@ -48,7 +48,7 @@ final class OptimizedMatching implements MatchingRouteInterface
         if ($collections === null) {
             throw new NoMatch($uri);
         }
-        
+
         // Строим индекс при первом вызове
         if (!$this->indexed) {
             $this->buildIndex($collections);
@@ -110,11 +110,11 @@ final class OptimizedMatching implements MatchingRouteInterface
             // Статический маршрут без параметров
             if (!$this->hasParameters($pattern)) {
                 $this->staticRoutes[$pattern] = $route;
-                
+
                 if ($alias !== null && !$this->hasParameters($alias)) {
                     $this->aliasRoutes[$alias] = $route;
                 }
-                
+
                 continue;
             }
 
@@ -142,25 +142,25 @@ final class OptimizedMatching implements MatchingRouteInterface
 
         // Группируем по первому сегменту
         $key = $this->isParameter($firstSegment) ? '*' : $firstSegment;
-        
+
         // Избегаем дубликатов
         if (!isset($this->dynamicRoutes[$key])) {
             $this->dynamicRoutes[$key] = [];
         }
-        
+
         // Проверяем что маршрут еще не добавлен в эту группу
         foreach ($this->dynamicRoutes[$key] as $existingRoute) {
             if ($existingRoute === $route) {
                 return;
             }
         }
-        
+
         $this->dynamicRoutes[$key][] = $route;
     }
 
     /**
      * Пытается сопоставить URI с маршрутом
-     * 
+     *
      * @param array<int, string> $segments
      */
     private function tryMatch(
@@ -283,4 +283,3 @@ final class OptimizedMatching implements MatchingRouteInterface
         $this->indexed = false;
     }
 }
-

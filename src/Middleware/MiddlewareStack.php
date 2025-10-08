@@ -113,10 +113,7 @@ final class MiddlewareStack
      *
      * @param array<MiddlewareInterface|class-string<MiddlewareInterface>> $middleware
      * @return self Для fluent interface
-     * @throws \RuntimeException|\InvalidArgumentException
-     */
-    /**
-     * @param array<int, string|callable|MiddlewareInterface> $middleware
+     * @throws \RuntimeException|\InvalidArgumentException If middleware is invalid or cannot be resolved
      */
     public function addFromArray(array $middleware): self
     {
@@ -126,12 +123,14 @@ final class MiddlewareStack
                 $item = $this->resolveMiddleware($item);
             } elseif (is_callable($item)) {
                 // Если это callable, оборачиваем в анонимный middleware
-                $item = new class($item) implements MiddlewareInterface {
+                $item = new class ($item) implements MiddlewareInterface {
                     /**
                      * @param callable(Request, callable): Response $handler
                      */
-                    public function __construct(private $handler) {}
-                    
+                    public function __construct(private $handler)
+                    {
+                    }
+
                     public function handle(Request $request, callable $next): Response
                     {
                         return ($this->handler)($request, $next);

@@ -28,6 +28,7 @@ final class Cookie implements CookieInterface
 
     /**
      * @param 'Lax'|'Strict'|'None' $sameSite
+     * @throws \InvalidArgumentException If sameSite value is invalid
      */
     public function __construct(
         string $name,
@@ -43,7 +44,7 @@ final class Cookie implements CookieInterface
         if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
             throw new \InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
         }
-        
+
         $this->name = $name;
         $this->value = $value;
         $this->expires = $expires;
@@ -175,13 +176,14 @@ final class Cookie implements CookieInterface
      *
      * @example
      * $cookie = Cookie::create('csrf', 'token')->withSameSite('Strict');
+     * @throws \InvalidArgumentException If sameSite value is invalid
      */
     public function withSameSite(string $sameSite): self
     {
         if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
             throw new \InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
         }
-        
+
         $clone = clone $this;
         assert(in_array($sameSite, ['Lax', 'Strict', 'None'], true));
         $clone->sameSite = $sameSite;

@@ -32,7 +32,7 @@ final class Response implements ResponseInterface
 
     /**
      * Конструктор HTTP ответа
-     * 
+     *
      * @param array<string, mixed> $headers
      */
     public function __construct(string $content = '', int $statusCode = 200, array $headers = [])
@@ -355,7 +355,7 @@ final class Response implements ResponseInterface
             $secure = $options['secure'] ?? false;
             $httpOnly = $options['httpOnly'] ?? true;
             $sameSite = $options['sameSite'] ?? 'Lax';
-            
+
             $cookie = new Cookie(
                 name: $name,
                 value: $value,

@@ -37,7 +37,7 @@ final class Matching implements MatchingRouteInterface
         if ($collections === null) {
             throw new NoMatch($uri);
         }
-        
+
         foreach ($collections->get() as $route) {
             if ($uri === $route->getRoute() || $uri === $route->alias()) {
                 return new MatchResult($route, []);

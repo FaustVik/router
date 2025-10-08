@@ -11,7 +11,7 @@ use FaustVik\Router\Router\QuickRouter;
 
 /**
  * Пример использования RateLimitMiddleware для защиты от DDoS
- * 
+ *
  * Middleware ограничивает количество запросов с одного IP адреса:
  * - Добавляет заголовки X-RateLimit-*
  * - Возвращает 429 Too Many Requests при превышении лимита
@@ -110,7 +110,7 @@ $monitorRateLimit = new RateLimitMiddleware(
 $router->get('/api/rate-limit-status', function () use ($monitorRateLimit) {
     $request = \FaustVik\Router\Http\Request::createFromGlobals();
     $status = $monitorRateLimit->getLimitStatus($request);
-    
+
     return Response::json([
         'limit' => 10,
         'attempts' => $status['attempts'],
@@ -132,7 +132,7 @@ $adminRateLimit = new RateLimitMiddleware(
 
 $router->post('/api/admin/clear-rate-limits', function () use ($cache) {
     $cache->clear();
-    
+
     return Response::json([
         'success' => true,
         'message' => 'All rate limits have been cleared'
@@ -174,36 +174,35 @@ try {
  * ====================================================================
  * Как протестировать:
  * ====================================================================
- * 
+ *
  * 1. Запустите встроенный PHP сервер:
  *    php -S localhost:8000 -t examples examples/rate-limit-example.php
- * 
+ *
  * 2. Тестирование базового лимита (3 запроса в минуту):
  *    curl -v http://localhost:8000/api/test/rate-limit
- *    
+ *
  *    # Делаем 3 запроса - все должны пройти
  *    # 4-й запрос вернет 429 Too Many Requests
- * 
+ *
  * 3. Проверка заголовков:
  *    X-RateLimit-Limit: 3
  *    X-RateLimit-Remaining: 2
  *    X-RateLimit-Reset: 1696789200
  *    Retry-After: 45  (только при 429)
- * 
+ *
  * 4. Проверка статуса:
  *    curl http://localhost:8000/api/rate-limit-status
- * 
+ *
  * 5. Очистка лимитов (если нужно сбросить для тестов):
  *    curl -X POST http://localhost:8000/api/admin/clear-rate-limits
- * 
+ *
  * ====================================================================
  * Production рекомендации:
  * ====================================================================
- * 
+ *
  * 1. Используйте Redis вместо FileCache для лучшей производительности
  * 2. Настройте разные лимиты для авторизованных/неавторизованных
  * 3. Добавьте whitelist IP адресов для администраторов
  * 4. Логируйте превышения лимита для мониторинга атак
  * 5. Используйте includePathInKey: true для API с разными endpoint'ами
  */
-

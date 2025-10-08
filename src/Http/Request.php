@@ -50,7 +50,7 @@ final class Request implements RequestInterface
 
     /**
      * Конструктор HTTP запроса
-     * 
+     *
      * @param array<string, mixed> $params
      * @param array<string, mixed> $query
      * @param array<string, mixed> $headers
@@ -703,7 +703,7 @@ final class Request implements RequestInterface
         foreach ($headers as $header) {
             if (!empty($this->server[$header])) {
                 $ip = $this->server[$header];
-                
+
                 if (!is_string($ip)) {
                     continue;
                 }

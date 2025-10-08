@@ -117,34 +117,34 @@ class ContainerAdapterFactory
     public static function createByType(string $type, object $container): RouterContainerInterface
     {
         $lowerType = strtolower($type);
-        
+
         if ($lowerType === 'php-di' || $lowerType === 'phpdi') {
             if (!$container instanceof PHPDIContainer) {
                 throw new \InvalidArgumentException('Container must be an instance of DI\Container for php-di type');
             }
             return new PhpDiContainerAdapter($container);
         }
-        
+
         if ($lowerType === 'symfony') {
             if (!$container instanceof ContainerInterface) {
                 throw new \InvalidArgumentException('Container must implement PSR-11 ContainerInterface for symfony type');
             }
             return new SymfonyContainerAdapter($container);
         }
-        
+
         if ($lowerType === 'pimple') {
             if (!$container instanceof ContainerInterface) {
                 throw new \InvalidArgumentException('Container must implement PSR-11 ContainerInterface for pimple type');
             }
             return new PimpleContainerAdapter($container);
         }
-        
+
         throw new \InvalidArgumentException("Unsupported container type: {$type}");
     }
 
     /**
      * Get supported container types
-     * 
+     *
      * @return array<string, class-string>
      */
     public static function getSupportedTypes(): array

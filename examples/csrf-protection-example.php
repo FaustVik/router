@@ -11,7 +11,7 @@ use FaustVik\Router\Router\QuickRouter;
 
 /**
  * Пример использования CsrfMiddleware для защиты от CSRF атак
- * 
+ *
  * Middleware защищает от межсайтовой подделки запросов:
  * - Автоматически генерирует CSRF токены
  * - Проверяет токены для POST/PUT/PATCH/DELETE запросов
@@ -42,7 +42,7 @@ $router->addGlobalMiddleware($csrfMiddleware);
 $router->get('/', function () {
     $csrfTokenField = CsrfMiddleware::getTokenField();
     $csrfTokenMeta = CsrfMiddleware::getTokenMeta();
-    
+
     return new Response(<<<HTML
 <!DOCTYPE html>
 <html lang="ru">
@@ -149,10 +149,10 @@ HTML
 $router->post('/posts', function (Request $request) {
     $title = $request->input('title');
     $content = $request->input('content');
-    
+
     // Здесь бы сохранили в БД
     // $postRepository->create(['title' => $title, 'content' => $content]);
-    
+
     return Response::json([
         'success' => true,
         'message' => 'Пост успешно создан!',
@@ -167,10 +167,10 @@ $router->post('/posts', function (Request $request) {
 $router->post('/auth/login', function (Request $request) {
     $email = $request->input('email');
     $password = $request->input('password');
-    
+
     // Здесь бы проверили credentials
     // if ($auth->attempt($email, $password)) { ... }
-    
+
     return Response::json([
         'success' => true,
         'message' => 'Успешный вход в систему',
@@ -187,7 +187,7 @@ $router->post('/auth/login', function (Request $request) {
 
 $router->post('/api/profile/update', function (Request $request) {
     $body = $request->getBody();
-    
+
     return Response::json([
         'success' => true,
         'message' => 'Профиль успешно обновлен!',
@@ -203,7 +203,7 @@ $router->post('/api/profile/update', function (Request $request) {
 $router->post('/api/webhook', function (Request $request) {
     // Webhook от внешнего сервиса (GitHub, Stripe и т.д.)
     // Здесь используется другая аутентификация (подпись, secret key)
-    
+
     return Response::json([
         'success' => true,
         'message' => 'Webhook received'
@@ -229,7 +229,7 @@ $router->post('/test/no-csrf', function () {
 $router->post('/auth/logout', function () use ($csrfMiddleware) {
     // После logout регенерируем CSRF токен для безопасности
     $newToken = $csrfMiddleware->regenerateToken();
-    
+
     return Response::json([
         'success' => true,
         'message' => 'Выход выполнен успешно',
@@ -251,11 +251,11 @@ $router->group('/api/admin', function ($group) {
     $group->post('/users', function () {
         return Response::json(['message' => 'User created']);
     });
-    
+
     $group->delete('/users/{id}', function ($id) {
         return Response::json(['message' => "User {$id} deleted"]);
     });
-    
+
     $group->put('/users/{id}', function ($id) {
         return Response::json(['message' => "User {$id} updated"]);
     });
@@ -278,34 +278,34 @@ try {
  * ====================================================================
  * Как протестировать:
  * ====================================================================
- * 
+ *
  * 1. Запустите встроенный PHP сервер:
  *    php -S localhost:8000 -t examples examples/csrf-protection-example.php
- * 
+ *
  * 2. Откройте браузер:
  *    http://localhost:8000
- * 
+ *
  * 3. Протестируйте формы:
  *    - Форма с CSRF токеном → успех (200)
  *    - Форма без токена → ошибка (419)
  *    - AJAX с токеном в заголовке → успех
- * 
+ *
  * 4. Тест через curl с токеном:
  *    # Получаем токен
  *    TOKEN=$(curl -c cookies.txt http://localhost:8000 | grep -oP '(?<=value=")[^"]+')
- *    
+ *
  *    # Отправляем с токеном
  *    curl -b cookies.txt -X POST http://localhost:8000/posts \
  *         -d "title=Test&content=Content&_csrf_token=$TOKEN"
- * 
+ *
  * 5. Тест без токена (получим 419):
  *    curl -X POST http://localhost:8000/posts \
  *         -d "title=Test&content=Content"
- * 
+ *
  * ====================================================================
  * Production рекомендации:
  * ====================================================================
- * 
+ *
  * 1. Регенерируйте токен после login/logout
  * 2. Используйте HTTPS для защиты токена в transit
  * 3. Исключайте только необходимые пути (webhook endpoints)
@@ -313,4 +313,3 @@ try {
  * 5. Логируйте неудачные проверки CSRF для мониторинга атак
  * 6. Рассмотрите SameSite cookie флаг для дополнительной защиты
  */
-
