@@ -12,7 +12,7 @@ use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
-use FaustVik\Router\Router\Components\matching\Matching;
+use FaustVik\Router\Router\Components\matching\OptimizedMatching;
 
 final class Config implements ConfigInterface
 {
@@ -28,7 +28,7 @@ final class Config implements ConfigInterface
     {
         $this->runner  = new Runner();
         $this->checker = new CheckerHttpMethod();
-        $this->match   = new CachedMatching(new Matching(), new FileCache());
+        $this->match   = new CachedMatching(new OptimizedMatching(), new FileCache());
     }
 
     public function setRunner(RunnerInterface $runner): void
