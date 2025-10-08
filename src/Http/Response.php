@@ -224,7 +224,7 @@ final class Response implements ResponseInterface
                 sameSite: $options['sameSite'] ?? 'Lax'
             );
         }
-        
+
         $this->cookies[$name] = $cookie;
         return $this;
     }

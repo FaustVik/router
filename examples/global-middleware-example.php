@@ -16,7 +16,7 @@ use FaustVik\Router\Router\QuickRouter;
 
 /**
  * Пример использования глобальных middleware
- * 
+ *
  * Глобальные middleware применяются ко всем маршрутам автоматически.
  * Это удобно для:
  * - CORS заголовков
@@ -34,11 +34,11 @@ class SimpleLoggingMiddleware implements MiddlewareInterface
     public function handle(Request $request, callable $next): Response
     {
         echo "[GLOBAL LOG] Запрос: {$request->getMethod()} {$request->getUri()}\n";
-        
+
         $response = $next($request);
-        
+
         echo "[GLOBAL LOG] Ответ: {$response->getStatusCode()}\n\n";
-        
+
         return $response;
     }
 }
@@ -49,7 +49,7 @@ class HeaderMiddleware implements MiddlewareInterface
     public function handle(Request $request, callable $next): Response
     {
         $response = $next($request);
-        
+
         return $response->withHeader('X-Powered-By', 'FaustVik Router v2.0');
     }
 }
@@ -77,7 +77,7 @@ $routes = new RoutesCollection();
 $routes->set(
     \FaustVik\Router\Route\RouteAnonymousFunc::create(
         route: '/',
-        func: function() {
+        func: function () {
             return "Hello World!";
         },
         methods: ['GET']
@@ -88,7 +88,7 @@ $routes->set(
 $routes->set(
     \FaustVik\Router\Route\RouteAnonymousFunc::create(
         route: '/protected',
-        func: function() {
+        func: function () {
             return "Protected resource";
         },
         methods: ['GET']
@@ -229,4 +229,3 @@ echo "✅ Они применяются ко всем маршрутам авт�
 echo "✅ Middleware маршрута выполняются после глобальных\n";
 echo "✅ Можно добавлять, заменять и очищать глобальные middleware\n";
 echo "✅ Работает с DI контейнером (если middleware требуют зависимости)\n";
-

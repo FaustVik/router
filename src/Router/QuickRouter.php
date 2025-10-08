@@ -36,23 +36,27 @@ final class QuickRouter
     /**
      * Создает новый QuickRouter
      *
-     * @param bool $cache Включить кеширование маршрутов (рекомендуется для production)
+     * @param bool|array<string, bool> $cache Включить кеширование маршрутов или массив опций (обратная совместимость)
      * @param bool $di Включить Dependency Injection контейнер
      *
      * @example
      * // Простой роутер (по умолчанию всё отключено)
      * $app = new QuickRouter();
      *
-     * // С кешированием (для production)
-     * $app = new QuickRouter(cache: true);
-     *
-     * // С DI контейнером
-     * $app = new QuickRouter(di: true);
-     *
-     * // С обоими
+     * @example
+     * // С named arguments (рекомендуется)
      * $app = new QuickRouter(cache: true, di: true);
      *
-     * // Старый стиль тоже работает (обратная совместимость)
+     * @example
+     * // Только кеширование (для production)
+     * $app = new QuickRouter(cache: true);
+     *
+     * @example
+     * // Только DI контейнер
+     * $app = new QuickRouter(di: true);
+     *
+     * @example
+     * // Старый стиль с массивом (обратная совместимость)
      * $app = new QuickRouter(['cache' => true, 'di' => true]);
      */
     public function __construct(bool|array $cache = false, bool $di = false)
@@ -276,7 +280,7 @@ final class QuickRouter
      * Это удобно для CORS, логирования, аутентификации и других общих задач.
      *
      * @param string|object|callable $middleware Middleware класс, объект или callable
-     * @return self
+     * @return self Возвращает себя для fluent interface
      *
      * @example
      * use FaustVik\Router\Middleware\CorsMiddleware;
@@ -287,9 +291,11 @@ final class QuickRouter
      * // Добавление одного middleware
      * $app->addMiddleware(CorsMiddleware::class);
      *
-     * // Добавление нескольких middleware
+     * @example
+     * // Цепочка вызовов (рекомендуется)
      * $app->addMiddleware(CorsMiddleware::class)
-     *     ->addMiddleware(LoggingMiddleware::class);
+     *     ->addMiddleware(LoggingMiddleware::class)
+     *     ->addMiddleware(RateLimitMiddleware::class);
      *
      * // Теперь все маршруты будут проходить через эти middleware
      * $app->get('/', fn() => "Hello World!");
@@ -306,13 +312,14 @@ final class QuickRouter
      *
      * Заменяет все существующие глобальные middleware на новые.
      *
-     * @param array $middleware Массив middleware
-     * @return self
+     * @param array<int, string|object|callable> $middleware Массив middleware
+     * @return self Возвращает себя для fluent interface
      *
      * @example
      * $app->setMiddleware([
      *     CorsMiddleware::class,
      *     LoggingMiddleware::class,
+     *     RateLimitMiddleware::class,
      * ]);
      */
     public function setMiddleware(array $middleware): self
@@ -324,7 +331,7 @@ final class QuickRouter
     /**
      * Получает все глобальные middleware
      *
-     * @return array
+     * @return array<int, string|object|callable> Массив глобальных middleware
      */
     public function getMiddleware(): array
     {
@@ -334,7 +341,7 @@ final class QuickRouter
     /**
      * Очищает все глобальные middleware
      *
-     * @return self
+     * @return self Возвращает себя для fluent interface
      */
     public function clearMiddleware(): self
     {
@@ -394,6 +401,7 @@ final class QuickRouter
      * @param string $uri URI маршрута
      * @param callable|array $handler Обработчик
      * @return RouteInterface
+     * @throws \InvalidArgumentException Если обработчик имеет неверный формат
      */
     private function addRoute(string|array $methods, string $uri, callable|array $handler): RouteInterface
     {
@@ -429,4 +437,3 @@ final class QuickRouter
         );
     }
 }
-

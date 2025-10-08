@@ -61,7 +61,7 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 
     /**
      * Устанавливает alias для маршрута
-     * 
+     *
      * @param string $alias Альтернативный путь к маршруту
      * @return self Для fluent interface
      */

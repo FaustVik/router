@@ -22,11 +22,11 @@ class SimpleLoggingMiddleware implements MiddlewareInterface
     public function handle(Request $request, callable $next): Response
     {
         echo "🚀 [LOG] Запрос: {$request->getMethod()} {$request->getUri()}\n";
-        
+
         $response = $next($request);
-        
+
         echo "✅ [LOG] Ответ: {$response->getStatusCode()}\n";
-        
+
         return $response;
     }
 }
@@ -40,13 +40,14 @@ class RateLimitMiddleware implements MiddlewareInterface
     public function __construct(
         private CacheInterface $cache,
         private int $maxAttempts = 10
-    ) {}
-    
+    ) {
+    }
+
     public function handle(Request $request, callable $next): Response
     {
         $key = 'rate_limit:' . $request->getClientIp();
         $attempts = (int) $this->cache->get($key);
-        
+
         if ($attempts >= $this->maxAttempts) {
             echo "❌ [RATE LIMIT] Превышен лимит запросов!\n";
             return Response::json([
@@ -54,10 +55,10 @@ class RateLimitMiddleware implements MiddlewareInterface
                 'retry_after' => 60
             ], 429);
         }
-        
+
         $this->cache->set($key, $attempts + 1, 60);
         echo "📊 [RATE LIMIT] Попытка {$attempts}/{$this->maxAttempts}\n";
-        
+
         return $next($request);
     }
 }
@@ -70,30 +71,31 @@ class DatabaseAuthMiddleware implements MiddlewareInterface
     public function __construct(
         private CacheInterface $cache,
         private string $tokenHeader = 'Authorization'
-    ) {}
-    
+    ) {
+    }
+
     public function handle(Request $request, callable $next): Response
     {
         $token = $request->getHeader($this->tokenHeader);
-        
+
         if (!$token) {
             echo "🔒 [AUTH] Токен не предоставлен\n";
             return Response::json(['error' => 'Unauthorized'], 401);
         }
-        
+
         // Проверяем кеш токенов
         $userId = $this->cache->get('token:' . $token);
-        
+
         if (!$userId) {
             echo "🔒 [AUTH] Невалидный токен\n";
             return Response::json(['error' => 'Invalid token'], 401);
         }
-        
+
         echo "✅ [AUTH] Пользователь #{$userId} аутентифицирован\n";
-        
+
         // Добавляем информацию о пользователе в запрос
         $request = $request->withAttribute('user_id', $userId);
-        
+
         return $next($request);
     }
 }
@@ -164,7 +166,7 @@ $limitedRoute = Route::create('/api/limited', function (Request $request) {
 // Маршрут 3: Защищенный эндпоинт (аутентификация + rate limit)
 $protectedRoute = Route::create('/api/protected', function (Request $request) {
     $userId = $request->getAttribute('user_id');
-    
+
     return Response::json([
         'message' => 'Защищенный эндпоинт',
         'user_id' => $userId,
@@ -212,13 +214,13 @@ $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 for ($i = 1; $i <= 7; $i++) {
     echo "\n--- Попытка #{$i} ---\n";
     $_SERVER['REQUEST_URI'] = '/api/limited';
-    
+
     try {
         $router->run();
     } catch (\Throwable $e) {
         echo "❌ Ошибка: " . $e->getMessage() . "\n";
     }
-    
+
     // Небольшая пауза для визуализации
     usleep(100000);
 }
@@ -265,8 +267,9 @@ class MiddlewareRequiringDependencies implements MiddlewareInterface
 {
     public function __construct(
         private CacheInterface $cache  // Требует зависимость!
-    ) {}
-    
+    ) {
+    }
+
     public function handle(Request $request, callable $next): Response
     {
         return $next($request);
@@ -296,4 +299,3 @@ try {
 echo str_repeat("=", 72) . "\n";
 echo "✅ Демонстрация завершена!\n";
 echo str_repeat("=", 72) . "\n";
-

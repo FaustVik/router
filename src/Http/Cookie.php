@@ -216,4 +216,3 @@ final class Cookie implements CookieInterface
         ];
     }
 }
-

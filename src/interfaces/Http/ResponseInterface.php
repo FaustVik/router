@@ -134,4 +134,3 @@ interface ResponseInterface
      */
     public function send(): void;
 }
-

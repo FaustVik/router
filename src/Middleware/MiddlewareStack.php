@@ -113,8 +113,7 @@ final class MiddlewareStack
      *
      * @param array<MiddlewareInterface|class-string<MiddlewareInterface>> $middleware
      * @return self Для fluent interface
-     * @throws \RuntimeException Если middleware не удалось разрешить
-     * @throws \InvalidArgumentException Если элемент не является middleware
+     * @throws \RuntimeException|\InvalidArgumentException
      */
     public function addFromArray(array $middleware): self
     {
@@ -163,7 +162,7 @@ final class MiddlewareStack
         if ($this->container !== null && $this->container->canResolve($className)) {
             try {
                 $instance = $this->container->resolve($className);
-                
+
                 if (!$instance instanceof MiddlewareInterface) {
                     throw new \RuntimeException(
                         sprintf(
@@ -172,7 +171,7 @@ final class MiddlewareStack
                         )
                     );
                 }
-                
+
                 return $instance;
             } catch (\Throwable $e) {
                 throw new \RuntimeException(
@@ -190,7 +189,7 @@ final class MiddlewareStack
         // Fallback: пытаемся создать напрямую (для middleware без зависимостей)
         try {
             $instance = new $className();
-            
+
             if (!$instance instanceof MiddlewareInterface) {
                 throw new \RuntimeException(
                     sprintf(
@@ -199,7 +198,7 @@ final class MiddlewareStack
                     )
                 );
             }
-            
+
             return $instance;
         } catch (\ArgumentCountError $e) {
             // Конструктор требует параметры, но DI контейнер не доступен

@@ -2,7 +2,7 @@
 
 /**
  * Пример работы с POST/PUT данными и JSON body
- * 
+ *
  * Демонстрирует:
  * - Обработку JSON запросов (Content-Type: application/json)
  * - Обработку form-data запросов
@@ -25,29 +25,29 @@ $router = new Router();
 // POST /api/users
 // Content-Type: application/json
 // Body: {"name": "John Doe", "email": "john@example.com", "age": 30}
-$router->post('/api/users', function(Request $request) {
+$router->post('/api/users', function (Request $request) {
     // Получаем все данные из body
     $data = $request->getBody();
-    
+
     // Или получаем отдельные поля
     $name = $request->input('name');
     $email = $request->input('email');
     $age = $request->input('age', 18); // со значением по умолчанию
-    
+
     // Проверяем наличие полей
     if (!$request->has('name')) {
         return Response::json([
             'error' => 'Name is required'
         ], 400);
     }
-    
+
     // Проверяем является ли запрос JSON
     if (!$request->isJson()) {
         return Response::json([
             'error' => 'Content-Type must be application/json'
         ], 415);
     }
-    
+
     return Response::json([
         'message' => 'User created successfully',
         'user' => [
@@ -64,13 +64,13 @@ $router->post('/api/users', function(Request $request) {
 // PUT /api/users/123
 // Content-Type: application/json
 // Body: {"name": "Jane Doe", "age": 25}
-$router->put('/api/users/{id}', function(Request $request) {
+$router->put('/api/users/{id}', function (Request $request) {
     $userId = $request->getParam('id');
-    
+
     // PUT данные автоматически читаются из php://input
     $name = $request->input('name');
     $age = $request->input('age');
-    
+
     return Response::json([
         'message' => 'User updated successfully',
         'user_id' => $userId,
@@ -87,20 +87,20 @@ $router->put('/api/users/{id}', function(Request $request) {
 // POST /api/upload
 // Content-Type: multipart/form-data
 // Form fields: file (file), description (text)
-$router->post('/api/upload', function(Request $request) {
+$router->post('/api/upload', function (Request $request) {
     // Проверяем наличие файла
     if (!$request->hasFile('avatar')) {
         return Response::json([
             'error' => 'Avatar file is required'
         ], 400);
     }
-    
+
     // Получаем данные файла
     $file = $request->file('avatar');
-    
+
     // Получаем текстовые поля из form-data
     $description = $request->input('description', 'No description');
-    
+
     // Информация о файле
     $fileInfo = [
         'name' => $file['name'],
@@ -109,10 +109,10 @@ $router->post('/api/upload', function(Request $request) {
         'tmp_name' => $file['tmp_name'],
         'error' => $file['error']
     ];
-    
+
     // В реальном приложении здесь была бы логика сохранения файла
     // move_uploaded_file($file['tmp_name'], '/path/to/destination/' . $file['name']);
-    
+
     return Response::json([
         'message' => 'File uploaded successfully',
         'description' => $description,
@@ -123,10 +123,10 @@ $router->post('/api/upload', function(Request $request) {
 // ============================================
 // 4. Пример: Комбинированный API endpoint
 // ============================================
-$router->post('/api/posts', function(Request $request) {
+$router->post('/api/posts', function (Request $request) {
     // Получаем все данные сразу
     $body = $request->getBody();
-    
+
     // Валидация
     $required = ['title', 'content'];
     foreach ($required as $field) {
@@ -136,7 +136,7 @@ $router->post('/api/posts', function(Request $request) {
             ], 400);
         }
     }
-    
+
     // Обработка опциональных полей
     $post = [
         'id' => uniqid(),
@@ -147,7 +147,7 @@ $router->post('/api/posts', function(Request $request) {
         'published' => $request->input('published', false),
         'created_at' => date('Y-m-d H:i:s')
     ];
-    
+
     return Response::json([
         'message' => 'Post created successfully',
         'post' => $post
@@ -157,12 +157,12 @@ $router->post('/api/posts', function(Request $request) {
 // ============================================
 // 5. Пример: PATCH (частичное обновление)
 // ============================================
-$router->patch('/api/posts/{id}', function(Request $request) {
+$router->patch('/api/posts/{id}', function (Request $request) {
     $postId = $request->getParam('id');
-    
+
     // PATCH обычно содержит только изменяемые поля
     $updates = $request->getBody();
-    
+
     return Response::json([
         'message' => 'Post updated successfully',
         'post_id' => $postId,
@@ -173,12 +173,12 @@ $router->patch('/api/posts/{id}', function(Request $request) {
 // ============================================
 // 6. Пример: DELETE с body
 // ============================================
-$router->delete('/api/users/{id}', function(Request $request) {
+$router->delete('/api/users/{id}', function (Request $request) {
     $userId = $request->getParam('id');
-    
+
     // Некоторые API требуют причину удаления в body
     $reason = $request->input('reason', 'User requested');
-    
+
     return Response::json([
         'message' => 'User deleted successfully',
         'user_id' => $userId,
@@ -189,7 +189,7 @@ $router->delete('/api/users/{id}', function(Request $request) {
 // ============================================
 // 7. Пример: Проверка типа запроса
 // ============================================
-$router->post('/api/data', function(Request $request) {
+$router->post('/api/data', function (Request $request) {
     $info = [
         'is_json' => $request->isJson(),
         'is_ajax' => $request->isAjax(),
@@ -197,7 +197,7 @@ $router->post('/api/data', function(Request $request) {
         'content_type' => $request->getHeader('Content-Type'),
         'body_data' => $request->getBody()
     ];
-    
+
     return Response::json($info);
 });
 
@@ -262,4 +262,3 @@ curl -X POST http://localhost:8000/api/data \
   -d '{"test": "data"}'
 
 */
-

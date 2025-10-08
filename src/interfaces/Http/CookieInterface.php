@@ -86,4 +86,3 @@ interface CookieInterface
      */
     public function toArray(): array;
 }
-

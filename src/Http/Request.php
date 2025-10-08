@@ -33,9 +33,12 @@ final class Request implements RequestInterface
     private array $headers;
     private array $server;
     private array $attributes = [];
-    private array $body = [];      // Для POST/PUT данных
-    private array $files = [];     // Для загруженных файлов
-    private array $cookies = [];   // Для HTTP cookies
+    private array $body = [];
+// Для POST/PUT данных
+    private array $files = [];
+// Для загруженных файлов
+    private array $cookies = [];
+// Для HTTP cookies
 
     /**
      * Конструктор HTTP запроса
@@ -59,36 +62,35 @@ final class Request implements RequestInterface
     /**
      * Создает запрос из глобальных переменных PHP
      *
-     * Использует $_SERVER, $_GET, $_POST, $_FILES, $_COOKIE и getallheaders() 
+     * Использует $_SERVER, $_GET, $_POST, $_FILES, $_COOKIE и getallheaders()
      * для создания объекта запроса. Автоматически парсит JSON body.
      * Поддерживает HTTP Method Override через _method поле или X-HTTP-Method-Override header.
      */
     public static function createFromGlobals(): self
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        
+
         // HTTP Method Override для REST API через формы
         if ($method === 'POST') {
             // Из POST параметра _method
             if (isset($_POST['_method'])) {
                 $method = strtoupper($_POST['_method']);
-            }
-            // Из HTTP заголовка X-HTTP-Method-Override
-            elseif (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+            } elseif (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+                // Из HTTP заголовка X-HTTP-Method-Override
                 $method = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
             }
         }
-        
+
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         $query = $_GET;
         $headers = function_exists('getallheaders') ? getallheaders() : [];
         $server = $_SERVER;
         $cookies = $_COOKIE;
-        
+
         // Обработка POST/PUT данных
         $body = [];
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-        
+
         // Если Content-Type содержит application/json - парсим JSON из php://input
         if (str_contains(strtolower($contentType), 'application/json')) {
             $rawBody = file_get_contents('php://input');
@@ -103,13 +105,11 @@ final class Request implements RequestInterface
                     // В production можно залогировать ошибку
                 }
             }
-        } 
-        // Для POST запросов с form-data берем $_POST
-        elseif ($method === 'POST' && !empty($_POST)) {
+        } elseif ($method === 'POST' && !empty($_POST)) {
+            // Для POST запросов с form-data берем $_POST
             $body = $_POST;
-        }
-        // Для PUT/PATCH/DELETE тоже пытаемся прочитать php://input
-        elseif (in_array($method, ['PUT', 'PATCH', 'DELETE'], true)) {
+        } elseif (in_array($method, ['PUT', 'PATCH', 'DELETE'], true)) {
+            // Для PUT/PATCH/DELETE тоже пытаемся прочитать php://input
             $rawBody = file_get_contents('php://input');
             if ($rawBody !== false && $rawBody !== '') {
                 // Пытаемся распарсить как JSON
@@ -124,14 +124,14 @@ final class Request implements RequestInterface
                 }
             }
         }
-        
+
         $files = $_FILES;
-        
+
         $request = new self($method, $uri, [], $query, $headers, $server);
         $request->body = $body;
         $request->files = $files;
         $request->cookies = $cookies;
-        
+
         return $request;
     }
 
@@ -331,8 +331,8 @@ final class Request implements RequestInterface
      */
     public function hasFile(string $key): bool
     {
-        return isset($this->files[$key]) 
-            && is_array($this->files[$key]) 
+        return isset($this->files[$key])
+            && is_array($this->files[$key])
             && ($this->files[$key]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
     }
 
@@ -406,18 +406,22 @@ final class Request implements RequestInterface
         }
 
         // Проверка через порт
-        if (isset($this->server['SERVER_PORT']) && (int)$this->server['SERVER_PORT'] === 443) {
+        if (isset($this->server['SERVER_PORT']) && (int) $this->server['SERVER_PORT'] === 443) {
             return true;
         }
 
         // Проверка через заголовки прокси
-        if (isset($this->server['HTTP_X_FORWARDED_PROTO']) 
-            && $this->server['HTTP_X_FORWARDED_PROTO'] === 'https') {
+        if (
+            isset($this->server['HTTP_X_FORWARDED_PROTO'])
+            && $this->server['HTTP_X_FORWARDED_PROTO'] === 'https'
+        ) {
             return true;
         }
 
-        if (isset($this->server['HTTP_X_FORWARDED_SSL']) 
-            && $this->server['HTTP_X_FORWARDED_SSL'] === 'on') {
+        if (
+            isset($this->server['HTTP_X_FORWARDED_SSL'])
+            && $this->server['HTTP_X_FORWARDED_SSL'] === 'on'
+        ) {
             return true;
         }
 
@@ -442,10 +446,14 @@ final class Request implements RequestInterface
 
         // Проверяем заголовки прокси в порядке приоритета
         $headers = [
-            'HTTP_CF_CONNECTING_IP',    // Cloudflare
-            'HTTP_X_REAL_IP',            // Nginx proxy
-            'HTTP_X_FORWARDED_FOR',      // Стандартный прокси заголовок
-            'HTTP_CLIENT_IP',            // Некоторые прокси
+            'HTTP_CF_CONNECTING_IP',
+// Cloudflare
+            'HTTP_X_REAL_IP',
+// Nginx proxy
+            'HTTP_X_FORWARDED_FOR',
+// Стандартный прокси заголовок
+            'HTTP_CLIENT_IP',
+// Некоторые прокси
             'HTTP_X_FORWARDED',
             'HTTP_FORWARDED_FOR',
             'HTTP_FORWARDED',
@@ -454,14 +462,14 @@ final class Request implements RequestInterface
         foreach ($headers as $header) {
             if (!empty($this->server[$header])) {
                 $ip = $this->server[$header];
-                
+
                 // X-Forwarded-For может содержать несколько IP через запятую
                 // Берем первый (клиентский)
                 if (str_contains($ip, ',')) {
                     $ips = explode(',', $ip);
                     $ip = trim($ips[0]);
                 }
-                
+
                 // Валидация IP
                 if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
                     return $ip;
@@ -484,7 +492,7 @@ final class Request implements RequestInterface
     {
         $uri = $this->uri;
         $questionMarkPos = strpos($uri, '?');
-        
+
         return $questionMarkPos !== false ? substr($uri, 0, $questionMarkPos) : $uri;
     }
 

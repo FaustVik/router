@@ -2,7 +2,7 @@
 
 /**
  * Пример работы с Cookies и Security функциями
- * 
+ *
  * Демонстрирует:
  * - Работу с HTTP Cookies (чтение и установка)
  * - Определение IP адреса клиента
@@ -24,29 +24,29 @@ $router = new Router();
 // 1. Работа с Cookies - простой способ
 // ============================================
 
-$router->get('/cookie/set', function(Request $request) {
+$router->get('/cookie/set', function (Request $request) {
     $response = Response::json(['message' => 'Cookie установлена']);
-    
+
     // Простая установка (session cookie)
     $response->setCookie('simple_cookie', 'test_value');
-    
+
     // С временем жизни (3600 секунд = 1 час)
     $response->setCookie('timed_cookie', 'expires_in_1h', 3600);
-    
+
     return $response;
 });
 
-$router->get('/cookie/get', function(Request $request) {
+$router->get('/cookie/get', function (Request $request) {
     // Чтение cookie
     $simpleCookie = $request->getCookie('simple_cookie', 'not_found');
     $timedCookie = $request->getCookie('timed_cookie', 'not_found');
-    
+
     // Получение всех cookies
     $allCookies = $request->getCookies();
-    
+
     // Проверка наличия
     $hasSimple = $request->hasCookie('simple_cookie');
-    
+
     return Response::json([
         'simple_cookie' => $simpleCookie,
         'timed_cookie' => $timedCookie,
@@ -55,12 +55,12 @@ $router->get('/cookie/get', function(Request $request) {
     ]);
 });
 
-$router->get('/cookie/delete', function(Request $request) {
+$router->get('/cookie/delete', function (Request $request) {
     $response = Response::json(['message' => 'Cookie удалена']);
-    
+
     // Удаление cookie
     $response->deleteCookie('simple_cookie');
-    
+
     return $response;
 });
 
@@ -68,9 +68,9 @@ $router->get('/cookie/delete', function(Request $request) {
 // 2. Работа с Cookies - продвинутый способ
 // ============================================
 
-$router->get('/cookie/advanced', function(Request $request) {
+$router->get('/cookie/advanced', function (Request $request) {
     $response = Response::json(['message' => 'Advanced cookies установлены']);
-    
+
     // Установка с массивом опций
     $response->setCookie('session_id', 'abc123xyz', [
         'expires' => 86400,      // 24 часа
@@ -80,13 +80,13 @@ $router->get('/cookie/advanced', function(Request $request) {
         'httpOnly' => true,      // Недоступна для JavaScript
         'sameSite' => 'Strict'   // CSRF защита
     ]);
-    
+
     return $response;
 });
 
-$router->get('/cookie/object', function(Request $request) {
+$router->get('/cookie/object', function (Request $request) {
     $response = Response::json(['message' => 'Cookie object установлена']);
-    
+
     // Использование объекта Cookie с named arguments
     $cookie = new Cookie(
         name: 'auth_token',
@@ -97,16 +97,16 @@ $router->get('/cookie/object', function(Request $request) {
         httpOnly: true,
         sameSite: 'Strict'
     );
-    
+
     // Или через fluent interface
     $cookie2 = Cookie::create(name: 'session', value: 'xyz', expires: 3600)
         ->secure(true)
         ->httpOnly(true)
         ->withSameSite('Strict')
         ->withPath('/api');
-    
+
     $response = $response->withCookie($cookie);
-    
+
     return $response;
 });
 
@@ -114,13 +114,13 @@ $router->get('/cookie/object', function(Request $request) {
 // 3. Определение IP адреса клиента
 // ============================================
 
-$router->get('/security/ip', function(Request $request) {
+$router->get('/security/ip', function (Request $request) {
     // Базовое определение (без учета прокси)
     $basicIp = $request->getClientIp(false);
-    
+
     // С учетом прокси (для production за Nginx/Cloudflare)
     $realIp = $request->getClientIp(true);
-    
+
     return Response::json([
         'basic_ip' => $basicIp,
         'real_ip_with_proxy' => $realIp,
@@ -134,15 +134,13 @@ $router->get('/security/ip', function(Request $request) {
 // 4. Проверка HTTPS соединения
 // ============================================
 
-$router->get('/security/https', function(Request $request) {
+$router->get('/security/https', function (Request $request) {
     $isSecure = $request->isSecure();
     $scheme = $request->getScheme();
     $fullUrl = $request->getFullUrl();
-    
-    $message = $isSecure 
-        ? '✓ Соединение защищено (HTTPS)' 
-        : '✗ Незащищенное соединение (HTTP)';
-    
+
+    $message = $isSecure ? '✓ Соединение защищено (HTTPS)' : '✗ Незащищенное соединение (HTTP)';
+
     return Response::json([
         'is_secure' => $isSecure,
         'scheme' => $scheme,
@@ -158,7 +156,7 @@ $router->get('/security/https', function(Request $request) {
 // ============================================
 
 // Пример HTML формы с method override
-$router->get('/form/delete-user', function() {
+$router->get('/form/delete-user', function () {
     $html = <<<'HTML'
 <!DOCTYPE html>
 <html>
@@ -193,9 +191,9 @@ HTML;
 });
 
 // Этот маршрут будет вызван при отправке формы выше
-$router->delete('/users/{id}', function(Request $request) {
+$router->delete('/users/{id}', function (Request $request) {
     $userId = $request->getParam('id');
-    
+
     return Response::json([
         'message' => 'User deleted via method override',
         'user_id' => $userId,
@@ -205,19 +203,19 @@ $router->delete('/users/{id}', function(Request $request) {
 });
 
 // API endpoint с поддержкой X-HTTP-Method-Override header
-$router->post('/api/users/{id}', function(Request $request) {
+$router->post('/api/users/{id}', function (Request $request) {
     // Если пришел header X-HTTP-Method-Override: DELETE
     // то метод будет DELETE, иначе POST
-    
+
     $method = $request->getMethod();
-    
+
     if ($method === 'DELETE') {
         return Response::json([
             'message' => 'User deleted via header override',
             'user_id' => $request->getParam('id')
         ]);
     }
-    
+
     return Response::json([
         'message' => 'Regular POST request',
         'user_id' => $request->getParam('id')
@@ -228,14 +226,14 @@ $router->post('/api/users/{id}', function(Request $request) {
 // 6. Пример аутентификации через Cookies
 // ============================================
 
-$router->post('/auth/login', function(Request $request) {
+$router->post('/auth/login', function (Request $request) {
     $email = $request->input('email');
     $password = $request->input('password');
-    
+
     // Здесь должна быть реальная проверка пользователя
     // Для примера просто создаем токен
     $token = bin2hex(random_bytes(32));
-    
+
     $response = Response::json([
         'message' => 'Login successful',
         'user' => [
@@ -243,7 +241,7 @@ $router->post('/auth/login', function(Request $request) {
             'token' => $token
         ]
     ]);
-    
+
     // Устанавливаем session cookie с токеном
     $response->setCookie('auth_token', $token, [
         'expires' => 86400 * 7,  // 7 дней
@@ -251,20 +249,20 @@ $router->post('/auth/login', function(Request $request) {
         'secure' => true,        // Только HTTPS
         'sameSite' => 'Strict'   // Защита от CSRF
     ]);
-    
+
     return $response;
 });
 
-$router->get('/auth/me', function(Request $request) {
+$router->get('/auth/me', function (Request $request) {
     $token = $request->getCookie('auth_token');
-    
+
     if (!$token) {
         return Response::json([
             'error' => 'Unauthorized',
             'message' => 'No auth token found'
         ], 401);
     }
-    
+
     // Здесь должна быть проверка токена
     // Для примера просто возвращаем успех
     return Response::json([
@@ -276,12 +274,12 @@ $router->get('/auth/me', function(Request $request) {
     ]);
 });
 
-$router->post('/auth/logout', function(Request $request) {
+$router->post('/auth/logout', function (Request $request) {
     $response = Response::json(['message' => 'Logged out']);
-    
+
     // Удаляем auth cookie
     $response->deleteCookie('auth_token');
-    
+
     return $response;
 });
 
@@ -289,7 +287,7 @@ $router->post('/auth/logout', function(Request $request) {
 // 7. Полная информация о запросе
 // ============================================
 
-$router->get('/debug/request-info', function(Request $request) {
+$router->get('/debug/request-info', function (Request $request) {
     return Response::json([
         'method' => $request->getMethod(),
         'uri' => $request->getUri(),
@@ -368,4 +366,3 @@ curl -X POST http://localhost:8000/auth/logout -b cookies.txt -c cookies.txt
 curl http://localhost:8000/debug/request-info
 
 */
-

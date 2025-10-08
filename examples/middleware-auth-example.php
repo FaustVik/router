@@ -171,4 +171,3 @@ try {
  * 6. Без токена (будет 401):
  *    curl http://localhost:8000/api/protected/profile
  */
-

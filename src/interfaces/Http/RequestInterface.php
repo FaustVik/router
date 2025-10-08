@@ -195,4 +195,3 @@ interface RequestInterface
      */
     public function isAjax(): bool;
 }
-

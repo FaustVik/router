@@ -86,7 +86,7 @@ class SimpleController
     {
         echo "Controller Index Page";
     }
-    
+
     public function show($id)
     {
         echo "Showing item #$id from controller";
@@ -178,11 +178,11 @@ function setupRoutes(QuickRouter $app): void
     $app->get('/', function () {
         return Response::html('<h1>Welcome to QuickRouter!</h1>');
     });
-    
+
     $app->get('/hello/{name}', function ($name) {
         echo "Hello, " . htmlspecialchars($name) . "!";
     });
-    
+
     $app->get('/api/users/{id}', function ($id) {
         return Response::json([
             'id' => (int) $id,
@@ -190,7 +190,7 @@ function setupRoutes(QuickRouter $app): void
             'email' => 'john@example.com'
         ]);
     });
-    
+
     $app->get('/posts/{category}/{id}', function ($category, $id) {
         echo "Category: $category, Post ID: $id";
     });
@@ -212,4 +212,3 @@ echo "3. Run with built-in server:\n";
 echo "   php -S localhost:8000 examples/quick-example.php\n";
 echo "   Then open: http://localhost:8000/hello/World\n";
 echo "\n";
-

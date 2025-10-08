@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Named Routes и URL Generation Example
- * 
+ *
  * Этот пример демонстрирует:
  * 1. Именование маршрутов с помощью метода name()
  * 2. Генерацию URL по имени маршрута
@@ -313,15 +313,15 @@ echo "   url('posts.index') = " . $router->url('posts.index') . "\n\n";
 // 3. Генерация URL с параметрами
 echo "3. Генерация URL с параметрами:\n";
 echo "   url('users.show', ['id' => 123]) = " . $router->url('users.show', ['id' => 123]) . "\n";
-echo "   url('users.posts.show', ['userId' => 5, 'postId' => 42]) = " 
+echo "   url('users.posts.show', ['userId' => 5, 'postId' => 42]) = "
     . $router->url('users.posts.show', ['userId' => 5, 'postId' => 42]) . "\n\n";
 
 // 4. Опциональные параметры
 echo "4. Опциональные параметры:\n";
 echo "   url('posts.archive') = " . $router->url('posts.archive') . "\n";
-echo "   url('posts.archive', ['year' => 2025]) = " 
+echo "   url('posts.archive', ['year' => 2025]) = "
     . $router->url('posts.archive', ['year' => 2025]) . "\n";
-echo "   url('posts.archive', ['year' => 2025, 'month' => 10]) = " 
+echo "   url('posts.archive', ['year' => 2025, 'month' => 10]) = "
     . $router->url('posts.archive', ['year' => 2025, 'month' => 10]) . "\n\n";
 
 // 5. Список всех именованных маршрутов
@@ -352,4 +352,3 @@ try {
 } catch (\Throwable $e) {
     echo "Ошибка: " . $e->getMessage() . "\n";
 }
-

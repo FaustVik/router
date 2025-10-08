@@ -10,7 +10,7 @@ use FaustVik\Router\Router\Router;
 
 /**
  * Продвинутый пример использования Named Routes
- * 
+ *
  * Демонстрирует:
  * - Генерацию URL по имени маршрута
  * - Query параметры
@@ -209,17 +209,17 @@ echo "\n=== 10. Практические примеры ===\n\n";
 function generatePaginationLinks(Router $router, int $currentPage, int $totalPages): array
 {
     $links = [];
-    
+
     if ($currentPage > 1) {
         $links['prev'] = $router->url('users.index', [], ['page' => $currentPage - 1]);
     }
-    
+
     $links['current'] = $router->url('users.index', [], ['page' => $currentPage]);
-    
+
     if ($currentPage < $totalPages) {
         $links['next'] = $router->url('users.index', [], ['page' => $currentPage + 1]);
     }
-    
+
     return $links;
 }
 
@@ -256,11 +256,11 @@ function generateBreadcrumbs(Router $router, string $section, ?string $page = nu
         'Home' => $router->url('docs.show', ['section' => 'home']),
         ucfirst($section) => $router->url('docs.show', ['section' => $section]),
     ];
-    
+
     if ($page) {
         $breadcrumbs[ucfirst($page)] = $router->url('docs.show', ['section' => $section, 'page' => $page], [], 'top');
     }
-    
+
     return $breadcrumbs;
 }
 
@@ -280,4 +280,3 @@ echo "✅ URL-кодирование специальных символов\n";
 echo "✅ Валидация constraints\n";
 echo "✅ Обработка ошибок\n";
 echo "✅ Практические примеры использования\n";
-

@@ -38,11 +38,18 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?string $uriRaw = null;
     private ?string $uri = null;
     private ?string $paramsString = null;
+
+    /** @var array<string, string|int|bool>|null Query параметры из URI */
     private ?array $params = null;
+
     private ConfigInterface $config;
     private ?RoutesCollectionInterface $collections = null;
     private ?RouterContainerInterface $container = null;
+
+    /** @var array<string, RouteInterface> Индексированные именованные маршруты */
     private array $namedRoutes = [];
+
+    /** @var array<int, string|object|callable> Глобальные middleware для всех маршрутов */
     private array $globalMiddleware = [];
 
     /**
@@ -141,10 +148,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
         // Передаем DI контейнер в middleware stack для разрешения зависимостей
         $middlewareStack = new MiddlewareStack($finalHandler, $this->container);
-        
+
         // Сначала добавляем глобальные middleware (применяются ко всем маршрутам)
         $middlewareStack->addFromArray($this->globalMiddleware);
-        
+
         // Затем добавляем middleware конкретного маршрута
         $middlewareStack->addFromArray($route->getMiddleware());
 
@@ -199,17 +206,17 @@ final class Router implements RouterInterface, CacheableRouterInterface
     protected function parse(): void
     {
         $uri = $this->getUri();
-        
+
         // Используем parse_url() для корректного разбора URI
         // Это быстрее и надежнее ручного парсинга
         $parsed = parse_url($uri);
-        
+
         // Извлекаем путь и декодируем его
         $this->uri = isset($parsed['path']) ? urldecode($parsed['path']) : '/';
-        
+
         // Сохраняем строку параметров для обратной совместимости
         $this->paramsString = $parsed['query'] ?? null;
-        
+
         // Парсим query string с помощью parse_str()
         // Это правильно обрабатывает массивы и вложенные параметры
         if ($this->paramsString) {
@@ -484,30 +491,39 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * которые не были предоставлены. Поддерживает query параметры и якоря.
      *
      * @param string $name Имя маршрута
-     * @param array $params Параметры пути для подстановки в {placeholders}
-     * @param array $query Query параметры для добавления в URL (?key=value)
+     * @param array<string, string|int> $params Параметры пути для подстановки в {placeholders}
+     * @param array<string, string|int|bool|array<mixed>> $query Query параметры для добавления в URL (?key=value)
      * @param string|null $fragment Якорь/фрагмент для добавления в URL (#fragment)
      * @return string Сгенерированный URL
      * @throws \InvalidArgumentException Если маршрут не найден или не все обязательные параметры переданы
      *
      * @example
-     * // Маршрут: /users/{id}
-     * $router->url('users.show', ['id' => 123]); 
+     * // Базовый пример
+     * $router->url('users.show', ['id' => 123]);
      * // => /users/123
      *
+     * @example
+     * // С named arguments (рекомендуется для сложных URL)
+     * $router->url(
+     *     name: 'posts.show',
+     *     params: ['id' => 456],
+     *     query: ['ref' => 'home', 'utm_source' => 'newsletter'],
+     *     fragment: 'comments'
+     * );
+     * // => /posts/456?ref=home&utm_source=newsletter#comments
+     *
+     * @example
      * // С query параметрами
-     * $router->url('users.index', [], ['page' => 2, 'sort' => 'name']); 
+     * $router->url('users.index', [], ['page' => 2, 'sort' => 'name']);
      * // => /users?page=2&sort=name
      *
+     * @example
      * // С якорем
-     * $router->url('posts.show', ['id' => 456], [], 'comments'); 
+     * $router->url('posts.show', ['id' => 456], [], 'comments');
      * // => /posts/456#comments
      *
-     * // Полный пример
-     * $router->url('posts.show', ['id' => 456], ['ref' => 'home'], 'comments'); 
-     * // => /posts/456?ref=home#comments
-     *
-     * // Маршрут: /posts/{id?}
+     * @example
+     * // Опциональные параметры
      * $router->url('posts.index'); // => /posts
      * $router->url('posts.index', ['id' => 456]); // => /posts/456
      */
@@ -525,9 +541,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
         foreach ($params as $key => $value) {
             if (isset($constraints[$key])) {
                 $pattern = '#^' . $constraints[$key] . '$#';
-                if (!preg_match($pattern, (string)$value)) {
+                if (!preg_match($pattern, (string) $value)) {
                     throw new \InvalidArgumentException(
-                        "Parameter '{$key}' with value '{$value}' does not match constraint pattern '{$constraints[$key]}' for route '{$name}'"
+                        "Parameter '{$key}' with value '{$value}' does not match constraint pattern " .
+                        "'{$constraints[$key]}' for route '{$name}'"
                     );
                 }
             }
@@ -537,15 +554,19 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Поддерживаем форматы: {param}, {param?}, {param:pattern}, {param:pattern?}
         foreach ($params as $key => $value) {
             // Экранируем значение для безопасности
-            $escapedValue = rawurlencode((string)$value);
+            $escapedValue = rawurlencode((string) $value);
 
             // Заменяем все варианты параметра
             $uri = preg_replace(
                 [
-                    '/\{' . preg_quote($key, '/') . '\?\}/',           // {param?}
-                    '/\{' . preg_quote($key, '/') . ':[^}]+\?\}/',     // {param:pattern?}
-                    '/\{' . preg_quote($key, '/') . '\}/',             // {param}
-                    '/\{' . preg_quote($key, '/') . ':[^}]+\}/',       // {param:pattern}
+                    '/\{' . preg_quote($key, '/') . '\?\}/',
+                // {param?}
+                    '/\{' . preg_quote($key, '/') . ':[^}]+\?\}/',
+                // {param:pattern?}
+                    '/\{' . preg_quote($key, '/') . '\}/',
+                // {param}
+                    '/\{' . preg_quote($key, '/') . ':[^}]+\}/',
+                // {param:pattern}
                 ],
                 $escapedValue,
                 $uri
@@ -602,7 +623,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     /**
      * Получает все именованные маршруты
      *
-     * @return array Массив именованных маршрутов [name => RouteInterface]
+     * @return array<string, RouteInterface> Ассоциативный массив [имя => RouteInterface]
      */
     public function getNamedRoutes(): array
     {
@@ -614,6 +635,12 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * @param string $name Имя маршрута
      * @return RouteInterface|null Маршрут или null если не найден
+     *
+     * @example
+     * $route = $router->getRouteByName('users.show');
+     * if ($route) {
+     *     echo $route->getRoute(); // /users/{id}
+     * }
      */
     public function getRouteByName(string $name): ?RouteInterface
     {
@@ -637,10 +664,12 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * // Добавление middleware класса
      * $router->addGlobalMiddleware(CorsMiddleware::class);
      *
+     * @example
      * // Добавление middleware объекта
      * $router->addGlobalMiddleware(new LoggingMiddleware($logger));
      *
-     * // Добавление нескольких middleware
+     * @example
+     * // Цепочка вызовов (рекомендуется)
      * $router->addGlobalMiddleware(CorsMiddleware::class)
      *        ->addGlobalMiddleware(LoggingMiddleware::class)
      *        ->addGlobalMiddleware(RateLimitMiddleware::class);
@@ -656,7 +685,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * Заменяет все существующие глобальные middleware на новые.
      *
-     * @param array $middleware Массив middleware
+     * @param array<int, string|object|callable> $middleware Массив middleware
      * @return self Возвращает текущий экземпляр для цепочки вызовов
      *
      * @example
@@ -675,7 +704,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     /**
      * Получает все глобальные middleware
      *
-     * @return array Массив глобальных middleware
+     * @return array<int, string|object|callable> Массив глобальных middleware
      */
     public function getGlobalMiddleware(): array
     {
