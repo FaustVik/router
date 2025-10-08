@@ -10,18 +10,18 @@ use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 /**
- * Стек Middleware для последовательной обработки запросов
+ * Middleware Stack for sequential request processing
  *
- * Реализует паттерн "цепочка обязанностей" (Chain of Responsibility)
- * для обработки HTTP запросов через последовательность middleware.
+ * Implements Chain of Responsibility pattern for processing
+ * HTTP requests through a sequence of middleware.
  *
- * Каждый middleware может:
- * - Обработать запрос перед передачей следующему
- * - Передать управление следующему middleware
- * - Обработать ответ после выполнения следующих middleware
- * - Прервать цепочку и вернуть собственный ответ
+ * Each middleware can:
+ * - Process request before passing to next
+ * - Pass control to next middleware
+ * - Process response after next middleware execution
+ * - Break chain and return own response
  *
- * Пример использования:
+ * Usage example:
  * ```php
  * $stack = new MiddlewareStack(function($request) {
  *     return Response::json(['message' => 'Hello']);
@@ -35,11 +35,11 @@ use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
  * $response = $stack->execute($request);
  * ```
  *
- * Пример с DI контейнером для middleware с зависимостями:
+ * Example with DI container for middleware with dependencies:
  * ```php
  * $stack = new MiddlewareStack($finalHandler, $container);
  * $stack->addFromArray([
- *     RateLimitMiddleware::class, // Будет разрешен через контейнер
+ *     RateLimitMiddleware::class, // Will be resolved through container
  *     AuthMiddleware::class
  * ]);
  * ```

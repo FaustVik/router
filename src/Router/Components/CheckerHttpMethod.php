@@ -7,15 +7,23 @@ namespace FaustVik\Router\Router\Components;
 use FaustVik\Router\exceptions\NotAllowedHttpMethod;
 use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
 
+/**
+ * HTTP method validator
+ *
+ * Validates if current HTTP method is allowed for route.
+ * Throws exception if method not allowed.
+ *
+ * @package FaustVik\Router\Router\Components
+ */
 final class CheckerHttpMethod implements CheckHttpMethodInterface
 {
     /**
-     * Проверяет, разрешён ли HTTP метод для маршрута
+     * Checks if HTTP method is allowed for route
      *
-     * @param array<string> $methods Разрешённые HTTP методы
-     * @param string|null $currentMethod Текущий HTTP метод (если null, берется из $_SERVER)
+     * @param array<string> $methods Allowed HTTP methods
+     * @param string|null $currentMethod Current HTTP method (if null, taken from $_SERVER)
      * @return void
-     * @throws NotAllowedHttpMethod
+     * @throws NotAllowedHttpMethod If method not allowed
      */
     public function isAllow(array $methods, ?string $currentMethod = null): void
     {

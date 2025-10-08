@@ -8,6 +8,14 @@ use Closure;
 use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 
+/**
+ * Route with anonymous function handler
+ *
+ * Represents a route that uses a closure or callable as its handler.
+ * Supports middleware, constraints, and named routes.
+ *
+ * @package FaustVik\Router\Route
+ */
 final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 {
     private string $route = '';
@@ -28,7 +36,21 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     }
 
     /**
-     * @param array<int, string> $methods
+     * Creates a new route with anonymous function
+     *
+     * @param string $route URI pattern (e.g. '/users/{id}')
+     * @param callable $func Handler function
+     * @param array<int, string> $methods HTTP methods
+     * @param string|null $alias Alternative route path
+     * @return RouteInterface
+     *
+     * @example
+     * // Simple closure route
+     * RouteAnonymousFunc::create('/hello', fn() => "Hello World!", ['GET']);
+     *
+     * @example
+     * // With URL parameters
+     * RouteAnonymousFunc::create('/users/{id}', fn($id) => "User #$id", ['GET']);
      */
     public static function create(
         string $route,
@@ -45,34 +67,54 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         return $self;
     }
 
+    /**
+     * Gets the URI pattern
+     *
+     * @return string URI pattern (e.g. '/users/{id}')
+     */
     public function getRoute(): string
     {
         return $this->route;
     }
 
+    /**
+     * Gets the handler function
+     *
+     * @return Closure Handler closure
+     */
     public function getFunc(): Closure
     {
         return $this->func;
     }
 
     /**
-     * @return array<int, string>
+     * Gets allowed HTTP methods
+     *
+     * @return array<int, string> Array of HTTP methods (GET, POST, etc.)
      */
     public function getMethods(): array
     {
         return $this->methods;
     }
 
+    /**
+     * Gets route alias
+     *
+     * @return string|null Alias or null if not set
+     */
     public function alias(): ?string
     {
         return $this->alias;
     }
 
     /**
-     * Устанавливает alias для маршрута
+     * Sets alias for the route
      *
-     * @param string $alias Альтернативный путь к маршруту
-     * @return self Для fluent interface
+     * @param string $alias Alternative route path
+     * @return self For fluent interface
+     *
+     * @example
+     * $route->setAlias('/user/{id}');
      */
     public function setAlias(string $alias): self
     {
@@ -81,7 +123,9 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     }
 
     /**
-     * @return array<int, string|callable>
+     * Gets route middleware
+     *
+     * @return array<int, string|callable> Array of middleware
      */
     public function getMiddleware(): array
     {
@@ -89,7 +133,13 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     }
 
     /**
-     * @param array<int, string|callable> $middleware
+     * Sets middleware for the route
+     *
+     * @param array<int, string|callable> $middleware Array of middleware
+     * @return self For fluent interface
+     *
+     * @example
+     * $route->middleware([AuthMiddleware::class, new LoggingMiddleware()]);
      */
     public function middleware(array $middleware): self
     {
@@ -97,11 +147,26 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         return $this;
     }
 
+    /**
+     * Gets route name
+     *
+     * @return string|null Route name or null if not set
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * Sets route name for URL generation
+     *
+     * @param string $name Route name
+     * @return self For fluent interface
+     *
+     * @example
+     * $route->name('api.users.show');
+     * // Usage: $router->url('api.users.show', ['id' => 123]);
+     */
     public function name(string $name): self
     {
         $this->name = $name;
@@ -109,13 +174,26 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
     }
 
     /**
-     * @return array<string, string>
+     * Gets parameter constraints
+     *
+     * @return array<string, string> Associative array [parameter => pattern]
      */
     public function getConstraints(): array
     {
         return $this->constraints;
     }
 
+    /**
+     * Sets constraint for route parameter
+     *
+     * @param string $param Parameter name from URI (without braces)
+     * @param string $pattern Regular expression for validation
+     * @return self For fluent interface
+     *
+     * @example
+     * $route->where('id', '\d+');        // Only digits
+     * $route->where('slug', '[a-z-]+');  // Letters and dashes
+     */
     public function where(string $param, string $pattern): self
     {
         $this->constraints[$param] = $pattern;

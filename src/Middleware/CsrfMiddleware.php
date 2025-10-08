@@ -10,31 +10,31 @@ use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 use RuntimeException;
 
 /**
- * Middleware для защиты от CSRF атак (Cross-Site Request Forgery)
+ * Middleware for CSRF attack protection (Cross-Site Request Forgery)
  *
- * Генерирует и проверяет CSRF токены для защиты от подделки межсайтовых запросов.
- * Токен проверяется для всех изменяющих методов: POST, PUT, PATCH, DELETE.
+ * Generates and validates CSRF tokens to protect against cross-site request forgery.
+ * Token is validated for all mutating methods: POST, PUT, PATCH, DELETE.
  *
- * Токен может быть передан:
- * - В поле формы: _csrf_token
- * - В заголовке: X-CSRF-Token
- * - В query параметре: _csrf_token
+ * Token can be passed as:
+ * - Form field: _csrf_token
+ * - Header: X-CSRF-Token
+ * - Query parameter: _csrf_token
  *
- * Использует hash_equals() для безопасного сравнения токенов (защита от timing attacks).
+ * Uses hash_equals() for safe token comparison (timing attack protection).
  *
- * Пример использования:
+ * Usage example:
  * ```php
- * // В middleware цепочке
+ * // In middleware chain
  * $csrf = new CsrfMiddleware(
  *     tokenLength: 32,
  *     sessionKey: '_csrf_token',
- *     excludePaths: ['/api/webhook'] // Исключить webhook endpoints
+ *     excludePaths: ['/api/webhook'] // Exclude webhook endpoints
  * );
  *
- * // В форме
+ * // In form
  * <input type="hidden" name="_csrf_token" value="<?= CsrfMiddleware::getToken() ?>">
  *
- * // Или в AJAX запросе
+ * // Or in AJAX request
  * headers: { 'X-CSRF-Token': '<?= CsrfMiddleware::getToken() ?>' }
  * ```
  *

@@ -12,12 +12,20 @@ use FaustVik\Router\interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\Router\Components\matching\Matching;
 use FaustVik\Router\Router\Components\matching\MatchResult;
 
+/**
+ * Cached route matching implementation
+ *
+ * Wraps route matching logic with caching layer to improve performance.
+ * Caches matching results to avoid repeated regex matching on same URIs.
+ *
+ * @package FaustVik\Router\Cache
+ */
 final class CachedMatching implements MatchingRouteInterface
 {
     private MatchingRouteInterface $originalMatcher;
     private CacheInterface $cache;
     private bool $cacheEnabled = false;
-    private int $cacheTtl = 3600; // 1 час по умолчанию
+    private int $cacheTtl = 3600; // 1 hour by default
 
     public function __construct(MatchingRouteInterface $matcher = null, CacheInterface $cache = null)
     {

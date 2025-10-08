@@ -26,14 +26,14 @@ use function time;
 use function unlink;
 
 /**
- * Файловый кеш с защитой от уязвимостей
- * 
- * Безопасная реализация файлового кеша:
- * - Использует JSON вместо serialize (защита от Object Injection)
- * - Валидация путей (защита от Path Traversal)
- * - Автоматическая защита директории кеша
- * - Проверка прав записи
- * 
+ * File-based cache with security protection
+ *
+ * Secure file cache implementation:
+ * - Uses JSON instead of serialize (Object Injection protection)
+ * - Path validation (Path Traversal protection)
+ * - Automatic cache directory protection
+ * - Write permission checks
+ *
  * @package FaustVik\Router\Cache
  */
 final class FileCache implements CacheInterface

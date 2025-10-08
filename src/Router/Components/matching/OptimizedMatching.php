@@ -10,30 +10,30 @@ use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 /**
- * Оптимизированный матчинг маршрутов с индексированием
+ * Optimized route matching with indexing
  *
- * Улучшения производительности:
- * - Статические маршруты хранятся в хеш-таблице (O(1) lookup)
- * - Динамические маршруты группируются по первому сегменту
- * - Сокращает количество проверок с O(n) до O(log n) в среднем
+ * Performance improvements:
+ * - Static routes stored in hash table (O(1) lookup)
+ * - Dynamic routes grouped by first segment
+ * - Reduces checks from O(n) to O(log n) on average
  *
- * Производительность:
- * - 10 маршрутов: ~0.05ms (2x быстрее)
- * - 100 маршрутов: ~0.2ms (5x быстрее)
- * - 1000 маршрутов: ~1ms (10x быстрее)
- * - 10000 маршрутов: ~5ms (20x быстрее)
+ * Performance:
+ * - 10 routes: ~0.05ms (2x faster)
+ * - 100 routes: ~0.2ms (5x faster)
+ * - 1000 routes: ~1ms (10x faster)
+ * - 10000 routes: ~5ms (20x faster)
  *
  * @package FaustVik\Router\Router\Components\matching
  */
 final class OptimizedMatching implements MatchingRouteInterface
 {
-    /** @var array<string, RouteInterface> Статические маршруты для O(1) поиска */
+    /** @var array<string, RouteInterface> Static routes for O(1) lookup */
     private array $staticRoutes = [];
 
-    /** @var array<string, array<RouteInterface>> Динамические маршруты сгруппированные по первому сегменту */
+    /** @var array<string, array<RouteInterface>> Dynamic routes grouped by first segment */
     private array $dynamicRoutes = [];
 
-    /** @var array<string, RouteInterface> Маршруты с алиасами */
+    /** @var array<string, RouteInterface> Routes with aliases */
     private array $aliasRoutes = [];
 
     private bool $indexed = false;

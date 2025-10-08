@@ -7,17 +7,17 @@ namespace FaustVik\Router\Http;
 use FaustVik\Router\interfaces\Http\ResponseInterface;
 
 /**
- * Класс для представления HTTP ответа
+ * HTTP Response representation class
  *
- * Инкапсулирует данные HTTP ответа:
- * - Содержимое ответа
- * - HTTP статус код
- * - HTTP заголовки
+ * Encapsulates HTTP response data:
+ * - Response content
+ * - HTTP status code
+ * - HTTP headers
  *
- * Предоставляет удобные методы для создания различных типов ответов:
- * - JSON ответы
- * - HTML ответы
- * - Редиректы
+ * Provides convenient methods for creating different response types:
+ * - JSON responses
+ * - HTML responses
+ * - Redirects
  *
  * @package FaustVik\Router\Http
  */
@@ -43,12 +43,18 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает новый экземпляр Response
+     * Creates new Response instance
      *
-     * Статический фабричный метод для создания ответа.
-     * Альтернатива прямому вызову конструктора.
+     * Static factory method for creating response.
+     * Alternative to direct constructor call.
      *
-     * @param array<string, string> $headers HTTP заголовки
+     * @param string $content Response content
+     * @param int $statusCode HTTP status code
+     * @param array<string, string> $headers HTTP headers
+     * @return self
+     *
+     * @example
+     * $response = Response::create('Hello World!', 200);
      */
     public static function create(string $content = '', int $statusCode = 200, iterable $headers = []): self
     {
@@ -57,12 +63,21 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает JSON ответ
+     * Creates JSON response
      *
-     * Автоматически устанавливает Content-Type: application/json
-     * и кодирует данные в JSON формат.
+     * Automatically sets Content-Type: application/json
+     * and encodes data to JSON format.
      *
-     * @param array<string, string> $headers Дополнительные HTTP заголовки
+     * @param mixed $data Data to encode as JSON
+     * @param int $statusCode HTTP status code
+     * @param array<string, string> $headers Additional HTTP headers
+     * @return self
+     *
+     * @example
+     * return Response::json(['success' => true, 'data' => $users]);
+     *
+     * @example
+     * return Response::json(['error' => 'Not found'], 404);
      */
     public static function json(mixed $data, int $statusCode = 200, iterable $headers = []): self
     {
@@ -74,11 +89,17 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает HTML ответ
+     * Creates HTML response
      *
-     * Автоматически устанавливает Content-Type: text/html
+     * Automatically sets Content-Type: text/html
      *
-     * @param array<string, string> $headers Дополнительные HTTP заголовки
+     * @param string $content HTML content
+     * @param int $statusCode HTTP status code
+     * @param array<string, string> $headers Additional HTTP headers
+     * @return self
+     *
+     * @example
+     * return Response::html('<h1>Hello World!</h1>');
      */
     public static function html(string $content, int $statusCode = 200, iterable $headers = []): self
     {
@@ -89,27 +110,63 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает редирект
+     * Creates redirect response
      *
-     * Устанавливает заголовок Location и соответствующий статус код
+     * Sets Location header and appropriate status code
+     *
+     * @param string $url Target URL
+     * @param int $statusCode HTTP status code (default 302)
+     * @return self
+     *
+     * @example
+     * return Response::redirect('/login');
+     *
+     * @example
+     * return Response::redirect('https://example.com', 301);  // Permanent redirect
      */
     public static function redirect(string $url, int $statusCode = 302): self
     {
         return new self('', $statusCode, ['Location' => $url]);
     }
 
+    /**
+     * Gets response content
+     *
+     * @return string Response content
+     *
+     * @example
+     * $content = $response->getContent();
+     */
     public function getContent(): string
     {
         return $this->content;
     }
 
+    /**
+     * Gets HTTP status code
+     *
+     * @return int Status code
+     *
+     * @example
+     * if ($response->getStatusCode() === 200) {
+     *     // Success
+     * }
+     */
     public function getStatusCode(): int
     {
         return $this->statusCode;
     }
 
     /**
-     * @return array<string, string>
+     * Gets all HTTP headers
+     *
+     * @return array<string, string> All headers
+     *
+     * @example
+     * $headers = $response->getHeaders();
+     * foreach ($headers as $name => $value) {
+     *     echo "$name: $value\n";
+     * }
      */
     public function getHeaders(): array
     {
@@ -127,10 +184,16 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Устанавливает содержимое ответа
+     * Sets response content (mutable)
      *
-     * Изменяет содержимое текущего экземпляра (mutable).
-     * Для immutable варианта используйте withContent().
+     * Modifies current instance.
+     * For immutable variant use withContent().
+     *
+     * @param string $content Response content
+     * @return self For fluent interface
+     *
+     * @example
+     * $response->setContent('New content');
      */
     public function setContent(string $content): self
     {
@@ -139,10 +202,16 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Устанавливает HTTP статус код
+     * Sets HTTP status code (mutable)
      *
-     * Изменяет статус код текущего экземпляра (mutable).
-     * Для immutable варианта используйте withStatusCode().
+     * Modifies current instance.
+     * For immutable variant use withStatusCode().
+     *
+     * @param int $statusCode HTTP status code
+     * @return self For fluent interface
+     *
+     * @example
+     * $response->setStatusCode(404);
      */
     public function setStatusCode(int $statusCode): self
     {
@@ -151,10 +220,17 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Устанавливает HTTP заголовок
+     * Sets HTTP header (mutable)
      *
-     * Изменяет заголовки текущего экземпляра (mutable).
-     * Для immutable варианта используйте withHeader().
+     * Modifies current instance.
+     * For immutable variant use withHeader().
+     *
+     * @param string $name Header name
+     * @param string $value Header value
+     * @return self For fluent interface
+     *
+     * @example
+     * $response->setHeader('X-Custom-Header', 'value');
      */
     public function setHeader(string $name, string $value): self
     {
@@ -163,11 +239,14 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Получает конкретный HTTP заголовок
+     * Gets specific HTTP header
      *
-     * @param string $key Название заголовка
-     * @param mixed $default Значение по умолчанию если заголовок не найден
-     * @return mixed Значение заголовка или значение по умолчанию
+     * @param string $key Header name
+     * @param mixed $default Default value if header not found
+     * @return mixed Header value or default
+     *
+     * @example
+     * $contentType = $response->getHeader('Content-Type');
      */
     public function getHeader(string $key, mixed $default = null): mixed
     {
@@ -175,10 +254,15 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает новый экземпляр ответа с измененным содержимым
+     * Creates new response with changed content (immutable)
      *
-     * Использует immutable pattern - возвращает новый экземпляр,
-     * не изменяя текущий.
+     * Uses immutable pattern - returns new instance without modifying current one.
+     *
+     * @param string $content New content
+     * @return self New response instance
+     *
+     * @example
+     * $newResponse = $response->withContent('Updated content');
      */
     public function withContent(string $content): self
     {
@@ -188,7 +272,13 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает новый экземпляр ответа с измененным статус кодом
+     * Creates new response with changed status code (immutable)
+     *
+     * @param int $statusCode HTTP status code
+     * @return self New response instance
+     *
+     * @example
+     * $notFoundResponse = $response->withStatusCode(404);
      */
     public function withStatusCode(int $statusCode): self
     {
@@ -198,7 +288,14 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает новый экземпляр ответа с добавленным заголовком
+     * Creates new response with added header (immutable)
+     *
+     * @param string $key Header name
+     * @param string $value Header value
+     * @return self New response instance
+     *
+     * @example
+     * $response = $response->withHeader('X-Custom', 'value');
      */
     public function withHeader(string $key, string $value): self
     {
@@ -208,9 +305,16 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Создает новый экземпляр ответа с добавленными заголовками
-     * 
-     * @param array<string, mixed> $headers
+     * Creates new response with added headers (immutable)
+     *
+     * @param array<string, mixed> $headers Headers to add
+     * @return self New response instance
+     *
+     * @example
+     * $response = $response->withHeaders([
+     *     'X-Custom-1' => 'value1',
+     *     'X-Custom-2' => 'value2'
+     * ]);
      */
     public function withHeaders(array $headers): self
     {
@@ -220,11 +324,25 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Устанавливает cookie (простой способ)
+     * Sets cookie (simple way)
      *
-     * @param string $name Имя cookie
-     * @param string $value Значение cookie
-     * @param int|array<string, mixed> $options Время жизни в секундах или массив опций
+     * @param string $name Cookie name
+     * @param string $value Cookie value
+     * @param int|array<string, mixed> $options Lifetime in seconds or options array
+     * @return self For fluent interface
+     *
+     * @example
+     * // Simple cookie
+     * $response->setCookie('theme', 'dark', 3600);
+     *
+     * @example
+     * // With options
+     * $response->setCookie('session_id', 'abc123', [
+     *     'expires' => 3600,
+     *     'path' => '/',
+     *     'secure' => true,
+     *     'httpOnly' => true
+     * ]);
      */
     public function setCookie(string $name, string $value, int|array $options = 0): self
     {
@@ -255,9 +373,14 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Добавляет cookie объект (продвинутый способ)
+     * Adds cookie object (advanced way)
      *
-     * @param Cookie $cookie Объект cookie
+     * @param Cookie $cookie Cookie object
+     * @return self New response instance
+     *
+     * @example
+     * $cookie = Cookie::create('theme', 'dark', 3600)->secure()->httpOnly();
+     * $response = $response->withCookie($cookie);
      */
     public function withCookie(Cookie $cookie): self
     {
@@ -267,9 +390,13 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Удаляет cookie
+     * Deletes cookie
      *
-     * @param string $name Имя cookie для удаления
+     * @param string $name Cookie name to delete
+     * @return self For fluent interface
+     *
+     * @example
+     * $response->deleteCookie('session_id');
      */
     public function deleteCookie(string $name): self
     {
@@ -278,9 +405,15 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Получает все cookies
+     * Gets all cookies
      *
-     * @return array<string, Cookie>
+     * @return array<string, Cookie> Array of cookie objects
+     *
+     * @example
+     * $cookies = $response->getCookies();
+     * foreach ($cookies as $cookie) {
+     *     echo $cookie->getName();
+     * }
      */
     public function getCookies(): array
     {
@@ -288,10 +421,14 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Отправляет ответ клиенту
+     * Sends response to client
      *
-     * Устанавливает HTTP статус код, заголовки, cookies и выводит содержимое.
-     * Проверяет, что заголовки еще не были отправлены.
+     * Sets HTTP status code, headers, cookies and outputs content.
+     * Checks if headers haven't been sent yet.
+     *
+     * @example
+     * $response = Response::json(['message' => 'Hello']);
+     * $response->send();
      */
     public function send(): void
     {

@@ -9,17 +9,17 @@ use FaustVik\Router\Http\Response;
 use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 /**
- * Middleware для обработки Cross-Origin Resource Sharing (CORS)
+ * Middleware for Cross-Origin Resource Sharing (CORS) handling
  *
- * Автоматически обрабатывает CORS заголовки и preflight OPTIONS запросы.
- * Поддерживает настройку разрешенных origins, методов, заголовков и credentials.
+ * Automatically handles CORS headers and preflight OPTIONS requests.
+ * Supports configuration of allowed origins, methods, headers and credentials.
  *
- * Пример использования:
+ * Usage example:
  * ```php
- * // Разрешить все origins
+ * // Allow all origins
  * $cors = new CorsMiddleware();
  *
- * // Настроить конкретные origins
+ * // Configure specific origins
  * $cors = new CorsMiddleware(
  *     allowedOrigins: ['https://example.com', 'https://app.example.com'],
  *     allowedMethods: ['GET', 'POST', 'PUT', 'DELETE'],

@@ -14,6 +14,18 @@ use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
 use FaustVik\Router\Router\Components\matching\OptimizedMatching;
 
+/**
+ * Router configuration class
+ *
+ * Manages router components configuration:
+ * - Route runner (controller/closure execution)
+ * - HTTP method checker
+ * - Route matching strategy
+ * - Cache settings
+ * - DI container
+ *
+ * @package FaustVik\Router\Router\Components
+ */
 final class Config implements ConfigInterface
 {
     private RunnerInterface $runner;

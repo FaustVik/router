@@ -18,6 +18,14 @@ use ReflectionException;
 use ReflectionFunction;
 use ReflectionNamedType;
 
+/**
+ * Route handler executor
+ *
+ * Executes route handlers (controllers or closures) with dependency injection.
+ * Resolves constructor dependencies and method parameters from DI container.
+ *
+ * @package FaustVik\Router\Router\Components
+ */
 final class Runner implements RunnerInterface
 {
     private ?RouterContainerInterface $container = null;

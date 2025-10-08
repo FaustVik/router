@@ -9,17 +9,17 @@ use FaustVik\Router\Http\Response;
 use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 /**
- * Middleware для базовой HTTP аутентификации
+ * Middleware for basic HTTP authentication
  *
- * Проверяет наличие и валидность Bearer токена в заголовке Authorization.
- * Добавляет информацию о пользователе в атрибуты запроса при успешной аутентификации.
+ * Checks presence and validity of Bearer token in Authorization header.
+ * Adds user information to request attributes on successful authentication.
  *
- * Требует обязательную функцию валидации токена для использования.
+ * Requires a token validation function to be provided.
  *
- * Пример использования:
+ * Usage example:
  * ```php
  * $auth = new AuthMiddleware(function(string $token): ?array {
- *     // Ваша логика проверки токена (JWT, база данных, etc.)
+ *     // Your token validation logic (JWT, database, etc.)
  *     $user = $userRepository->findByToken($token);
  *     return $user ? $user->toArray() : null;
  * });

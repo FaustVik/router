@@ -7,11 +7,27 @@ namespace FaustVik\Router\Route;
 use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 
+/**
+ * Collection of routes
+ *
+ * Manages all routes in the application. Provides helper methods
+ * for common HTTP methods and supports route grouping.
+ *
+ * @package FaustVik\Router\Route
+ */
 final class RoutesCollection implements RoutesCollectionInterface
 {
     /** @var array<int, RouteInterface> */
     private array $collections = [];
 
+    /**
+     * Adds one or more routes to the collection
+     *
+     * @param RouteInterface ...$routes Routes to add
+     *
+     * @example
+     * $collection->set($route1, $route2, $route3);
+     */
     public function set(RouteInterface ...$routes): void
     {
         foreach ($routes as $route) {
@@ -20,16 +36,31 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @return RouteInterface[]
+     * Gets all routes from the collection
+     *
+     * @return RouteInterface[] Array of all routes
+     *
+     * @example
+     * foreach ($collection->get() as $route) {
+     *     echo $route->getRoute();
+     * }
      */
     public function get(): array
     {
         return $this->collections;
     }
 
-    /** Helper методы для HTTP методов */
     /**
-     * @param array<int, mixed> $arg
+     * Adds GET route
+     *
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addGet('/users', UserController::class, 'index');
      */
     public function addGet(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
@@ -39,7 +70,16 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, mixed> $arg
+     * Adds POST route
+     *
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addPost('/users', UserController::class, 'store');
      */
     public function addPost(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
@@ -49,7 +89,16 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, mixed> $arg
+     * Adds PUT route
+     *
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addPut('/users/{id}', UserController::class, 'update');
      */
     public function addPut(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
@@ -59,7 +108,16 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, mixed> $arg
+     * Adds DELETE route
+     *
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addDelete('/users/{id}', UserController::class, 'destroy');
      */
     public function addDelete(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
@@ -69,7 +127,16 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, mixed> $arg
+     * Adds PATCH route
+     *
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addPatch('/users/{id}', UserController::class, 'patch');
      */
     public function addPatch(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
@@ -79,7 +146,16 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, mixed> $arg
+     * Adds route for any HTTP method
+     *
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addAny('/webhook', WebhookController::class, 'handle');
      */
     public function addAny(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
@@ -95,8 +171,17 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, string> $methods
-     * @param array<int, mixed> $arg
+     * Adds route for specific HTTP methods
+     *
+     * @param array<int, string> $methods Array of HTTP methods
+     * @param string $route URI pattern
+     * @param string $class Controller class
+     * @param string $action Controller method
+     * @param array<int, mixed> $arg Additional arguments
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addMatch(['GET', 'POST'], '/form', FormController::class, 'handle');
      */
     public function addMatch(
         array $methods,
@@ -110,7 +195,16 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
-    /** Helper методы для анонимных функций */
+    /**
+     * Adds GET route with closure handler
+     *
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addGetFunc('/hello', fn() => "Hello World!");
+     */
     public function addGetFunc(string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create($route, $func, ['GET']);
@@ -118,6 +212,16 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * Adds POST route with closure handler
+     *
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addPostFunc('/submit', fn() => "Processing...");
+     */
     public function addPostFunc(string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create($route, $func, ['POST']);
@@ -125,6 +229,16 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * Adds PUT route with closure handler
+     *
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addPutFunc('/users/{id}', fn($id) => "Updating user $id");
+     */
     public function addPutFunc(string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create($route, $func, ['PUT']);
@@ -132,6 +246,16 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * Adds DELETE route with closure handler
+     *
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addDeleteFunc('/users/{id}', fn($id) => "Deleting user $id");
+     */
     public function addDeleteFunc(string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create($route, $func, ['DELETE']);
@@ -139,6 +263,16 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * Adds PATCH route with closure handler
+     *
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addPatchFunc('/settings', fn() => "Patching settings");
+     */
     public function addPatchFunc(string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create($route, $func, ['PATCH']);
@@ -146,6 +280,16 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * Adds route for any HTTP method with closure handler
+     *
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addAnyFunc('/webhook', fn() => "Handling webhook");
+     */
     public function addAnyFunc(string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create(
@@ -158,7 +302,15 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, string> $methods
+     * Adds route for specific HTTP methods with closure handler
+     *
+     * @param array<int, string> $methods Array of HTTP methods
+     * @param string $route URI pattern
+     * @param callable $func Handler function
+     * @return RouteInterface
+     *
+     * @example
+     * $collection->addMatchFunc(['GET', 'POST'], '/form', fn() => "Handling form");
      */
     public function addMatchFunc(array $methods, string $route, callable $func): RouteInterface
     {
@@ -167,7 +319,17 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
-    /** Группировка */
+    /**
+     * Creates a route group with prefix
+     *
+     * @param string $prefix URL prefix for all routes in the group
+     * @return RouteGroup
+     *
+     * @example
+     * $collection->prefix('/api')->group(function($group) {
+     *     $group->get('/users', UserController::class, 'index');
+     * });
+     */
     public function prefix(string $prefix): RouteGroup
     {
         $group = new RouteGroup($this);
@@ -176,7 +338,15 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /**
-     * @param array<int, string|callable> $middleware
+     * Creates a route group with middleware
+     *
+     * @param array<int, string|callable> $middleware Array of middleware
+     * @return RouteGroup
+     *
+     * @example
+     * $collection->middleware([AuthMiddleware::class])->group(function($group) {
+     *     $group->get('/profile', ProfileController::class, 'show');
+     * });
      */
     public function middleware(array $middleware): RouteGroup
     {
@@ -185,6 +355,18 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $group;
     }
 
+    /**
+     * Creates a route group
+     *
+     * @param callable $callback Function to define routes in the group
+     *
+     * @example
+     * $collection->group(function($group) {
+     *     $group->prefix('/api');
+     *     $group->middleware([AuthMiddleware::class]);
+     *     $group->get('/users', UserController::class, 'index');
+     * });
+     */
     public function group(callable $callback): void
     {
         $group = new RouteGroup($this);

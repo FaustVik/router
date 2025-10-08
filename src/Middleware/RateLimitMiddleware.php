@@ -10,25 +10,25 @@ use FaustVik\Router\interfaces\Cache\CacheInterface;
 use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 /**
- * Middleware для ограничения частоты запросов (Rate Limiting)
+ * Middleware for request rate limiting
  *
- * Защищает приложение от DDoS атак и чрезмерного использования API путем
- * ограничения количества запросов с одного IP адреса за определенный период времени.
+ * Protects application from DDoS attacks and excessive API usage by
+ * limiting number of requests from single IP address within time period.
  *
- * Добавляет стандартные заголовки X-RateLimit-* в ответы:
- * - X-RateLimit-Limit: максимальное количество запросов
- * - X-RateLimit-Remaining: оставшееся количество запросов
- * - X-RateLimit-Reset: Unix timestamp когда лимит сбросится
- * - Retry-After: секунды до следующей попытки (только при 429)
+ * Adds standard X-RateLimit-* headers to responses:
+ * - X-RateLimit-Limit: maximum number of requests
+ * - X-RateLimit-Remaining: remaining number of requests
+ * - X-RateLimit-Reset: Unix timestamp when limit resets
+ * - Retry-After: seconds until next attempt (only on 429)
  *
- * Пример использования:
+ * Usage example:
  * ```php
  * $cache = new FileCache();
  * $rateLimit = new RateLimitMiddleware(
  *     cache: $cache,
- *     maxAttempts: 60,        // 60 запросов
- *     decaySeconds: 60,       // в минуту
- *     includePathInKey: true  // отдельный лимит для каждого endpoint
+ *     maxAttempts: 60,        // 60 requests
+ *     decaySeconds: 60,       // per minute
+ *     includePathInKey: true  // separate limit for each endpoint
  * );
  * ```
  *

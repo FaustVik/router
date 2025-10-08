@@ -9,10 +9,28 @@ use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 
+/**
+ * Basic route matching implementation
+ *
+ * Performs route matching by comparing URI against route patterns.
+ * Supports:
+ * - Static routes
+ * - Dynamic parameters {param}
+ * - Optional parameters {param?}
+ * - Parameter constraints
+ * - Route aliases
+ *
+ * @package FaustVik\Router\Router\Components\matching
+ */
 final class Matching implements MatchingRouteInterface
 {
     /**
-     * @throws NoMatch
+     * Matches URI against routes collection
+     *
+     * @param string $uri URI to match
+     * @param RoutesCollectionInterface|null $collections Routes collection
+     * @return MatchResult Match result with route and parameters
+     * @throws NoMatch If no matching route found
      */
     public function match(string $uri, ?RoutesCollectionInterface $collections): MatchResult
     {

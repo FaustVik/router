@@ -9,17 +9,17 @@ use FaustVik\Router\Http\Response;
 use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 /**
- * Middleware для логирования HTTP запросов
+ * Middleware for HTTP request logging
  *
- * Записывает информацию о каждом запросе: метод, URI, IP, User-Agent,
- * код ответа и время выполнения. Поддерживает кастомные логгеры.
+ * Logs information about each request: method, URI, IP, User-Agent,
+ * response code and execution time. Supports custom loggers.
  *
- * Пример использования:
+ * Usage example:
  * ```php
- * // Логирование в файл
+ * // Log to file
  * $logger = new LoggingMiddleware('logs/app.log');
  *
- * // С кастомным логгером (PSR-3)
+ * // With custom logger (PSR-3)
  * $logger = new LoggingMiddleware(null, function($message, $context) {
  *     $psrLogger->info($message, $context);
  * });

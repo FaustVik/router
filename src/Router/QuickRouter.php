@@ -10,17 +10,17 @@ use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
 
 /**
- * QuickRouter - Упрощенный роутер для быстрого старта
+ * QuickRouter - Simplified router for quick start
  *
- * Обертка над полным Router с простым и понятным API.
- * Идеально подходит для:
- * - Новичков в PHP
- * - Мелких проектов (10-100 маршрутов)
- * - Быстрого прототипирования
- * - Лендингов и простых сайтов
+ * Wrapper over full Router with simple and clear API.
+ * Perfect for:
+ * - PHP beginners
+ * - Small projects (10-100 routes)
+ * - Rapid prototyping
+ * - Landing pages and simple websites
  *
  * @example
- * // Hello World за 5 минут
+ * // Hello World in 5 minutes
  * $app = new QuickRouter();
  * $app->get('/', fn() => "Hello World!");
  * $app->get('/users/{id}', fn($id) => "User #$id");
@@ -34,29 +34,29 @@ final class QuickRouter
     private RoutesCollection $routes;
 
     /**
-     * Создает новый QuickRouter
+     * Creates new QuickRouter
      *
-     * @param bool|array<string, bool> $cache Включить кеширование маршрутов или массив опций (обратная совместимость)
-     * @param bool $di Включить Dependency Injection контейнер
+     * @param bool|array<string, bool> $cache Enable route caching or options array (backward compatibility)
+     * @param bool $di Enable Dependency Injection container
      *
      * @example
-     * // Простой роутер (по умолчанию всё отключено)
+     * // Simple router (everything disabled by default)
      * $app = new QuickRouter();
      *
      * @example
-     * // С named arguments (рекомендуется)
+     * // With named arguments (recommended)
      * $app = new QuickRouter(cache: true, di: true);
      *
      * @example
-     * // Только кеширование (для production)
+     * // Only caching (for production)
      * $app = new QuickRouter(cache: true);
      *
      * @example
-     * // Только DI контейнер
+     * // Only DI container
      * $app = new QuickRouter(di: true);
      *
      * @example
-     * // Старый стиль с массивом (обратная совместимость)
+     * // Old style with array (backward compatibility)
      * $app = new QuickRouter(['cache' => true, 'di' => true]);
      */
     public function __construct(bool|array $cache = false, bool $di = false)
@@ -65,14 +65,14 @@ final class QuickRouter
         $this->routes = new RoutesCollection();
         $this->router->setCollection($this->routes);
 
-        // Поддержка старого API (массив опций) для обратной совместимости
+        // Support old API (options array) for backward compatibility
         if (is_array($cache)) {
             $options = $cache;
             $cache = $options['cache'] ?? false;
             $di = $options['di'] ?? false;
         }
 
-        // По умолчанию всё отключено для простоты
+        // Everything disabled by default for simplicity
         if ($cache) {
             $this->router->enableCache();
         }
@@ -83,23 +83,23 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет GET маршрут
+     * Adds GET route
      *
-     * @param string $uri URI маршрута (например '/users/{id}')
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param string $uri Route URI (e.g. '/users/{id}')
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
-     * // С анонимной функцией
+     * // With anonymous function
      * $app->get('/', fn() => "Hello World!");
      *
-     * // С параметрами из URL
+     * // With URL parameters
      * $app->get('/users/{id}', fn($id) => "User #$id");
      *
-     * // С контроллером
+     * // With controller
      * $app->get('/users', [UserController::class, 'index']);
      *
-     * // С middleware
+     * // With middleware
      * $app->get('/admin', [AdminController::class, 'index'])
      *     ->middleware([AuthMiddleware::class]);
      */
@@ -113,10 +113,10 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет POST маршрут
+     * Adds POST route
      *
-     * @param string $uri URI маршрута
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param string $uri Route URI
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -133,10 +133,10 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет PUT маршрут
+     * Adds PUT route
      *
-     * @param string $uri URI маршрута
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param string $uri Route URI
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -152,10 +152,10 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет DELETE маршрут
+     * Adds DELETE route
      *
-     * @param string $uri URI маршрута
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param string $uri Route URI
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -171,10 +171,10 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет PATCH маршрут
+     * Adds PATCH route
      *
-     * @param string $uri URI маршрута
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param string $uri Route URI
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -190,10 +190,10 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет маршрут для любых HTTP методов
+     * Adds route for any HTTP methods
      *
-     * @param string $uri URI маршрута
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param string $uri Route URI
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -209,11 +209,11 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет маршрут для указанных HTTP методов
+     * Adds route for specified HTTP methods
      *
-     * @param array<int, string> $methods Массив HTTP методов ['GET', 'POST']
-     * @param string $uri URI маршрута
-     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
+     * @param array<int, string> $methods Array of HTTP methods ['GET', 'POST']
+     * @param string $uri Route URI
+     * @param callable|array<int, mixed> $handler Callable function or [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -229,10 +229,10 @@ final class QuickRouter
     }
 
     /**
-     * Создает группу маршрутов с общим префиксом
+     * Creates route group with common prefix
      *
-     * @param string $prefix Префикс для всех маршрутов в группе
-     * @param callable $callback Функция для определения маршрутов группы
+     * @param string $prefix Prefix for all routes in group
+     * @param callable $callback Function to define group routes
      * @return self
      *
      * @example
@@ -240,7 +240,7 @@ final class QuickRouter
      *     $app->get('/users', [UserController::class, 'index']);
      *     $app->get('/posts', [PostController::class, 'index']);
      * });
-     * // Создаст: /api/users и /api/posts
+     * // Creates: /api/users and /api/posts
      */
     public function prefix(string $prefix, callable $callback): self
     {
@@ -251,10 +251,10 @@ final class QuickRouter
     }
 
     /**
-     * Создает группу маршрутов с общим middleware
+     * Creates route group with common middleware
      *
-     * @param array $middleware Массив middleware классов
-     * @param callable $callback Функция для определения маршрутов группы
+     * @param array $middleware Array of middleware classes
+     * @param callable $callback Function to define group routes
      * @param array<int, string|callable> $middleware
      * @return self
      *
@@ -275,13 +275,13 @@ final class QuickRouter
     }
 
     /**
-     * Добавляет глобальный middleware для всех маршрутов
+     * Adds global middleware for all routes
      *
-     * Глобальные middleware выполняются перед middleware конкретного маршрута.
-     * Это удобно для CORS, логирования, аутентификации и других общих задач.
+     * Global middleware executes before route-specific middleware.
+     * Useful for CORS, logging, authentication and other common tasks.
      *
-     * @param string|callable $middleware Middleware класс или callable
-     * @return self Возвращает себя для fluent interface
+     * @param string|callable $middleware Middleware class or callable
+     * @return self Returns self for fluent interface
      *
      * @example
      * use FaustVik\Router\Middleware\CorsMiddleware;
@@ -289,16 +289,16 @@ final class QuickRouter
      *
      * $app = new QuickRouter();
      *
-     * // Добавление одного middleware
+     * // Adding single middleware
      * $app->addMiddleware(CorsMiddleware::class);
      *
      * @example
-     * // Цепочка вызовов (рекомендуется)
+     * // Method chaining (recommended)
      * $app->addMiddleware(CorsMiddleware::class)
      *     ->addMiddleware(LoggingMiddleware::class)
      *     ->addMiddleware(RateLimitMiddleware::class);
      *
-     * // Теперь все маршруты будут проходить через эти middleware
+     * // Now all routes will pass through these middleware
      * $app->get('/', fn() => "Hello World!");
      * $app->run();
      */
@@ -309,12 +309,12 @@ final class QuickRouter
     }
 
     /**
-     * Устанавливает массив глобальных middleware
+     * Sets array of global middleware
      *
-     * Заменяет все существующие глобальные middleware на новые.
+     * Replaces all existing global middleware with new ones.
      *
-     * @param array<int, string|callable> $middleware Массив middleware
-     * @return self Возвращает себя для fluent interface
+     * @param array<int, string|callable> $middleware Middleware array
+     * @return self Returns self for fluent interface
      *
      * @example
      * $app->setMiddleware([
@@ -330,9 +330,9 @@ final class QuickRouter
     }
 
     /**
-     * Получает все глобальные middleware
+     * Gets all global middleware
      *
-     * @return array<int, string|object|callable> Массив глобальных middleware
+     * @return array<int, string|object|callable> Array of global middleware
      */
     public function getMiddleware(): array
     {
@@ -340,9 +340,9 @@ final class QuickRouter
     }
 
     /**
-     * Очищает все глобальные middleware
+     * Clears all global middleware
      *
-     * @return self Возвращает себя для fluent interface
+     * @return self Returns self for fluent interface
      */
     public function clearMiddleware(): self
     {
@@ -351,16 +351,16 @@ final class QuickRouter
     }
 
     /**
-     * Запускает роутер
+     * Runs router
      *
-     * Обрабатывает текущий HTTP запрос и выполняет соответствующий маршрут.
+     * Processes current HTTP request and executes matching route.
      *
      * @return void
      *
      * @example
      * $app = new QuickRouter();
      * $app->get('/', fn() => "Hello!");
-     * $app->run(); // Обработка запроса
+     * $app->run(); // Process request
      */
     public function run(): void
     {
@@ -368,15 +368,15 @@ final class QuickRouter
     }
 
     /**
-     * Доступ к расширенному API
+     * Access to extended API
      *
-     * Возвращает полный Router для доступа к продвинутым функциям:
+     * Returns full Router for access to advanced features:
      * - Dependency Injection
-     * - Кеширование
-     * - Настройка компонентов
-     * - И многое другое
+     * - Caching
+     * - Component configuration
+     * - And much more
      *
-     * @return Router Полный Router с расширенным API
+     * @return Router Full Router with extended API
      *
      * @example
      * $app = new QuickRouter();

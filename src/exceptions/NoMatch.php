@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\exceptions;
 
+/**
+ * Exception thrown when no route matches the URI
+ *
+ * @package FaustVik\Router\exceptions
+ */
 final class NoMatch extends Exception
 {
     public function __construct(string $uri)

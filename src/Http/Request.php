@@ -7,20 +7,20 @@ namespace FaustVik\Router\Http;
 use FaustVik\Router\interfaces\Http\RequestInterface;
 
 /**
- * Класс для представления HTTP запроса
+ * HTTP Request representation class
  *
- * Инкапсулирует данные HTTP запроса:
- * - HTTP метод (GET, POST, PUT, DELETE и т.д.)
- * - URI пути
- * - Параметры маршрута
- * - Query параметры ($_GET)
- * - Body данные (JSON, form-data, для POST/PUT/PATCH/DELETE)
- * - Загруженные файлы ($_FILES)
- * - HTTP заголовки
- * - Серверные переменные
- * - Атрибуты (для передачи данных через middleware)
+ * Encapsulates HTTP request data:
+ * - HTTP method (GET, POST, PUT, DELETE, etc.)
+ * - URI path
+ * - Route parameters
+ * - Query parameters ($_GET)
+ * - Body data (JSON, form-data, for POST/PUT/PATCH/DELETE)
+ * - Uploaded files ($_FILES)
+ * - HTTP headers
+ * - Server variables
+ * - Attributes (for passing data through middleware)
  *
- * Автоматически парсит JSON из php://input для Content-Type: application/json
+ * Automatically parses JSON from php://input for Content-Type: application/json
  *
  * @package FaustVik\Router\Http
  */
@@ -73,11 +73,18 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Создает запрос из глобальных переменных PHP
+     * Creates request from PHP globals
      *
-     * Использует $_SERVER, $_GET, $_POST, $_FILES, $_COOKIE и getallheaders()
-     * для создания объекта запроса. Автоматически парсит JSON body.
-     * Поддерживает HTTP Method Override через _method поле или X-HTTP-Method-Override header.
+     * Uses $_SERVER, $_GET, $_POST, $_FILES, $_COOKIE and getallheaders()
+     * to create request object. Automatically parses JSON body.
+     * Supports HTTP Method Override via _method field or X-HTTP-Method-Override header.
+     *
+     * @return self
+     *
+     * @example
+     * // In your public/index.php
+     * $request = Request::createFromGlobals();
+     * $router->handle($request);
      */
     public static function createFromGlobals(): self
     {
@@ -148,44 +155,90 @@ final class Request implements RequestInterface
         return $request;
     }
 
+    /**
+     * Gets HTTP method
+     *
+     * @return string HTTP method (GET, POST, PUT, DELETE, etc.)
+     *
+     * @example
+     * if ($request->getMethod() === 'POST') {
+     *     // Handle POST request
+     * }
+     */
     public function getMethod(): string
     {
         return $this->method;
     }
 
+    /**
+     * Gets request URI
+     *
+     * @return string Full URI with query string
+     *
+     * @example
+     * echo $request->getUri();  // /users/123?page=1
+     */
     public function getUri(): string
     {
         return $this->uri;
     }
 
+    /**
+     * Gets all route parameters
+     *
+     * @return array<string, mixed> All parameters from route matching
+     *
+     * @example
+     * // Route: /users/{id}/posts/{postId}
+     * $params = $request->getParams();
+     * // ['id' => '123', 'postId' => '456']
+     */
     public function getParams(): array
     {
         return $this->params;
     }
 
     /**
-     * Получает конкретный параметр маршрута
+     * Gets specific route parameter
      *
-     * @param string $key Ключ параметра
-     * @param mixed $default Значение по умолчанию если параметр не найден
-     * @return mixed Значение параметра или значение по умолчанию
+     * @param string $key Parameter key
+     * @param mixed $default Default value if parameter not found
+     * @return mixed Parameter value or default
+     *
+     * @example
+     * $userId = $request->getParam('id', 0);
+     * $username = $request->getParam('username', 'guest');
      */
     public function getParam(string $key, mixed $default = null): mixed
     {
         return $this->params[$key] ?? $default;
     }
 
+    /**
+     * Gets all query parameters
+     *
+     * @return array<string, mixed> All query parameters from URL
+     *
+     * @example
+     * // URL: /users?page=2&sort=name
+     * $query = $request->getQuery();
+     * // ['page' => '2', 'sort' => 'name']
+     */
     public function getQuery(): array
     {
         return $this->query;
     }
 
     /**
-     * Получает конкретный query параметр
+     * Gets specific query parameter
      *
-     * @param string $key Ключ параметра
-     * @param mixed $default Значение по умолчанию если параметр не найден
-     * @return mixed Значение параметра или значение по умолчанию
+     * @param string $key Parameter key
+     * @param mixed $default Default value if parameter not found
+     * @return mixed Parameter value or default
+     *
+     * @example
+     * $page = $request->getQueryParam('page', 1);
+     * $sort = $request->getQueryParam('sort', 'id');
      */
     public function getQueryParam(string $key, mixed $default = null): mixed
     {
@@ -193,7 +246,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * @return array<string, string>
+     * Gets all HTTP headers
+     *
+     * @return array<string, string> All HTTP headers
+     *
+     * @example
+     * $headers = $request->getHeaders();
+     * foreach ($headers as $name => $value) {
+     *     echo "$name: $value\n";
+     * }
      */
     public function getHeaders(): array
     {
@@ -211,28 +272,45 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает конкретный HTTP заголовок
+     * Gets specific HTTP header
      *
-     * @param string $key Название заголовка
-     * @param mixed $default Значение по умолчанию если заголовок не найден
-     * @return mixed Значение заголовка или значение по умолчанию
+     * @param string $key Header name
+     * @param mixed $default Default value if header not found
+     * @return mixed Header value or default
+     *
+     * @example
+     * $token = $request->getHeader('Authorization');
+     * $contentType = $request->getHeader('Content-Type', 'text/html');
      */
     public function getHeader(string $key, mixed $default = null): mixed
     {
         return $this->headers[$key] ?? $default;
     }
 
+    /**
+     * Gets all server variables
+     *
+     * @return array<string, mixed> $_SERVER array
+     *
+     * @example
+     * $serverVars = $request->getServer();
+     * $httpHost = $serverVars['HTTP_HOST'] ?? 'localhost';
+     */
     public function getServer(): array
     {
         return $this->server;
     }
 
     /**
-     * Получает конкретную серверную переменную
+     * Gets specific server variable
      *
-     * @param string $key Ключ переменной
-     * @param mixed $default Значение по умолчанию если переменная не найдена
-     * @return mixed Значение переменной или значение по умолчанию
+     * @param string $key Variable key
+     * @param mixed $default Default value if variable not found
+     * @return mixed Variable value or default
+     *
+     * @example
+     * $serverName = $request->getServerParam('SERVER_NAME', 'localhost');
+     * $remoteAddr = $request->getServerParam('REMOTE_ADDR');
      */
     public function getServerParam(string $key, mixed $default = null): mixed
     {
@@ -240,14 +318,18 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает атрибут запроса
+     * Gets request attribute
      *
-     * Атрибуты используются для передачи данных между middleware.
-     * Например, аутентификация может сохранить пользователя в атрибуте.
+     * Attributes are used to pass data between middleware.
+     * For example, authentication can store user in an attribute.
      *
-     * @param string $key Ключ атрибута
-     * @param mixed $default Значение по умолчанию если атрибут не найден
-     * @return mixed Значение атрибута или значение по умолчанию
+     * @param string $key Attribute key
+     * @param mixed $default Default value if attribute not found
+     * @return mixed Attribute value or default
+     *
+     * @example
+     * // In middleware: $request = $request->withAttribute('user', $user);
+     * // In controller: $user = $request->getAttribute('user');
      */
     public function getAttribute(string $key, mixed $default = null): mixed
     {
@@ -255,10 +337,17 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Создает новый экземпляр запроса с добавленным атрибутом
+     * Creates new request instance with added attribute
      *
-     * Используется immutable pattern - возвращает новый экземпляр,
-     * не изменяя текущий.
+     * Uses immutable pattern - returns new instance without modifying current one.
+     *
+     * @param string $key Attribute key
+     * @param mixed $value Attribute value
+     * @return self New request instance
+     *
+     * @example
+     * $request = $request->withAttribute('user', $authenticatedUser);
+     * $request = $request->withAttribute('role', 'admin');
      */
     public function withAttribute(string $key, mixed $value): self
     {
@@ -268,9 +357,13 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Создает новый экземпляр запроса с измененными параметрами
-     * 
-     * @param array<string, mixed> $params
+     * Creates new request instance with changed parameters
+     *
+     * @param array<string, mixed> $params Route parameters
+     * @return self New request instance
+     *
+     * @example
+     * $request = $request->withParams(['id' => '123', 'slug' => 'hello']);
      */
     public function withParams(array $params): self
     {
@@ -280,7 +373,13 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Создает новый экземпляр запроса с измененным URI
+     * Creates new request instance with changed URI
+     *
+     * @param string $uri New URI
+     * @return self New request instance
+     *
+     * @example
+     * $request = $request->withUri('/new/path');
      */
     public function withUri(string $uri): self
     {
@@ -290,12 +389,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Создает новый экземпляр запроса с измененным body
+     * Creates new request instance with changed body
      *
-     * Полезно для тестирования и манипуляции данными запроса
+     * Useful for testing and manipulating request data
      *
-     * @param array<string, mixed> $body Данные body
-     * @return self Новый экземпляр запроса
+     * @param array<string, mixed> $body Body data
+     * @return self New request instance
+     *
+     * @example
+     * $request = $request->withBody(['name' => 'John', 'email' => 'john@example.com']);
      */
     public function withBody(array $body): self
     {
@@ -305,14 +407,18 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает все данные из body запроса
+     * Gets all data from request body
      *
-     * Для POST/PUT/PATCH/DELETE запросов возвращает данные из:
-     * - JSON body (если Content-Type: application/json)
-     * - $_POST (для form-data)
-     * - php://input (для других типов)
+     * For POST/PUT/PATCH/DELETE requests returns data from:
+     * - JSON body (if Content-Type: application/json)
+     * - $_POST (for form-data)
+     * - php://input (for other types)
      *
-     * @return array<string, mixed> Данные body запроса
+     * @return array<string, mixed> Body data
+     *
+     * @example
+     * $data = $request->getBody();
+     * // ['name' => 'John', 'email' => 'john@example.com']
      */
     public function getBody(): array
     {
@@ -320,14 +426,17 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает конкретное значение из body запроса
+     * Gets specific value from request body
      *
-     * Удобный метод для получения отдельных полей из body.
-     * Пример: $email = $request->input('email', 'default@example.com');
+     * Convenient method for getting individual fields from body.
      *
-     * @param string $key Ключ поля
-     * @param mixed $default Значение по умолчанию если поле не найдено
-     * @return mixed Значение поля или значение по умолчанию
+     * @param string $key Field key
+     * @param mixed $default Default value if field not found
+     * @return mixed Field value or default
+     *
+     * @example
+     * $email = $request->input('email', 'default@example.com');
+     * $name = $request->input('name');
      */
     public function input(string $key, mixed $default = null): mixed
     {
@@ -335,10 +444,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Проверяет наличие поля в body
+     * Checks if field exists in body
      *
-     * @param string $key Ключ поля
-     * @return bool true если поле существует
+     * @param string $key Field key
+     * @return bool true if field exists
+     *
+     * @example
+     * if ($request->has('email')) {
+     *     $email = $request->input('email');
+     * }
      */
     public function has(string $key): bool
     {
@@ -346,9 +460,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает все загруженные файлы
+     * Gets all uploaded files
      *
-     * @return array<string, mixed> Массив $_FILES
+     * @return array<string, mixed> $_FILES array
+     *
+     * @example
+     * $files = $request->getFiles();
+     * foreach ($files as $name => $file) {
+     *     echo $file['name'];
+     * }
      */
     public function getFiles(): array
     {
@@ -356,10 +476,16 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает конкретный загруженный файл
+     * Gets specific uploaded file
      *
-     * @param string $key Ключ файла из формы
-     * @return array<string, mixed>|null Данные файла или null если файл не найден
+     * @param string $key File key from form
+     * @return array<string, mixed>|null File data or null if not found
+     *
+     * @example
+     * $avatar = $request->file('avatar');
+     * if ($avatar) {
+     *     move_uploaded_file($avatar['tmp_name'], '/path/to/avatars/' . $avatar['name']);
+     * }
      */
     public function file(string $key): ?array
     {
@@ -368,10 +494,16 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Проверяет наличие успешно загруженного файла
+     * Checks if file was successfully uploaded
      *
-     * @param string $key Ключ файла из формы
-     * @return bool true если файл загружен без ошибок
+     * @param string $key File key from form
+     * @return bool true if file uploaded without errors
+     *
+     * @example
+     * if ($request->hasFile('avatar')) {
+     *     $avatar = $request->file('avatar');
+     *     // Process file upload
+     * }
      */
     public function hasFile(string $key): bool
     {
@@ -381,9 +513,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Проверяет является ли запрос JSON запросом
+     * Checks if request is JSON
      *
-     * @return bool true если Content-Type содержит application/json
+     * @return bool true if Content-Type contains application/json
+     *
+     * @example
+     * if ($request->isJson()) {
+     *     $data = $request->getBody();
+     *     // Process JSON data
+     * }
      */
     public function isJson(): bool
     {
@@ -393,9 +531,14 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Проверяет является ли запрос AJAX запросом
+     * Checks if request is AJAX
      *
-     * @return bool true если запрос отправлен через XMLHttpRequest
+     * @return bool true if request sent via XMLHttpRequest
+     *
+     * @example
+     * if ($request->isAjax()) {
+     *     return Response::json($data);
+     * }
      */
     public function isAjax(): bool
     {
@@ -405,9 +548,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает все cookies
+     * Gets all cookies
      *
-     * @return array<string, string> Все HTTP cookies
+     * @return array<string, string> All HTTP cookies
+     *
+     * @example
+     * $cookies = $request->getCookies();
+     * foreach ($cookies as $name => $value) {
+     *     echo "$name: $value\n";
+     * }
      */
     public function getCookies(): array
     {
@@ -425,11 +574,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает конкретную cookie
+     * Gets specific cookie
      *
-     * @param string $key Имя cookie
-     * @param mixed $default Значение по умолчанию
-     * @return mixed
+     * @param string $key Cookie name
+     * @param mixed $default Default value
+     * @return mixed Cookie value or default
+     *
+     * @example
+     * $sessionId = $request->getCookie('session_id');
+     * $theme = $request->getCookie('theme', 'light');
      */
     public function getCookie(string $key, mixed $default = null): mixed
     {
@@ -437,10 +590,15 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Проверяет наличие cookie
+     * Checks if cookie exists
      *
-     * @param string $key Имя cookie
-     * @return bool
+     * @param string $key Cookie name
+     * @return bool true if cookie exists
+     *
+     * @example
+     * if ($request->hasCookie('session_id')) {
+     *     $sessionId = $request->getCookie('session_id');
+     * }
      */
     public function hasCookie(string $key): bool
     {
@@ -448,12 +606,17 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Проверяет использует ли запрос HTTPS
+     * Checks if request uses HTTPS
      *
-     * Проверяет различные серверные переменные для определения HTTPS.
-     * Учитывает прокси и балансировщики нагрузки.
+     * Checks various server variables to determine HTTPS.
+     * Takes into account proxies and load balancers.
      *
-     * @return bool true если соединение защищено (HTTPS)
+     * @return bool true if connection is secure (HTTPS)
+     *
+     * @example
+     * if ($request->isSecure()) {
+     *     // Handle HTTPS-specific logic
+     * }
      */
     public function isSecure(): bool
     {
@@ -498,13 +661,21 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает IP адрес клиента
+     * Gets client IP address
      *
-     * Определяет реальный IP адрес клиента с учетом прокси серверов
-     * и балансировщиков нагрузки. Проверяет заголовки прокси в порядке приоритета.
+     * Determines real client IP address considering proxy servers
+     * and load balancers. Checks proxy headers in priority order.
      *
-     * @param bool $trustProxy Доверять ли заголовкам прокси (по умолчанию false)
-     * @return string IP адрес клиента
+     * @param bool $trustProxy Whether to trust proxy headers (default false)
+     * @return string Client IP address
+     *
+     * @example
+     * // Basic usage
+     * $ip = $request->getClientIp();
+     *
+     * @example
+     * // Behind proxy (Cloudflare, nginx, etc.)
+     * $ip = $request->getClientIp(trustProxy: true);
      */
     public function getClientIp(bool $trustProxy = false): string
     {
@@ -557,11 +728,13 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает путь URI без query string
+     * Gets URI path without query string
      *
-     * Пример: /users/123?page=1 -> /users/123
+     * @return string Path without parameters
      *
-     * @return string Путь без параметров
+     * @example
+     * // URI: /users/123?page=1
+     * $path = $request->getPath();  // /users/123
      */
     public function getPath(): string
     {
@@ -572,9 +745,12 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает схему протокола
+     * Gets protocol scheme
      *
-     * @return string 'http' или 'https'
+     * @return string 'http' or 'https'
+     *
+     * @example
+     * $scheme = $request->getScheme();  // 'https'
      */
     public function getScheme(): string
     {
@@ -582,9 +758,12 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает хост из заголовков
+     * Gets host from headers
      *
-     * @return string Имя хоста
+     * @return string Host name
+     *
+     * @example
+     * $host = $request->getHost();  // 'example.com'
      */
     public function getHost(): string
     {
@@ -595,9 +774,13 @@ final class Request implements RequestInterface
     }
 
     /**
-     * Получает полный URL запроса
+     * Gets full request URL
      *
-     * @return string Полный URL (scheme://host/path?query)
+     * @return string Full URL (scheme://host/path?query)
+     *
+     * @example
+     * $fullUrl = $request->getFullUrl();
+     * // https://example.com/users/123?page=1
      */
     public function getFullUrl(): string
     {

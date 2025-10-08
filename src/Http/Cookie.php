@@ -7,10 +7,10 @@ namespace FaustVik\Router\Http;
 use FaustVik\Router\interfaces\Http\CookieInterface;
 
 /**
- * Класс для работы с HTTP Cookie
+ * HTTP Cookie management class
  *
- * Представляет HTTP cookie с настройками безопасности и времени жизни.
- * Поддерживает fluent interface для удобной настройки.
+ * Represents HTTP cookie with security settings and lifetime.
+ * Supports fluent interface for easy configuration.
  *
  * @package FaustVik\Router\Http
  */
@@ -57,11 +57,15 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Создает новый cookie
+     * Creates new cookie
      *
-     * @param string $name Имя cookie
-     * @param string $value Значение cookie
-     * @param int $expires Время жизни в секундах
+     * @param string $name Cookie name
+     * @param string $value Cookie value
+     * @param int $expires Lifetime in seconds
+     * @return self
+     *
+     * @example
+     * $cookie = Cookie::create('theme', 'dark', 3600);
      */
     public static function create(string $name, string $value = '', int $expires = 0): self
     {
@@ -69,7 +73,14 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Создает cookie для удаления (expires в прошлом)
+     * Creates cookie for deletion (expires in the past)
+     *
+     * @param string $name Cookie name to delete
+     * @return self
+     *
+     * @example
+     * $cookie = Cookie::forget('session_id');
+     * $response->withCookie($cookie);
      */
     public static function forget(string $name): self
     {
@@ -77,7 +88,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Устанавливает флаг secure (только HTTPS)
+     * Sets secure flag (HTTPS only)
+     *
+     * @param bool $secure Secure flag value
+     * @return self New cookie instance
+     *
+     * @example
+     * $cookie = Cookie::create('session', '123')->secure();
      */
     public function secure(bool $secure = true): self
     {
@@ -87,7 +104,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Устанавливает флаг httpOnly (недоступна для JS)
+     * Sets httpOnly flag (inaccessible from JS)
+     *
+     * @param bool $httpOnly HttpOnly flag value
+     * @return self New cookie instance
+     *
+     * @example
+     * $cookie = Cookie::create('session', '123')->httpOnly();
      */
     public function httpOnly(bool $httpOnly = true): self
     {
@@ -97,7 +120,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Устанавливает путь действия cookie
+     * Sets cookie path
+     *
+     * @param string $path Cookie path
+     * @return self New cookie instance
+     *
+     * @example
+     * $cookie = Cookie::create('theme', 'dark')->withPath('/admin');
      */
     public function withPath(string $path): self
     {
@@ -107,7 +136,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Устанавливает домен действия cookie
+     * Sets cookie domain
+     *
+     * @param string $domain Cookie domain
+     * @return self New cookie instance
+     *
+     * @example
+     * $cookie = Cookie::create('lang', 'en')->withDomain('.example.com');
      */
     public function withDomain(string $domain): self
     {
@@ -117,7 +152,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Устанавливает время жизни
+     * Sets cookie lifetime
+     *
+     * @param int $expires Lifetime in seconds
+     * @return self New cookie instance
+     *
+     * @example
+     * $cookie = Cookie::create('session', '123')->withExpires(7200);
      */
     public function withExpires(int $expires): self
     {
@@ -127,9 +168,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Устанавливает SameSite политику
+     * Sets SameSite policy
      *
-     * @param 'Lax'|'Strict'|'None' $sameSite 'Strict', 'Lax', или 'None'
+     * @param 'Lax'|'Strict'|'None' $sameSite 'Strict', 'Lax', or 'None'
+     * @return self New cookie instance
+     *
+     * @example
+     * $cookie = Cookie::create('csrf', 'token')->withSameSite('Strict');
      */
     public function withSameSite(string $sameSite): self
     {
@@ -184,7 +229,13 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Отправляет cookie в браузер
+     * Sends cookie to browser
+     *
+     * @return bool Success status
+     *
+     * @example
+     * $cookie = Cookie::create('theme', 'dark', 3600);
+     * $cookie->send();
      */
     public function send(): bool
     {
@@ -214,9 +265,14 @@ final class Cookie implements CookieInterface
     }
 
     /**
-     * Преобразует cookie в массив
+     * Converts cookie to array
      *
-     * @return array<string, mixed>
+     * @return array<string, mixed> Cookie data as array
+     *
+     * @example
+     * $cookie = Cookie::create('theme', 'dark');
+     * $data = $cookie->toArray();
+     * // ['name' => 'theme', 'value' => 'dark', ...]
      */
     public function toArray(): array
     {

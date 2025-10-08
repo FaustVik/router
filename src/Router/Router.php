@@ -22,14 +22,14 @@ use FaustVik\Router\Router\Components\matching\MatchResult;
 use function str_contains;
 
 /**
- * Основной класс роутера
+ * Main Router class
  *
- * Обеспечивает:
- * - Маршрутизацию HTTP запросов
- * - Обработку параметров URL и query string
- * - Поддержку middleware
- * - Кеширование результатов маршрутизации
- * - Dependency Injection контейнер
+ * Provides:
+ * - HTTP request routing
+ * - URL and query string parameter handling
+ * - Middleware support
+ * - Route matching caching
+ * - Dependency Injection container
  *
  * @package FaustVik\Router\Router
  */
@@ -40,7 +40,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?string $paramsString = null;
 
     /** 
-     * @var array<string, mixed>|null Query параметры из URI
+     * @var array<string, mixed>|null Query parameters from URI
      * @phpstan-ignore-next-line property.onlyWritten
      */
     private ?array $params = null;
@@ -49,16 +49,16 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?RoutesCollectionInterface $collections = null;
     private ?RouterContainerInterface $container = null;
 
-    /** @var array<string, RouteInterface> Индексированные именованные маршруты */
+    /** @var array<string, RouteInterface> Indexed named routes */
     private array $namedRoutes = [];
 
-    /** @var array<int, string|callable> Глобальные middleware для всех маршрутов */
+    /** @var array<int, string|callable> Global middleware for all routes */
     private array $globalMiddleware = [];
 
     /**
-     * Конструктор роутера
+     * Router constructor
      *
-     * Инициализирует базовую конфигурацию роутера
+     * Initializes basic router configuration
      */
     public function __construct()
     {
@@ -66,7 +66,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Устанавливает конфигурацию роутера
+     * Sets router configuration
      */
     public function setConfig(ConfigInterface $config): void
     {
@@ -74,7 +74,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Получает текущую конфигурацию роутера
+     * Gets current router configuration
      */
     public function getConfig(): ConfigInterface
     {
@@ -82,15 +82,15 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Устанавливает коллекцию маршрутов
+     * Sets routes collection
      *
-     * Автоматически индексирует именованные маршруты для быстрого доступа
+     * Automatically indexes named routes for fast access
      */
     public function setCollection(RoutesCollectionInterface $collections): self
     {
         $this->collections = $collections;
 
-        // Индексируем именованные маршруты для быстрого доступа через url()
+        // Index named routes for fast access through url()
         $this->namedRoutes = [];
         foreach ($collections->get() as $route) {
             if ($route->getName()) {
@@ -102,42 +102,42 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Обрабатывает Request и возвращает Response без отправки
+     * Processes Request and returns Response without sending
      *
-     * Этот метод выполняет всю логику маршрутизации, но не отправляет ответ клиенту.
-     * Полезно для:
-     * - Тестирования маршрутов
-     * - Создания собственных HTTP серверов
-     * - Интеграции с другими фреймворками
-     * - Получения ответа для дальнейшей обработки
+     * This method executes all routing logic but doesn't send response to client.
+     * Useful for:
+     * - Route testing
+     * - Building custom HTTP servers
+     * - Integration with other frameworks
+     * - Getting response for further processing
      *
-     * Полный цикл обработки:
-     * 1. Парсинг URI для извлечения пути и параметров
-     * 2. Поиск подходящего маршрута
-     * 3. Проверка HTTP метода
-     * 4. Выполнение middleware stack (глобальные + маршрутные)
-     * 5. Запуск обработчика маршрута
-     * 6. Возврат Response объекта
+     * Full processing cycle:
+     * 1. Parse URI to extract path and parameters
+     * 2. Find matching route
+     * 3. Check HTTP method
+     * 4. Execute middleware stack (global + route-specific)
+     * 5. Run route handler
+     * 6. Return Response object
      *
-     * @param Request $request HTTP запрос для обработки
-     * @return Response HTTP ответ
-     * @throws \FaustVik\Router\exceptions\NoMatch Если маршрут не найден
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
+     * @param Request $request HTTP request to process
+     * @return Response HTTP response
+     * @throws \FaustVik\Router\exceptions\NoMatch If route not found
+     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
      *
      * @example
-     * // Тестирование маршрута
+     * // Route testing
      * $request = new Request('GET', '/users/123');
      * $response = $router->handle($request);
      * assert($response->getStatusCode() === 200);
      *
      * @example
-     * // Интеграция с другим фреймворком
+     * // Integration with another framework
      * $response = $router->handle($psrRequest->toRequest());
      * return $response->toPsr7Response();
      */
     public function handle(Request $request): Response
     {
-        // Устанавливаем URI из запроса
+        // Set URI from request
         $this->setUri($request->getUri());
 
         // Парсим URI для извлечения пути и параметров
@@ -182,41 +182,41 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Основной метод запуска роутера
+     * Main router execution method
      *
-     * Это удобный метод для быстрого старта. Создает Request из глобальных переменных,
-     * обрабатывает его через handle() и отправляет ответ клиенту.
+     * Convenience method for quick start. Creates Request from global variables,
+     * processes it through handle() and sends response to client.
      *
-     * Для тестирования и более гибкого контроля используйте handle() напрямую.
+     * For testing and more flexible control use handle() directly.
      *
-     * @throws \FaustVik\Router\exceptions\NoMatch Если маршрут не найден
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
+     * @throws \FaustVik\Router\exceptions\NoMatch If route not found
+     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
      *
      * @example
-     * // Обычное использование
+     * // Common usage
      * $router = new Router();
      * $router->setCollection($routes);
      * $router->run();
      *
-     * @see handle() Для обработки без автоматической отправки ответа
+     * @see handle() For processing without automatic response sending
      */
     public function run(): void
     {
-        // Создаем Request из глобальных переменных PHP
+        // Create Request from PHP global variables
         $request = Request::createFromGlobals();
 
-        // Обрабатываем запрос через handle()
+        // Process request through handle()
         $response = $this->handle($request);
 
-        // Отправляем ответ клиенту
+        // Send response to client
         $response->send();
     }
 
     /**
-     * Устанавливает URI для обработки
+     * Sets URI for processing
      *
-     * Используется для тестирования или когда нужно обработать
-     * конкретный URI не из $_SERVER
+     * Used for testing or when need to process
+     * specific URI not from $_SERVER
      */
     public function setUri(string $uri): self
     {
@@ -225,9 +225,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Получает URI для обработки
+     * Gets URI for processing
      *
-     * Если URI не был установлен явно, берет из $_SERVER['REQUEST_URI']
+     * If URI not explicitly set, takes from $_SERVER['REQUEST_URI']
      */
     public function getUri(): string
     {
@@ -239,17 +239,17 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Парсит URI запроса
+     * Parses request URI
      *
-     * Разделяет URI на путь и параметры query string.
-     * Использует parse_url() и parse_str() для правильной обработки сложных URL.
+     * Splits URI into path and query string parameters.
+     * Uses parse_url() and parse_str() for proper complex URL handling.
      *
-     * Поддерживает:
-     * - Массивы в query string: ?ids[]=1&ids[]=2
-     * - Вложенные параметры: ?user[name]=John&user[age]=30
-     * - Специальные символы в параметрах
+     * Supports:
+     * - Arrays in query string: ?ids[]=1&ids[]=2
+     * - Nested parameters: ?user[name]=John&user[age]=30
+     * - Special characters in parameters
      *
-     * Например: "/users/123?name=John&age=30" ->
+     * Example: "/users/123?name=John&age=30" ->
      * - $this->uri = "/users/123"
      * - $this->params = ["name" => "John", "age" => "30"]
      */
@@ -257,18 +257,18 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $uri = $this->getUri();
 
-        // Используем parse_url() для корректного разбора URI
-        // Это быстрее и надежнее ручного парсинга
+        // Use parse_url() for correct URI parsing
+        // This is faster and more reliable than manual parsing
         $parsed = parse_url($uri);
 
-        // Извлекаем путь и декодируем его
+        // Extract path and decode it
         $this->uri = isset($parsed['path']) ? urldecode($parsed['path']) : '/';
 
-        // Сохраняем строку параметров для обратной совместимости
+        // Save params string for backward compatibility
         $this->paramsString = $parsed['query'] ?? null;
 
-        // Парсим query string с помощью parse_str()
-        // Это правильно обрабатывает массивы и вложенные параметры
+        // Parse query string using parse_str()
+        // This correctly handles arrays and nested parameters
         if ($this->paramsString) {
             $parsedParams = [];
             parse_str($this->paramsString, $parsedParams);
@@ -278,34 +278,34 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Находит подходящий маршрут для URI
+     * Finds matching route for URI
      *
-     * Использует компонент Matching для поиска маршрута,
-     * который соответствует текущему URI.
+     * Uses Matching component to find route
+     * that matches current URI.
      *
-     * @throws \FaustVik\Router\exceptions\NoMatch Если подходящий маршрут не найден
+     * @throws \FaustVik\Router\exceptions\NoMatch If matching route not found
      */
     protected function match(): MatchResult
     {
-        // После вызова parse() $this->uri всегда инициализирован
+        // After parse() call $this->uri is always initialized
         assert($this->uri !== null);
         
         return $this->getConfig()->getMatch()->match($this->uri, $this->collections);
     }
 
     /**
-     * Проверяет разрешенные HTTP методы для маршрута
+     * Checks allowed HTTP methods for route
      *
-     * Использует компонент CheckerHttpMethod для проверки,
-     * разрешен ли текущий HTTP метод для найденного маршрута.
+     * Uses CheckerHttpMethod component to verify
+     * if current HTTP method is allowed for found route.
      *
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
+     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
      */
     /**
-     * Проверяет, разрешён ли HTTP метод для маршрута
+     * Checks if HTTP method is allowed for route
      *
-     * @param RouteInterface $route Маршрут для проверки
-     * @param string|null $httpMethod HTTP метод (если null, берется из $_SERVER)
+     * @param RouteInterface $route Route to check
+     * @param string|null $httpMethod HTTP method (if null, taken from $_SERVER)
      * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod
      */
     protected function check(RouteInterface $route, ?string $httpMethod = null): void
@@ -314,10 +314,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Включает кеширование маршрутов
+     * Enables route caching
      *
-     * Активирует систему кеширования для ускорения поиска маршрутов.
-     * Результаты поиска маршрутов будут сохраняться в кеше.
+     * Activates caching system to speed up route matching.
+     * Route matching results will be saved in cache.
      */
     public function enableCache(): void
     {
@@ -325,10 +325,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Отключает кеширование маршрутов
+     * Disables route caching
      *
-     * Деактивирует систему кеширования.
-     * Поиск маршрутов будет выполняться каждый раз заново.
+     * Deactivates caching system.
+     * Route matching will be performed from scratch each time.
      */
     public function disableCache(): void
     {
@@ -336,7 +336,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Проверяет, включено ли кеширование
+     * Checks if caching is enabled
      */
     public function isCacheEnabled(): bool
     {
@@ -344,7 +344,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Устанавливает кеш-драйвер
+     * Sets cache driver
      */
     public function setCache(CacheInterface $cache): void
     {
@@ -352,7 +352,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Получает текущий кеш-драйвер
+     * Gets current cache driver
      */
     public function getCache(): ?CacheInterface
     {
@@ -360,9 +360,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Очищает кеш маршрутов
+     * Clears route cache
      *
-     * Удаляет все сохраненные результаты поиска маршрутов.
+     * Removes all saved route matching results.
      */
     public function clearRouteCache(): bool
     {
@@ -370,7 +370,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Генерирует ключ кеша для текущего URI
+     * Generates cache key for current URI
      */
     public function getCacheKey(): string
     {
@@ -378,17 +378,17 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     // ============================================================================
-    // DI Container methods - Методы для работы с Dependency Injection контейнером
+    // DI Container methods - Methods for working with Dependency Injection container
     // ============================================================================
 
     /**
-     * Включает Dependency Injection с опциональной конфигурацией
+     * Enables Dependency Injection with optional configuration
      *
-     * Создает встроенный контейнер DefaultContainer и настраивает его
-     * с помощью переданной closure-функции.
+     * Creates built-in DefaultContainer and configures it
+     * using passed closure function.
      *
-     * @param \Closure|null $configurator Функция для настройки контейнера
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param \Closure|null $configurator Function to configure container
+     * @return self Returns current instance for method chaining
      *
      * @example
      * $router->enableDI(function($container) {
@@ -404,20 +404,20 @@ final class Router implements RouterInterface, CacheableRouterInterface
             $this->container = new DefaultContainer();
         }
 
-        // Обновляем конфигурацию с контейнером
+        // Update configuration with container
         $this->config->setContainer($this->container);
 
         return $this;
     }
 
     /**
-     * Устанавливает кастомный контейнер
+     * Sets custom container
      *
-     * Позволяет использовать внешний контейнер (Symfony, PHP-DI, Pimple и др.)
-     * через систему адаптеров.
+     * Allows using external container (Symfony, PHP-DI, Pimple, etc.)
+     * through adapter system.
      *
-     * @param object $container Экземпляр внешнего контейнера
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param object $container External container instance
+     * @return self Returns current instance for method chaining
      *
      * @example
      * $phpDiContainer = new DI\Container();
@@ -427,14 +427,14 @@ final class Router implements RouterInterface, CacheableRouterInterface
     {
         $this->container = ContainerAdapterFactory::createFor($container);
 
-        // Обновляем конфигурацию с контейнером
+        // Update configuration with container
         $this->config->setContainer($this->container);
 
         return $this;
     }
 
     /**
-     * Получает текущий DI контейнер
+     * Gets current DI container
      */
     public function getContainer(): ?RouterContainerInterface
     {
@@ -442,7 +442,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Проверяет, включен ли DI
+     * Checks if DI is enabled
      */
     public function isDIEnabled(): bool
     {
@@ -450,13 +450,13 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Настраивает контейнер с помощью массива конфигурации
+     * Configures container using configuration array
      *
-     * Позволяет настроить контейнер декларативно через массив.
-     * Поддерживает секции 'bindings' и 'singletons'.
+     * Allows configuring container declaratively through array.
+     * Supports 'bindings' and 'singletons' sections.
      *
-     * @param array $config Массив конфигурации контейнера
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param array $config Container configuration array
+     * @return self Returns current instance for method chaining
      *
      * @example
      * $router->configureContainer([
@@ -478,7 +478,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             $this->config->setContainer($this->container);
         }
 
-        // Обрабатываем обычные привязки
+        // Process regular bindings
         if (isset($config['bindings']) && is_array($config['bindings'])) {
             foreach ($config['bindings'] as $abstract => $concrete) {
                 if (!is_string($abstract)) {
@@ -488,7 +488,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
             }
         }
 
-        // Обрабатываем singleton привязки
+        // Process singleton bindings
         if (isset($config['singletons']) && is_array($config['singletons'])) {
             foreach ($config['singletons'] as $abstract => $concrete) {
                 if (!is_string($abstract)) {
@@ -502,14 +502,14 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Привязывает сервис к контейнеру
+     * Binds service to container
      *
-     * Регистрирует привязку абстракции к конкретной реализации.
-     * При каждом запросе будет создаваться новый экземпляр.
+     * Registers binding of abstraction to concrete implementation.
+     * New instance will be created on each request.
      *
-     * @param string $abstract Абстракция (интерфейс или класс)
-     * @param mixed $concrete Конкретная реализация (класс, closure или экземпляр)
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param string $abstract Abstraction (interface or class)
+     * @param mixed $concrete Concrete implementation (class, closure or instance)
+     * @return self Returns current instance for method chaining
      *
      * @example
      * $router->bind(LoggerInterface::class, FileLogger::class);
@@ -527,14 +527,14 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Привязывает singleton к контейнеру
+     * Binds singleton to container
      *
-     * Регистрирует привязку абстракции к конкретной реализации как singleton.
-     * Экземпляр будет создан только один раз и переиспользован.
+     * Registers binding of abstraction to concrete implementation as singleton.
+     * Instance will be created only once and reused.
      *
-     * @param string $abstract Абстракция (интерфейс или класс)
-     * @param mixed $concrete Конкретная реализация (класс, closure или экземпляр)
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param string $abstract Abstraction (interface or class)
+     * @param mixed $concrete Concrete implementation (class, closure or instance)
+     * @return self Returns current instance for method chaining
      *
      * @example
      * $router->singleton(DatabaseConnection::class, DatabaseConnection::class);
@@ -552,29 +552,29 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     // ============================================================================
-    // Named Routes & URL Generation - Именованные маршруты и генерация URL
+    // Named Routes & URL Generation - Named routes and URL generation
     // ============================================================================
 
     /**
-     * Генерирует URL по имени маршрута
+     * Generates URL by route name
      *
-     * Заменяет параметры в URL и удаляет опциональные параметры,
-     * которые не были предоставлены. Поддерживает query параметры и якоря.
+     * Replaces parameters in URL and removes optional parameters
+     * that were not provided. Supports query parameters and fragments.
      *
-     * @param string $name Имя маршрута
-     * @param array<string, string|int> $params Параметры пути для подстановки в {placeholders}
-     * @param array<string, string|int|bool|array<mixed>> $query Query параметры для добавления в URL (?key=value)
-     * @param string|null $fragment Якорь/фрагмент для добавления в URL (#fragment)
-     * @return string Сгенерированный URL
-     * @throws \InvalidArgumentException Если маршрут не найден или не все обязательные параметры переданы
+     * @param string $name Route name
+     * @param array<string, string|int> $params Path parameters for substitution in {placeholders}
+     * @param array<string, string|int|bool|array<mixed>> $query Query parameters to add to URL (?key=value)
+     * @param string|null $fragment Anchor/fragment to add to URL (#fragment)
+     * @return string Generated URL
+     * @throws \InvalidArgumentException If route not found or not all required parameters provided
      *
      * @example
-     * // Базовый пример
+     * // Basic example
      * $router->url('users.show', ['id' => 123]);
      * // => /users/123
      *
      * @example
-     * // С named arguments (рекомендуется для сложных URL)
+     * // With named arguments (recommended for complex URLs)
      * $router->url(
      *     name: 'posts.show',
      *     params: ['id' => 456],
@@ -584,17 +584,17 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * // => /posts/456?ref=home&utm_source=newsletter#comments
      *
      * @example
-     * // С query параметрами
+     * // With query parameters
      * $router->url('users.index', [], ['page' => 2, 'sort' => 'name']);
      * // => /users?page=2&sort=name
      *
      * @example
-     * // С якорем
+     * // With fragment
      * $router->url('posts.show', ['id' => 456], [], 'comments');
      * // => /posts/456#comments
      *
      * @example
-     * // Опциональные параметры
+     * // Optional parameters
      * $router->url('posts.index'); // => /posts
      * $router->url('posts.index', ['id' => 456]); // => /posts/456
      */
@@ -608,7 +608,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $uri = $route->getRoute();
         $constraints = $route->getConstraints();
 
-        // Валидируем параметры по constraints перед генерацией URL
+        // Validate parameters against constraints before URL generation
         foreach ($params as $key => $value) {
             if (isset($constraints[$key])) {
                 $pattern = '#^' . $constraints[$key] . '$#';
@@ -621,13 +621,13 @@ final class Router implements RouterInterface, CacheableRouterInterface
             }
         }
 
-        // Заменяем параметры в URI
-        // Поддерживаем форматы: {param}, {param?}, {param:pattern}, {param:pattern?}
+        // Replace parameters in URI
+        // Support formats: {param}, {param?}, {param:pattern}, {param:pattern?}
         foreach ($params as $key => $value) {
-            // Экранируем значение для безопасности
+            // Escape value for security
             $escapedValue = rawurlencode((string) $value);
 
-            // Заменяем все варианты параметра
+            // Replace all parameter variants
             $replaced = preg_replace(
                 [
                     '/\{' . preg_quote($key, '/') . '\?\}/',
@@ -643,14 +643,14 @@ final class Router implements RouterInterface, CacheableRouterInterface
                 $uri
             );
             
-            // preg_replace может вернуть null при ошибке
+            // preg_replace can return null on error
             if ($replaced === null) {
                 throw new \RuntimeException("Failed to replace parameter '{$key}' in URI");
             }
             $uri = $replaced;
         }
 
-        // Удаляем оставшиеся опциональные параметры
+        // Remove remaining optional parameters
         $uri = preg_replace('/\{[^}]+\?\}/', '', $uri);
         if ($uri === null) {
             throw new \RuntimeException("Failed to process optional parameters in URI");
@@ -661,14 +661,14 @@ final class Router implements RouterInterface, CacheableRouterInterface
             throw new \RuntimeException("Failed to process optional parameters in URI");
         }
 
-        // Проверяем, что все обязательные параметры были заполнены
+        // Check that all required parameters were filled
         if (preg_match('/\{([^}?:]+)(?::[^}]+)?\}/', $uri, $matches)) {
             throw new \InvalidArgumentException(
                 "Missing required parameter '{$matches[1]}' for route '{$name}'"
             );
         }
 
-        // Очищаем двойные слеши и trailing slash
+        // Clean up double slashes and trailing slash
         $uri = preg_replace('#/{2,}#', '/', $uri);
         if ($uri === null) {
             throw new \RuntimeException("Failed to clean up URI slashes");
@@ -676,15 +676,15 @@ final class Router implements RouterInterface, CacheableRouterInterface
         
         $uri = rtrim($uri, '/');
 
-        // Возвращаем корневой путь если URI пустой
+        // Return root path if URI is empty
         $uri = $uri === '' ? '/' : $uri;
 
-        // Добавляем query параметры если есть
+        // Add query parameters if present
         if (!empty($query)) {
             $uri .= '?' . http_build_query($query);
         }
 
-        // Добавляем якорь/фрагмент если есть
+        // Add fragment if present
         if ($fragment !== null && $fragment !== '') {
             $uri .= '#' . rawurlencode($fragment);
         }
@@ -693,10 +693,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Проверяет существование именованного маршрута
+     * Checks if named route exists
      *
-     * @param string $name Имя маршрута
-     * @return bool True если маршрут существует
+     * @param string $name Route name
+     * @return bool True if route exists
      *
      * @example
      * if ($router->has('users.show')) {
@@ -709,9 +709,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Получает все именованные маршруты
+     * Gets all named routes
      *
-     * @return array<string, RouteInterface> Ассоциативный массив [имя => RouteInterface]
+     * @return array<string, RouteInterface> Associative array [name => RouteInterface]
      */
     public function getNamedRoutes(): array
     {
@@ -719,10 +719,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Получает маршрут по имени
+     * Gets route by name
      *
-     * @param string $name Имя маршрута
-     * @return RouteInterface|null Маршрут или null если не найден
+     * @param string $name Route name
+     * @return RouteInterface|null Route or null if not found
      *
      * @example
      * $route = $router->getRouteByName('users.show');
@@ -736,28 +736,28 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     // ============================================================================
-    // Global Middleware - Глобальные middleware для всех маршрутов
+    // Global Middleware - Global middleware for all routes
     // ============================================================================
 
     /**
-     * Добавляет глобальный middleware для всех маршрутов
+     * Adds global middleware for all routes
      *
-     * Глобальные middleware выполняются перед middleware конкретного маршрута.
-     * Это удобно для CORS, логирования, аутентификации и других общих задач.
+     * Global middleware executes before route-specific middleware.
+     * Useful for CORS, logging, authentication and other common tasks.
      *
-     * @param string|callable $middleware Middleware класс или callable
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param string|callable $middleware Middleware class or callable
+     * @return self Returns current instance for method chaining
      *
      * @example
-     * // Добавление middleware класса
+     * // Adding middleware class
      * $router->addGlobalMiddleware(CorsMiddleware::class);
      *
      * @example
-     * // Добавление middleware функции
+     * // Adding middleware function
      * $router->addGlobalMiddleware(fn($request, $next) => $next($request));
      *
      * @example
-     * // Цепочка вызовов (рекомендуется)
+     * // Method chaining (recommended)
      * $router->addGlobalMiddleware(CorsMiddleware::class)
      *        ->addGlobalMiddleware(LoggingMiddleware::class)
      *        ->addGlobalMiddleware(RateLimitMiddleware::class);
@@ -769,12 +769,12 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Устанавливает массив глобальных middleware
+     * Sets array of global middleware
      *
-     * Заменяет все существующие глобальные middleware на новые.
+     * Replaces all existing global middleware with new ones.
      *
-     * @param array<int, string|callable> $middleware Массив middleware
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @param array<int, string|callable> $middleware Middleware array
+     * @return self Returns current instance for method chaining
      *
      * @example
      * $router->setGlobalMiddleware([
@@ -790,9 +790,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Получает все глобальные middleware
+     * Gets all global middleware
      *
-     * @return array<int, string|object|callable> Массив глобальных middleware
+     * @return array<int, string|object|callable> Array of global middleware
      */
     public function getGlobalMiddleware(): array
     {
@@ -800,9 +800,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Очищает все глобальные middleware
+     * Clears all global middleware
      *
-     * @return self Возвращает текущий экземпляр для цепочки вызовов
+     * @return self Returns current instance for method chaining
      */
     public function clearGlobalMiddleware(): self
     {
