@@ -18,10 +18,6 @@ vendor/
 /custom_cache/
 *.cache
 
-# PHPStan
-phpstan.neon.dist
-phpstan-baseline.neon
-
 # Log files
 *.log
 /logs/
