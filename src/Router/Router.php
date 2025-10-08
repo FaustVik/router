@@ -99,22 +99,44 @@ final class Router implements RouterInterface, CacheableRouterInterface
     }
 
     /**
-     * Основной метод запуска роутера
+     * Обрабатывает Request и возвращает Response без отправки
      *
-     * Выполняет следующие шаги:
-     * 1. Парсит URI запроса
-     * 2. Находит подходящий маршрут
-     * 3. Проверяет HTTP метод
-     * 4. Создает объект запроса
-     * 5. Выполняет middleware stack
-     * 6. Запускает контроллер
-     * 7. Отправляет ответ
+     * Этот метод выполняет всю логику маршрутизации, но не отправляет ответ клиенту.
+     * Полезно для:
+     * - Тестирования маршрутов
+     * - Создания собственных HTTP серверов
+     * - Интеграции с другими фреймворками
+     * - Получения ответа для дальнейшей обработки
      *
+     * Полный цикл обработки:
+     * 1. Парсинг URI для извлечения пути и параметров
+     * 2. Поиск подходящего маршрута
+     * 3. Проверка HTTP метода
+     * 4. Выполнение middleware stack (глобальные + маршрутные)
+     * 5. Запуск обработчика маршрута
+     * 6. Возврат Response объекта
+     *
+     * @param Request $request HTTP запрос для обработки
+     * @return Response HTTP ответ
      * @throws \FaustVik\Router\exceptions\NoMatch Если маршрут не найден
      * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
+     *
+     * @example
+     * // Тестирование маршрута
+     * $request = new Request('GET', '/users/123');
+     * $response = $router->handle($request);
+     * assert($response->getStatusCode() === 200);
+     *
+     * @example
+     * // Интеграция с другим фреймворком
+     * $response = $router->handle($psrRequest->toRequest());
+     * return $response->toPsr7Response();
      */
-    public function run(): void
+    public function handle(Request $request): Response
     {
+        // Устанавливаем URI из запроса
+        $this->setUri($request->getUri());
+
         // Парсим URI для извлечения пути и параметров
         $this->parse();
 
@@ -123,24 +145,34 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $route = $matchResult->getRoute();
 
         // Объединяем параметры из URL с параметрами из query string
-        // Параметры из URL имеют приоритет над query параметрами
+        // Параметры из URL имеют приоритет над query параметры
         $urlParams = $matchResult->getParameters();
-        $allParams = array_merge($this->params ?? [], $urlParams);
+        $queryParams = $request->getQuery();
+        $allParams = array_merge($queryParams, $urlParams);
 
-        // Проверяем разрешенные HTTP методы
-        $this->check($route);
+        // Сохраняем текущий метод и временно устанавливаем из Request для проверки
+        $originalMethod = $_SERVER['REQUEST_METHOD'] ?? null;
+        $_SERVER['REQUEST_METHOD'] = $request->getMethod();
+        
+        try {
+            // Проверяем разрешенные HTTP методы
+            $this->check($route);
+        } finally {
+            // Восстанавливаем оригинальный метод
+            if ($originalMethod !== null) {
+                $_SERVER['REQUEST_METHOD'] = $originalMethod;
+            } else {
+                unset($_SERVER['REQUEST_METHOD']);
+            }
+        }
 
-        // Создаем объект запроса с полными данными
-        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $headers = function_exists('getallheaders') ? getallheaders() : [];
-        $server = $_SERVER;
-
-        $request = new Request($method, $this->uri, $allParams, $this->params ?? [], $headers, $server);
+        // Обновляем Request с параметрами маршрута
+        $request = $request->withParams($allParams);
 
         // Создаем middleware stack с финальным обработчиком
-        $finalHandler = function (Request $request) use ($route, $allParams): Response {
+        $finalHandler = function (Request $req) use ($route, $allParams): Response {
             ob_start();
-            $this->getConfig()->getRunner()->run($route, $allParams, $request);
+            $this->getConfig()->getRunner()->run($route, $allParams, $req);
             $content = ob_get_clean();
 
             return new Response($content ?: '');
@@ -155,8 +187,36 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Затем добавляем middleware конкретного маршрута
         $middlewareStack->addFromArray($route->getMiddleware());
 
-        // Выполняем middleware stack
-        $response = $middlewareStack->execute($request);
+        // Выполняем middleware stack и возвращаем результат
+        return $middlewareStack->execute($request);
+    }
+
+    /**
+     * Основной метод запуска роутера
+     *
+     * Это удобный метод для быстрого старта. Создает Request из глобальных переменных,
+     * обрабатывает его через handle() и отправляет ответ клиенту.
+     *
+     * Для тестирования и более гибкого контроля используйте handle() напрямую.
+     *
+     * @throws \FaustVik\Router\exceptions\NoMatch Если маршрут не найден
+     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
+     *
+     * @example
+     * // Обычное использование
+     * $router = new Router();
+     * $router->setCollection($routes);
+     * $router->run();
+     *
+     * @see handle() Для обработки без автоматической отправки ответа
+     */
+    public function run(): void
+    {
+        // Создаем Request из глобальных переменных PHP
+        $request = Request::createFromGlobals();
+
+        // Обрабатываем запрос через handle()
+        $response = $this->handle($request);
 
         // Отправляем ответ клиенту
         $response->send();
