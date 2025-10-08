@@ -1,56 +1,63 @@
-# Примеры использования FaustVik Router
+# FaustVik Router Examples
 
-## Обзор примеров
+[🇷🇺 Русская версия](README.ru.md)
 
-### Для начинающих
-- **`basic-example.php`** - Введение в роутер, базовые маршруты, контроллеры, URL параметры
-- **`simple-groups-example.php`** - Простая демонстрация группировки маршрутов
+## Examples Overview
 
-### Для среднего уровня  
-- **`url-parameters-example.php`** - Продвинутая работа с URL параметрами, вложенные параметры
-- **`response-types-example.php`** - Различные типы ответов: JSON, HTML, редиректы, заголовки
-- **`groups-example.php`** - Комплексная группировка роутов с middleware и вложенностью
+### For Beginners
+- **`quick-example.php`** - QuickRouter introduction - Hello World in 5 minutes
+- **`basic-example.php`** - Router introduction, basic routes, controllers, URL parameters
+- **`simple-groups-example.php`** - Simple route grouping demonstration
 
-### Для продвинутых
-- **`rest-api-example.php`** - Полноценный REST API с CRUD операциями
-- **`named-routes-example.php`** - Named Routes и генерация URL
-- **`named-routes-advanced-example.php`** - ✨ **НОВОЕ!** Продвинутая генерация URL с query параметрами и якорями
-- **`post-data-example.php`** - ✨ **НОВОЕ!** Работа с POST/PUT/PATCH данными, JSON body, загрузка файлов
-- **`cookies-and-security-example.php`** - ✨ **НОВОЕ!** Cookies, IP detection, HTTPS check, Method Override
-- **`middleware-di-example.php`** - ✨ **НОВОЕ!** DI в Middleware - как работать с middleware с зависимостями
-- **`global-middleware-example.php`** - ✨ **НОВОЕ!** Глобальные middleware для всех маршрутов
-- **`error-handling-example.php`** - Обработка ошибок, исключения, HTTP коды
-- **`cache-example.php`** - Базовое кеширование маршрутов
-- **`cache-production-example.php`** - Кеширование для продакшн окружения
+### Intermediate Level
+- **`url-parameters-example.php`** - Advanced URL parameters, nested parameters
+- **`response-types-example.php`** - Different response types: JSON, HTML, redirects, headers
+- **`groups-example.php`** - Complex route grouping with middleware and nesting
+- **`middleware-example.php`** - Middleware basics
 
-## Новые возможности v.2.0-alpha
+### Advanced Level
+- **`rest-api-example.php`** - Full REST API with CRUD operations
+- **`named-routes-example.php`** - Named Routes and URL generation
+- **`named-routes-advanced-example.php`** - ✨ **NEW!** Advanced URL generation with query parameters and fragments
+- **`post-data-example.php`** - ✨ **NEW!** Working with POST/PUT/PATCH data, JSON body, file uploads
+- **`cookies-and-security-example.php`** - ✨ **NEW!** Cookies, IP detection, HTTPS check, Method Override
+- **`middleware-di-example.php`** - ✨ **NEW!** DI in Middleware - working with middleware dependencies
+- **`global-middleware-example.php`** - ✨ **NEW!** Global middleware for all routes
+- **`error-handling-example.php`** - Error handling, exceptions, HTTP codes
+- **`di-basic-example.php`** - Dependency injection basics
+- **`cache-example.php`** - Basic route caching
+- **`cache-production-example.php`** - Caching for production environment
+- **`csrf-protection-example.php`** - CSRF token protection
+- **`rate-limit-example.php`** - Request rate limiting
 
-### 🏷️ Named Routes и URL Generation
+## New Features in v.2.0-alpha
 
-#### Базовая генерация URL
+### 🏷️ Named Routes and URL Generation
+
+#### Basic URL Generation
 ```php
-// Создание именованного маршрута
+// Create named route
 Route::create('/users/{id}', UserController::class, 'show')
     ->name('users.show')
     ->where('id', '\d+');
 
-// Генерация URL
+// Generate URL
 $router->url('users.show', ['id' => 123]); // => /users/123
 ```
 
-#### Query параметры (новое!)
+#### Query Parameters (new!)
 ```php
 $router->url('users.index', [], ['page' => 2, 'sort' => 'name']);
 // => /users?page=2&sort=name
 ```
 
-#### Якоря/фрагменты (новое!)
+#### Anchors/Fragments (new!)
 ```php
 $router->url('posts.show', ['id' => 456], [], 'comments');
 // => /posts/456#comments
 ```
 
-#### Полный пример (новое!)
+#### Full Example (new!)
 ```php
 $router->url(
     name: 'posts.show',
@@ -61,66 +68,66 @@ $router->url(
 // => /posts/456?ref=home#comments
 ```
 
-#### Практическое использование
+#### Practical Usage
 ```php
-// Пагинация
+// Pagination
 $prevUrl = $router->url('products.index', [], ['page' => $page - 1]);
 $nextUrl = $router->url('products.index', [], ['page' => $page + 1]);
 
-// Фильтрация
+// Filtering
 $filterUrl = $router->url('products.index', [], [
     'category' => 'electronics',
     'price_min' => 100,
     'price_max' => 500
 ]);
 
-// Навигация по документации с якорями
+// Documentation navigation with anchors
 $docUrl = $router->url('docs.show', ['section' => 'api'], [], 'authentication');
 ```
 
-### 🚀 Кеширование маршрутов
+### 🚀 Route Caching
 
-Кеширование значительно ускоряет обработку запросов, особенно при большом количестве маршрутов.
+Caching significantly speeds up request processing, especially with many routes.
 
-#### Базовое кеширование
+#### Basic Caching
 ```php
 $router = new Router();
 
-// Включаем кеширование
+// Enable caching
 $router->enableCache();
 
-// Настраиваем кеш
+// Configure cache
 $cache = new FileCache('cache/routes', 'app_');
 $router->setCache($cache);
 
-// Настраиваем TTL
-$router->getConfig()->setCacheTtl(3600); // 1 час
+// Configure TTL
+$router->getConfig()->setCacheTtl(3600); // 1 hour
 ```
 
-#### Управление кешем
+#### Cache Management
 ```php
-// Проверяем статус
+// Check status
 if ($router->isCacheEnabled()) {
-    echo "Кеш включен";
+    echo "Cache enabled";
 }
 
-// Очищаем кеш
+// Clear cache
 $router->clearRouteCache();
 
-// Отключаем кеш
+// Disable cache
 $router->disableCache();
 ```
 
-#### Производительность
-- **Без кеша**: ~5-10 мс на запрос
-- **С кешем**: ~0.5-1 мс на запрос (первичное кеширование)
-- **Из кеша**: ~0.1-0.3 мс на запрос
+#### Performance
+- **Without cache**: ~5-10 ms per request
+- **With cache**: ~0.5-1 ms per request (initial caching)
+- **From cache**: ~0.1-0.3 ms per request
 
-### 🎯 Группировка роутов
+### 🎯 Route Grouping
 
-Группировка позволяет объединять маршруты с общими свойствами:
+Grouping allows combining routes with common properties:
 
-#### Простая группировка с префиксом
+#### Simple Grouping with Prefix
 ```php
 $routes->prefix('/api')->group(function($group) {
     $group->get('/users', UserController::class, 'index');     // /api/users
@@ -129,7 +136,7 @@ $routes->prefix('/api')->group(function($group) {
 });
 ```
 
-#### Группировка с middleware
+#### Grouping with Middleware
 ```php
 $routes->middleware([AuthMiddleware::class])
     ->prefix('/admin')
@@ -139,7 +146,7 @@ $routes->middleware([AuthMiddleware::class])
     });
 ```
 
-#### Вложенная группировка
+#### Nested Grouping
 ```php
 $routes->prefix('/api')->group(function($api) {
     $api->prefix('/v1')->group(function($v1) {
@@ -154,7 +161,7 @@ $routes->prefix('/api')->group(function($api) {
 });
 ```
 
-#### Анонимные функции в группах
+#### Anonymous Functions in Groups
 ```php
 $routes->prefix('/blog')->group(function($group) {
     $group->getFunc('/rss', function(): Response {
@@ -163,37 +170,37 @@ $routes->prefix('/blog')->group(function($group) {
 });
 ```
 
-#### Методы группировки
+#### Grouping Methods
 
-**HTTP методы для классов:**
-- `get(route, class, action)` - GET запросы
-- `post(route, class, action)` - POST запросы  
-- `put(route, class, action)` - PUT запросы
-- `delete(route, class, action)` - DELETE запросы
-- `patch(route, class, action)` - PATCH запросы
-- `any(route, class, action)` - Любые HTTP методы
-- `match([methods], route, class, action)` - Указанные методы
+**HTTP methods for classes:**
+- `get(route, class, action)` - GET requests
+- `post(route, class, action)` - POST requests
+- `put(route, class, action)` - PUT requests
+- `delete(route, class, action)` - DELETE requests
+- `patch(route, class, action)` - PATCH requests
+- `any(route, class, action)` - Any HTTP methods
+- `match([methods], route, class, action)` - Specified methods
 
-**HTTP методы для анонимных функций:**
-- `getFunc(route, function)` - GET с функцией
-- `postFunc(route, function)` - POST с функцией
-- `putFunc(route, function)` - PUT с функцией
-- `deleteFunc(route, function)` - DELETE с функцией
-- `anyFunc(route, function)` - Любые методы с функцией
+**HTTP methods for anonymous functions:**
+- `getFunc(route, function)` - GET with function
+- `postFunc(route, function)` - POST with function
+- `putFunc(route, function)` - PUT with function
+- `deleteFunc(route, function)` - DELETE with function
+- `anyFunc(route, function)` - Any methods with function
 
-**Управление группами:**
-- `prefix(string)` - Добавить префикс к маршрутам
-- `middleware(array)` - Применить middleware к группе
-- `group(callable)` - Создать вложенную группу
+**Group management:**
+- `prefix(string)` - Add prefix to routes
+- `middleware(array)` - Apply middleware to group
+- `group(callable)` - Create nested group
 
-## Быстрый старт
+## Quick Start
 
-### 1. Простейший пример
+### 1. Simplest Example
 ```bash
 REQUEST_METHOD="GET" REQUEST_URI="/" php basic-example.php
 ```
 
-### 2. Тестирование групп
+### 2. Testing Groups
 ```bash
 REQUEST_METHOD="GET" REQUEST_URI="/api/v1/users" php simple-groups-example.php
 ```
@@ -203,16 +210,16 @@ REQUEST_METHOD="GET" REQUEST_URI="/api/v1/users" php simple-groups-example.php
 REQUEST_METHOD="GET" REQUEST_URI="/api/users" php rest-api-example.php
 ```
 
-## Концепции
+## Concepts
 
-### 🔄 URL параметры
-Маршруты поддерживают параметры в фигурных скобках: `/users/{id}`, `/posts/{postId}/comments/{commentId}`
+### 🔄 URL Parameters
+Routes support parameters in curly braces: `/users/{id}`, `/posts/{postId}/comments/{commentId}`
 
 ### 🛡️ Middleware
-Middleware обрабатывает запросы до/после контроллеров: аутентификация, логирование, CORS
+Middleware processes requests before/after controllers: authentication, logging, CORS
 
-#### Глобальные middleware (новое в v2.0-alpha!)
-Применяются ко всем маршрутам автоматически:
+#### Global Middleware (new in v2.0-alpha!)
+Applied to all routes automatically:
 ```php
 // Router
 $router->addGlobalMiddleware(CorsMiddleware::class)
@@ -223,72 +230,86 @@ $app = new QuickRouter();
 $app->addMiddleware(CorsMiddleware::class)
     ->addMiddleware(LoggingMiddleware::class);
 
-// Теперь все маршруты будут проходить через эти middleware
+// Now all routes will pass through these middleware
 ```
 
-#### Middleware маршрута
-Применяются к конкретному маршруту:
+#### Route Middleware
+Applied to specific route:
 ```php
 $route->middleware([AuthMiddleware::class]);
 ```
 
-**Порядок выполнения**: глобальные → middleware маршрута → контроллер
+**Execution order**: global → route middleware → controller
 
 ### 📊 Request/Response
-- `Request` объект содержит данные запроса, параметры маршрута, заголовки
-- `Response` объект позволяет создавать JSON, HTML, редиректы с заголовками
+- `Request` object contains request data, route parameters, headers
+- `Response` object allows creating JSON, HTML, redirects with headers
 
-### ⚡ Производительность
-- PHPStan Level 5 - строгая типизация
-- Автоматическая инъекция зависимостей
-- Совместимость с CLI и веб-сервером
+### ⚡ Performance
+- PHPStan Level 5 - strict typing
+- Automatic dependency injection
+- Compatible with CLI and web server
 
-## Тестирование
+## Testing
 
-Все примеры можно тестировать через CLI:
+All examples can be tested via CLI:
 
 ```bash
 cd examples/
 
-# Базовый пример
+# QuickRouter introduction
+php quick-example.php
+
+# Basic example
 REQUEST_METHOD="GET" REQUEST_URI="/" php basic-example.php
 
-# Группировка роутов
+# Route grouping
 REQUEST_METHOD="GET" REQUEST_URI="/api/v2/users/123" php simple-groups-example.php
 
-# URL параметры
+# URL parameters
 REQUEST_METHOD="GET" REQUEST_URI="/users/123/posts/456/comments/789" php url-parameters-example.php
 
-# JSON ответы
+# JSON responses
 REQUEST_METHOD="GET" REQUEST_URI="/api/users" php response-types-example.php
 
 # REST API
 REQUEST_METHOD="POST" REQUEST_URI="/api/users" php rest-api-example.php
 
-# Обработка ошибок
+# Error handling
 REQUEST_METHOD="GET" REQUEST_URI="/errors/validation" php error-handling-example.php
 
-# Кеширование
+# Caching
 REQUEST_METHOD="GET" REQUEST_URI="/user/123/profile/settings" php cache-example.php
 REQUEST_METHOD="GET" REQUEST_URI="/api/users/123" php cache-production-example.php
 
-# Глобальные middleware
+# Global middleware
 php global-middleware-example.php
 
-# Named Routes с query параметрами и якорями
+# Named Routes with query parameters and fragments
 php named-routes-advanced-example.php
+
+# CSRF protection
+php csrf-protection-example.php
+
+# Rate limiting
+php rate-limit-example.php
 ```
 
-## Структура обучения
+## Learning Path
 
-1. **Начните с `basic-example.php`** - изучите основы
-2. **Перейдите к `simple-groups-example.php`** - освойте группировку  
-3. **Изучите `url-parameters-example.php`** - параметры маршрутов
-4. **Попробуйте `response-types-example.php`** - разные типы ответов
-5. **Создайте API с `rest-api-example.php`** - CRUD операции
-6. **Освойте `error-handling-example.php`** - обработку ошибок
-7. **Изучите `groups-example.php`** - сложную группировку
-8. **Изучите `cache-example.php`** - базовое кеширование
-9. **Освойте `cache-production-example.php`** - кеширование для продакшн
+1. **Start with `quick-example.php`** - 5-minute introduction to QuickRouter
+2. **Then `basic-example.php`** - learn the basics
+3. **Move to `simple-groups-example.php`** - master grouping
+4. **Study `url-parameters-example.php`** - route parameters
+5. **Try `response-types-example.php`** - different response types
+6. **Create API with `rest-api-example.php`** - CRUD operations
+7. **Master `error-handling-example.php`** - error handling
+8. **Study `groups-example.php`** - complex grouping
+9. **Learn `cache-example.php`** - basic caching
+10. **Master `cache-production-example.php`** - production caching
+11. **Explore `di-basic-example.php`** - dependency injection
+12. **Try `csrf-protection-example.php`** - CSRF protection
+13. **Study `rate-limit-example.php`** - rate limiting
 
-Каждый пример содержит подробные комментарии и готов для запуска! 
+Each example contains detailed comments and is ready to run! 🚀
+
