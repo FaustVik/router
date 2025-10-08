@@ -1,6 +1,6 @@
 # Актуальные проблемы Router v2.0-alpha (Октябрь 2025)
 
-> **Дата анализа:** 6 октября 2025  
+> **Дата анализа:** 8 октября 2025  
 > **Версия:** v2.0-alpha  
 > **Статус:** Активная разработка
 
@@ -8,469 +8,37 @@
 
 ## 📊 Сводка
 
-| Категория | Критических | Высоких | Средних | Всего |
-|-----------|-------------|---------|---------|-------|
-| Безопасность | ~~2~~ **0** ✅ | 0 | 0 | **0** ✅ |
-| Архитектура | 0 | ~~3~~ **1** | 2 | **3** |
-| Производительность | 0 | 1 | 1 | **2** |
-| Тестирование | 0 | 1 | 0 | **1** |
-| **ИТОГО** | ~~2~~ **0** ✅ | ~~5~~ **3** | **3** | **6** |
-
-**Прогресс:** 
-- ✅ Критические проблемы безопасности **РЕШЕНЫ** (6 октября 2025)
-- ✅ DI в MiddlewareStack **РЕАЛИЗОВАНО** с опциональным контейнером (7 октября 2025)
-- ❌ ErrorHandler **ОТКЛОНЕНО** - Router остается простой библиотекой
+| Категория | Высоких | Средних | Низких | Всего |
+|-----------|---------|---------|--------|-------|
+| Архитектура | 1 | 0 | 0 | **1** |
+| Производительность | 1 | 1 | 0 | **2** |
+| Тестирование | 1 | 0 | 0 | **1** |
+| Функциональность | 0 | 2 | 0 | **2** |
+| **ИТОГО** | **3** | **3** | **0** | **6** |
 
 ---
 
-## ✅ Что уже исправлено (с прошлого анализа)
+## ✅ Что уже исправлено
 
-### 1. ✅ POST/PUT/PATCH/DELETE body теперь обрабатывается
-**Файл:** `src/Http/Request.php`
+### Безопасность ✅
+- ✅ PHP Object Injection через unserialize() - **ИСПРАВЛЕНО** (6 октября 2025)
+- ✅ Path Traversal в FileCache - **ИСПРАВЛЕНО** (6 октября 2025)
 
-Реализована обработка:
-- JSON body через `php://input`
-- `$_POST` данные
-- `$_FILES` загрузка файлов
-- `$_COOKIE` обработка
-- HTTP Method Override через `_method` и `X-HTTP-Method-Override`
+### Функциональность ✅
+- ✅ POST/PUT/PATCH/DELETE body обработка - **РЕАЛИЗОВАНО**
+- ✅ DI контейнер в MiddlewareStack - **РЕАЛИЗОВАНО** (7 октября 2025)
+- ✅ Named Routes и URL Generation - **РЕАЛИЗОВАНО**
+- ✅ Query параметры и якоря в url() - **РЕАЛИЗОВАНО** (8 октября 2025)
+- ✅ Глобальные middleware - **РЕАЛИЗОВАНО** (8 октября 2025)
 
-```php
-public function getBody(): array
-public function input(string $key, mixed $default = null): mixed
-public function file(string $key): ?array
-public function hasFile(string $key): bool
-```
-
-### 2. ✅ Добавлены интерфейсы для Request и Response
-**Файлы:** 
-- `src/interfaces/Http/RequestInterface.php`
-- `src/interfaces/Http/ResponseInterface.php`
-
-Классы теперь реализуют интерфейсы, что улучшает тестируемость.
-
-### 3. ✅ Начато тестирование
-**Директория:** `tests/`
-
-Добавлены тесты для:
-- ✅ `Http/CookieTest.php` - 100% покрытие
-- ✅ `Http/RequestTest.php` - высокое покрытие
-- ✅ `Http/ResponseTest.php` - 100% покрытие
-- ✅ `Middleware/AuthMiddlewareTest.php`
-- ✅ `Middleware/CorsMiddlewareTest.php`
-- ✅ `Middleware/LoggingMiddlewareTest.php`
-- ✅ `Middleware/MiddlewareStackTest.php`
-
-### 4. ✅ Request расширен полезными методами
-Добавлены:
-- `isJson()`, `isAjax()`, `isSecure()`
-- `getClientIp(bool $trustProxy)` - с поддержкой прокси
-- `getPath()`, `getScheme()`, `getHost()`, `getFullUrl()`
-- Cookies методы: `getCookies()`, `getCookie()`, `hasCookie()`
-
-### 5. ✅ DI контейнер в MiddlewareStack (7 октября 2025)
-**Файл:** `src/Middleware/MiddlewareStack.php`
-
-Реализовано:
-- ✅ Опциональный DI контейнер в конструкторе
-- ✅ Автоматическое разрешение middleware с зависимостями
-- ✅ Graceful degradation - работает как с DI, так и без него
-- ✅ Понятные сообщения об ошибках
-- ✅ Обратная совместимость сохранена
-
-Теперь middleware с зависимостями работают через DI:
-```php
-$container->bind(RateLimitMiddleware::class, function($c) {
-    return new RateLimitMiddleware(
-        cache: $c->resolve(CacheInterface::class),
-        maxAttempts: 100
-    );
-});
-
-// ✅ Работает!
-$route->middleware([RateLimitMiddleware::class]);
-```
-
----
-
-## ✅ ИСПРАВЛЕННЫЕ критические проблемы (6 октября 2025)
-
-### 1. ~~PHP Object Injection через unserialize()~~ ✅ ИСПРАВЛЕНО
-
-**Приоритет:** ~~КРИТИЧЕСКИЙ~~ → **РЕШЕНО**  
-**Файл:** `src/Cache/FileCache.php`  
-**Дата исправления:** 6 октября 2025
-
-**Что было:**
-```php
-$data = unserialize($content); // ОПАСНО! RCE уязвимость
-```
-
-**Что исправлено:**
-```php
-// Безопасный JSON вместо unserialize
-$data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-```
-
-**Дополнительные улучшения:**
-- ✅ Валидация структуры данных после десериализации
-- ✅ Обработка JsonException с удалением поврежденных файлов
-- ✅ Документация методов с PHPDoc
-
----
-
-## 🔴 КРИТИЧЕСКИЕ проблемы (актуальные)
-
-**Атака:**
-Если злоумышленник получит доступ к файлам кеша (например, через misconfiguration, LFI, или другую уязвимость), он может:
-1. Создать вредоносный сериализованный объект
-2. Внедрить его в файл кеша
-3. При десериализации выполнится произвольный код
-
-**Реальные CVE:**
-- CVE-2019-19935 (WordPress)
-- CVE-2020-36193 (Phar)
-- CVE-2021-21315 (System Commander)
-
-**Решение 1 (Быстрое, минимальные изменения):**
-```php
-// src/Cache/FileCache.php
-$data = unserialize($content, ['allowed_classes' => false]);
-```
-
-**Решение 2 (Рекомендуемое - переход на JSON):**
-```php
-// В FileCache.php заменить serialize/unserialize на JSON
-
-public function get(string $key): mixed
-{
-    // ...
-    try {
-        $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-    } catch (\JsonException $e) {
-        $this->delete($key);
-        return null;
-    }
-    // ...
-}
-
-public function set(string $key, mixed $value, int $ttl = 0): bool
-{
-    // ...
-    try {
-        $serialized = json_encode($data, JSON_THROW_ON_ERROR);
-    } catch (\JsonException $e) {
-        return false;
-    }
-    
-    return file_put_contents($filename, $serialized, LOCK_EX) !== false;
-}
-```
-
-**Решение 3 (Максимальная безопасность - с HMAC):**
-```php
-// Добавить HMAC проверку целостности
-private string $secretKey;
-
-public function __construct(string $cacheDir = 'cache', string $prefix = 'router_', ?string $secretKey = null)
-{
-    $this->secretKey = $secretKey ?? bin2hex(random_bytes(32));
-    // ...
-}
-
-public function set(string $key, mixed $value, int $ttl = 0): bool
-{
-    $data = [
-        'value' => $value,
-        'ttl' => $ttl > 0 ? time() + $ttl : 0,
-        'created' => time()
-    ];
-    
-    $serialized = json_encode($data, JSON_THROW_ON_ERROR);
-    $hash = hash_hmac('sha256', $serialized, $this->secretKey);
-    
-    $content = json_encode([
-        'data' => $serialized,
-        'hash' => $hash
-    ], JSON_THROW_ON_ERROR);
-    
-    return file_put_contents($filename, $content, LOCK_EX) !== false;
-}
-
-public function get(string $key): mixed
-{
-    // ...
-    $envelope = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-    
-    $expectedHash = hash_hmac('sha256', $envelope['data'], $this->secretKey);
-    if (!hash_equals($expectedHash, $envelope['hash'])) {
-        $this->delete($key);
-        return null; // Tampering detected!
-    }
-    
-    $data = json_decode($envelope['data'], true, 512, JSON_THROW_ON_ERROR);
-    // ...
-}
-```
-
----
-
-### 2. ~~Path Traversal в FileCache~~ ✅ ИСПРАВЛЕНО
-
-**Приоритет:** ~~КРИТИЧЕСКИЙ~~ → **РЕШЕНО**  
-**Файл:** `src/Cache/FileCache.php`  
-**Дата исправления:** 6 октября 2025
-
-**Что было:**
-```php
-public function __construct(string $cacheDir = 'cache', string $prefix = 'router_')
-{
-    $this->cacheDir = rtrim($cacheDir, '/'); // Нет валидации!
-    
-    if (!is_dir($this->cacheDir)) {
-        mkdir($this->cacheDir, 0755, true); // Может создать где угодно
-    }
-}
-```
-
-**Что исправлено:**
-```php
-public function __construct(string $cacheDir = 'cache', string $prefix = 'router_')
-{
-    // Валидация и нормализация пути
-    $this->cacheDir = $this->validateAndNormalizePath($cacheDir);
-    
-    // Проверка прав записи
-    if (!is_writable($this->cacheDir)) {
-        throw new RuntimeException("Cache directory is not writable");
-    }
-    
-    // Автоматическая защита директории
-    $this->protectCacheDirectory();
-}
-
-private function validateAndNormalizePath(string $cacheDir): string
-{
-    // Проверка на path traversal
-    if (strpos($cacheDir, '..') !== false) {
-        throw new InvalidArgumentException('Path traversal detected');
-    }
-    
-    // Получение абсолютного пути
-    // ... безопасная логика ...
-}
-```
-
-**Дополнительные улучшения:**
-- ✅ Валидация пути с проверкой на `..`
-- ✅ Проверка прав записи при инициализации
-- ✅ Автоматическое создание `.htaccess` (Deny from all)
-- ✅ Автоматическое создание `.gitignore`
-- ✅ Автоматическое создание `index.php` с 403 ошибкой
-- ✅ Выброс исключений при ошибках вместо silent fail
-
-**Решение:**
-```php
-public function __construct(string $cacheDir = 'cache', string $prefix = 'router_')
-{
-    // Получаем абсолютный путь
-    $absolutePath = realpath($cacheDir);
-    
-    // Если директория не существует, пытаемся создать
-    if ($absolutePath === false) {
-        $absolutePath = $cacheDir;
-    }
-    
-    // Проверка на path traversal
-    if (strpos($absolutePath, '..') !== false) {
-        throw new \InvalidArgumentException('Invalid cache directory: path traversal detected');
-    }
-    
-    // Проверка что путь внутри проекта (опционально, но рекомендуется)
-    $projectRoot = dirname(__DIR__, 2); // Корень проекта
-    if (strpos(realpath($absolutePath) ?: $absolutePath, $projectRoot) !== 0) {
-        throw new \InvalidArgumentException('Cache directory must be within project root');
-    }
-    
-    $this->cacheDir = rtrim($absolutePath, '/');
-    $this->prefix = $prefix;
-    
-    // Создаем директорию если не существует
-    if (!is_dir($this->cacheDir)) {
-        if (!@mkdir($this->cacheDir, 0755, true)) {
-            throw new \RuntimeException("Cannot create cache directory: {$this->cacheDir}");
-        }
-    }
-    
-    // Проверка прав записи
-    if (!is_writable($this->cacheDir)) {
-        throw new \RuntimeException("Cache directory is not writable: {$this->cacheDir}");
-    }
-    
-    // Создаем .gitignore и .htaccess для защиты
-    $this->protectCacheDirectory();
-}
-
-private function protectCacheDirectory(): void
-{
-    // Добавляем .gitignore
-    $gitignore = $this->cacheDir . '/.gitignore';
-    if (!file_exists($gitignore)) {
-        file_put_contents($gitignore, "*\n!.gitignore\n");
-    }
-    
-    // Добавляем .htaccess для Apache (запрет доступа через web)
-    $htaccess = $this->cacheDir . '/.htaccess';
-    if (!file_exists($htaccess)) {
-        file_put_contents($htaccess, "Deny from all\n");
-    }
-}
-```
+### Производительность ✅
+- ✅ Оптимизация parse() через parse_url() - **РЕАЛИЗОВАНО** (8 октября 2025)
 
 ---
 
 ## 🟠 ВЫСОКИЕ проблемы
 
-### 3. ~~Централизованная обработка ошибок~~ (ОТКЛОНЕНО)
-
-**Статус:** ❌ НЕ БУДЕТ РЕАЛИЗОВАНО  
-**Причина:** Усложнение библиотеки
-
-**Решение:** Router - это библиотека для маршрутизации, не фреймворк. 
-- ✅ Router выбрасывает понятные исключения (NoMatch, NotAllowedHttpMethod и др.)
-- ✅ Приложение само решает как их обрабатывать (через try-catch, middleware, или обработчик уровня приложения)
-- ✅ Это дает максимальную гибкость разработчику
-
-**Примеры обработки в приложении:**
-```php
-// Вариант 1: В index.php
-try {
-    $router->run();
-} catch (NoMatch $e) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Not found']);
-}
-
-// Вариант 2: Через middleware приложения
-class ErrorHandlerMiddleware {
-    public function handle($request, $next) {
-        try {
-            return $next($request);
-        } catch (\Throwable $e) {
-            return Response::json(['error' => $e->getMessage()], 500);
-        }
-    }
-}
-```
-
----
-
-### 4. ~~MiddlewareStack не использует DI контейнер~~ ✅ ИСПРАВЛЕНО
-
-**Приоритет:** ~~ВЫСОКИЙ~~ → **РЕШЕНО**  
-**Файл:** `src/Middleware/MiddlewareStack.php`  
-**Дата исправления:** 7 октября 2025
-
-**Что было:**
-```php
-public function addFromArray(array $middleware): self
-{
-    foreach ($middleware as $item) {
-        if (is_string($item) && class_exists($item)) {
-            $item = new $item(); // ❌ Прямая инстанциация БЕЗ DI!
-        }
-        // ...
-    }
-}
-```
-
-Middleware с зависимостями в конструкторе не работали:
-```php
-class RateLimitMiddleware implements MiddlewareInterface
-{
-    public function __construct(
-        private CacheInterface $cache,  // ❌ ArgumentCountError!
-        private int $maxAttempts = 60
-    ) {}
-}
-
-$route->middleware([RateLimitMiddleware::class]); // ❌ Падает!
-```
-
-**Что исправлено:**
-
-1. **DI контейнер теперь опциональный** - библиотека остается простой для новичков:
-   ```php
-   public function __construct(
-       callable $finalHandler, 
-       ?RouterContainerInterface $container = null  // ✅ Опциональный!
-   )
-   ```
-
-2. **Graceful degradation** - работает как с DI, так и без него:
-   - Простые middleware без зависимостей → создаются напрямую
-   - Сложные middleware с зависимостями → разрешаются через DI контейнер
-
-3. **Понятные сообщения об ошибках** - если middleware требует зависимости, но DI нет:
-   ```
-   Middleware RateLimitMiddleware requires constructor dependencies, 
-   but no DI container is available. Either register it in the DI 
-   container or pass an instance instead of class name.
-   ```
-
-**Использование для новичков (без DI):**
-```php
-// Простой middleware без зависимостей - работает "из коробки"
-class SimpleAuthMiddleware implements MiddlewareInterface
-{
-    public function handle(Request $request, callable $next): Response
-    {
-        if (!isset($_SESSION['user'])) {
-            return Response::json(['error' => 'Unauthorized'], 401);
-        }
-        return $next($request);
-    }
-}
-
-// ✅ Работает без DI контейнера
-$route->middleware([SimpleAuthMiddleware::class]);
-```
-
-**Использование для опытных разработчиков (с DI):**
-```php
-// Middleware с зависимостями
-class RateLimitMiddleware implements MiddlewareInterface
-{
-    public function __construct(
-        private CacheInterface $cache,
-        private int $maxAttempts = 60
-    ) {}
-}
-
-// Регистрируем в DI
-$container->bind(RateLimitMiddleware::class, function($c) {
-    return new RateLimitMiddleware(
-        cache: $c->resolve(CacheInterface::class),
-        maxAttempts: 100
-    );
-});
-
-// ✅ Работает через DI!
-$route->middleware([RateLimitMiddleware::class]);
-```
-
-**Изменения в коде:**
-- ✅ `MiddlewareStack::__construct()` принимает опциональный `$container`
-- ✅ Добавлен метод `resolveMiddleware()` с умной логикой разрешения
-- ✅ `Router::run()` передает контейнер в `MiddlewareStack`
-- ✅ Детальная обработка ошибок с понятными сообщениями
-- ✅ Обратная совместимость сохранена (опциональный параметр)
-
-**См. пример:** `examples/middleware-di-example.php`
-
----
-
-### 5. Отсутствие PSR-7/PSR-15 совместимости
+### 1. PSR-7/PSR-15 совместимость
 
 **Приоритет:** ВЫСОКИЙ  
 **Сложность:** Высокая  
@@ -484,125 +52,26 @@ $route->middleware([RateLimitMiddleware::class]);
 
 **Последствия:**
 - Невозможна интеграция с PSR экосистемой
-- Не работает с популярными библиотеками (Guzzle, Slim, др.)
+- Не работает с популярными библиотеками (Guzzle, Slim, и др.)
 - Разработчики должны изучать кастомный API
 
-**Решение (поэтапное):**
+**Решение:**
+Создать адаптеры (Wrapper Pattern) для совместимости:
 
-**Шаг 1: Установить PSR пакеты**
 ```bash
 composer require psr/http-message psr/http-server-handler psr/http-server-middleware
-composer require nyholm/psr7 # Реализация PSR-7
-composer require nyholm/psr7-server # ServerRequest фабрика
+composer require nyholm/psr7
+composer require nyholm/psr7-server
 ```
 
-**Шаг 2: Создать адаптеры (Wrapper Pattern)**
-```php
-// src/Http/Psr7/ServerRequestAdapter.php
-<?php
-
-namespace FaustVik\Router\Http\Psr7;
-
-use FaustVik\Router\Http\Request;
-use Psr\Http\Message\ServerRequestInterface;
-
-/**
- * Адаптер для преобразования Request в PSR-7 ServerRequest
- */
-final class ServerRequestAdapter
-{
-    public static function toPsr7(Request $request): ServerRequestInterface
-    {
-        return \Nyholm\Psr7\ServerRequest::fromGlobals()
-            ->withUri(new \Nyholm\Psr7\Uri($request->getUri()))
-            ->withMethod($request->getMethod())
-            ->withQueryParams($request->getQuery())
-            ->withParsedBody($request->getBody())
-            ->withUploadedFiles($request->getFiles());
-    }
-    
-    public static function fromPsr7(ServerRequestInterface $psrRequest): Request
-    {
-        $request = new Request(
-            method: $psrRequest->getMethod(),
-            uri: (string)$psrRequest->getUri(),
-            params: [],
-            query: $psrRequest->getQueryParams(),
-            headers: $psrRequest->getHeaders(),
-            server: $psrRequest->getServerParams()
-        );
-        
-        // Копируем body
-        $body = $psrRequest->getParsedBody();
-        if (is_array($body)) {
-            // Используем рефлексию для установки приватного поля
-            $reflection = new \ReflectionClass($request);
-            $bodyProperty = $reflection->getProperty('body');
-            $bodyProperty->setAccessible(true);
-            $bodyProperty->setValue($request, $body);
-        }
-        
-        return $request;
-    }
-}
-```
-
-**Шаг 3: PSR-15 Middleware адаптер**
-```php
-// src/Middleware/Psr15MiddlewareAdapter.php
-<?php
-
-namespace FaustVik\Router\Middleware;
-
-use FaustVik\Router\Http\Request;
-use FaustVik\Router\Http\Response;
-use FaustVik\Router\Http\Psr7\ServerRequestAdapter;
-use FaustVik\Router\Http\Psr7\ResponseAdapter;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
-use Psr\Http\Server\MiddlewareInterface as Psr15MiddlewareInterface;
-
-/**
- * Адаптер для использования PSR-15 middleware в Router
- */
-final class Psr15MiddlewareAdapter implements MiddlewareInterface
-{
-    public function __construct(private Psr15MiddlewareInterface $psr15Middleware) {}
-    
-    public function handle(Request $request, callable $next): Response
-    {
-        $psrRequest = ServerRequestAdapter::toPsr7($request);
-        
-        $psrHandler = new class($next) implements \Psr\Http\Server\RequestHandlerInterface {
-            public function __construct(private $next) {}
-            
-            public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
-            {
-                $request = ServerRequestAdapter::fromPsr7($request);
-                $response = ($this->next)($request);
-                return ResponseAdapter::toPsr7($response);
-            }
-        };
-        
-        $psrResponse = $this->psr15Middleware->process($psrRequest, $psrHandler);
-        
-        return ResponseAdapter::fromPsr7($psrResponse);
-    }
-}
-```
-
-**Использование:**
-```php
-use Some\Psr15\Middleware as ExternalMiddleware;
-use FaustVik\Router\Middleware\Psr15MiddlewareAdapter;
-
-$route->middleware([
-    new Psr15MiddlewareAdapter(new ExternalMiddleware())
-]);
-```
+**Файлы для создания:**
+- `src/Http/Psr7/ServerRequestAdapter.php` - адаптер Request → PSR-7
+- `src/Http/Psr7/ResponseAdapter.php` - адаптер Response → PSR-7
+- `src/Middleware/Psr15MiddlewareAdapter.php` - адаптер для PSR-15 middleware
 
 ---
 
-### 6. Отсутствие тестов для Router и компонентов
+### 2. Отсутствие тестов для Router и компонентов
 
 **Приоритет:** ВЫСОКИЙ  
 **Покрытие:** ~40% (только Http и Middleware)
@@ -614,55 +83,42 @@ $route->middleware([
 - ❌ `src/Router/Components/Runner.php`
 - ❌ `src/Router/Components/CheckerHttpMethod.php`
 - ❌ `src/Router/Components/Config.php`
-- ❌ `src/Route/Route.php`
-- ❌ `src/Route/RouteGroup.php`
-- ❌ `src/Route/RoutesCollection.php`
 - ❌ `src/Cache/FileCache.php`
 - ❌ `src/DI/DefaultContainer.php`
 
 **План тестирования:**
 ```php
 // tests/Router/RouterTest.php
-final class RouterTest extends TestCase
-{
-    public function testRouterMatchesSimpleRoute(): void
-    public function testRouterMatchesParametrizedRoute(): void
-    public function testRouterThrowsNoMatchException(): void
-    public function testRouterExecutesMiddleware(): void
-    public function testRouterInjectsDependencies(): void
-    public function testRouterHandlesCaching(): void
-}
+- testRouterMatchesSimpleRoute()
+- testRouterMatchesParametrizedRoute()
+- testRouterThrowsNoMatchException()
+- testRouterExecutesMiddleware()
+- testRouterExecutesGlobalMiddleware()
+- testRouterInjectsDependencies()
+- testRouterHandlesCaching()
+- testUrlGenerationWithQueryAndFragment()
 
-// tests/Router/Components/MatchingTest.php
-final class MatchingTest extends TestCase
-{
-    public function testMatchExactRoute(): void
-    public function testMatchWithParameters(): void
-    public function testMatchWithAlias(): void
-    public function testThrowsNoMatchForInvalidRoute(): void
-    public function testMatchesMultipleParameters(): void
-}
+// tests/Router/QuickRouterTest.php
+- testQuickRouterBasicRoutes()
+- testQuickRouterGlobalMiddleware()
+- testQuickRouterPrefix()
 
 // tests/Cache/FileCacheTest.php
-final class FileCacheTest extends TestCase
-{
-    public function testSetAndGet(): void
-    public function testTtlExpiration(): void
-    public function testClear(): void
-    public function testDeleteMultiple(): void
-    public function testPathTraversalProtection(): void // Важный тест безопасности!
-}
+- testSetAndGet()
+- testTtlExpiration()
+- testClear()
+- testDeleteMultiple()
+- testPathTraversalProtection() // Важный тест безопасности!
+- testJsonSerialization()
 ```
 
 **Цель:** 80%+ покрытие кода тестами
 
 ---
 
-## 🟡 СРЕДНИЕ проблемы
+### 3. Неэффективный алгоритм матчинга O(n)
 
-### 7. Неэффективный алгоритм матчинга O(n)
-
-**Приоритет:** СРЕДНИЙ  
+**Приоритет:** ВЫСОКИЙ  
 **Файл:** `src/Router/Components/matching/Matching.php`
 
 **Проблема:**
@@ -670,16 +126,8 @@ final class FileCacheTest extends TestCase
 public function match(string $uri, RoutesCollectionInterface $collections): MatchResult
 {
     foreach ($collections->get() as $route) { // O(n) - линейный поиск
-        if ($uri === $route->getRoute() || $uri === $route->alias()) {
-            return new MatchResult($route, []);
-        }
-        
-        $matchResult = $this->matchWithParameters($uri, $route);
-        if ($matchResult !== null) {
-            return $matchResult;
-        }
+        // ...проверка каждого маршрута
     }
-    // ...
 }
 ```
 
@@ -692,20 +140,18 @@ public function match(string $uri, RoutesCollectionInterface $collections): Matc
 **Для сравнения (FastRoute):**
 - Любое количество маршрутов: ~0.01ms ✅
 
-**Решение 1: Radix Tree (как FastRoute)**
+**Решение:** Radix Tree или улучшенное индексирование
+
 ```php
 // src/Router/Components/matching/RadixMatcher.php
 final class RadixMatcher implements MatchingRouteInterface
 {
-    private array $staticRoutes = [];     // Точные совпадения
-    private array $dynamicRoutes = [];    // С параметрами
+    private array $staticRoutes = [];     // Точные совпадения O(1)
     private array $routeTree = [];        // Дерево по первому сегменту
     
     public function buildIndex(RoutesCollectionInterface $collections): void
     {
         foreach ($collections->get() as $route) {
-            $routePattern = $route->getRoute();
-            
             // Статические маршруты в хеш-таблицу
             if (strpos($routePattern, '{') === false) {
                 $this->staticRoutes[$routePattern] = $route;
@@ -715,42 +161,24 @@ final class RadixMatcher implements MatchingRouteInterface
             // Динамические маршруты группируем по первому сегменту
             $segments = explode('/', trim($routePattern, '/'));
             $firstSegment = $segments[0] ?? '/';
-            
-            if (!isset($this->routeTree[$firstSegment])) {
-                $this->routeTree[$firstSegment] = [];
-            }
-            
             $this->routeTree[$firstSegment][] = $route;
-            $this->dynamicRoutes[] = $route;
         }
     }
     
     public function match(string $uri, RoutesCollectionInterface $collections): MatchResult
     {
-        // 1. Сначала проверяем статические маршруты O(1)
+        // 1. Статические маршруты O(1)
         if (isset($this->staticRoutes[$uri])) {
             return new MatchResult($this->staticRoutes[$uri], []);
         }
         
-        // 2. Ищем по дереву сегментов
+        // 2. Поиск по дереву сегментов
         $segments = explode('/', trim($uri, '/'));
         $firstSegment = $segments[0] ?? '/';
         
-        // Проверяем только кандидатов с подходящим первым сегментом
         if (isset($this->routeTree[$firstSegment])) {
             foreach ($this->routeTree[$firstSegment] as $route) {
-                $matchResult = $this->matchWithParameters($uri, $route);
-                if ($matchResult !== null) {
-                    return $matchResult;
-                }
-            }
-        }
-        
-        // 3. Fallback - проверяем все динамические маршруты
-        foreach ($this->dynamicRoutes as $route) {
-            $matchResult = $this->matchWithParameters($uri, $route);
-            if ($matchResult !== null) {
-                return $matchResult;
+                // Проверяем только подходящие кандидаты
             }
         }
         
@@ -759,64 +187,27 @@ final class RadixMatcher implements MatchingRouteInterface
 }
 ```
 
-**Результаты после оптимизации:**
+**Ожидаемые результаты:**
 - 10 маршрутов: ~0.05ms (2x быстрее)
 - 100 маршрутов: ~0.2ms (5x быстрее)
 - 1000 маршрутов: ~1ms (10x быстрее)
 - 10000 маршрутов: ~5ms (20x быстрее)
 
-**Решение 2: Использовать кеширование**
-Текущий кеш уже помогает, но можно улучшить:
-```php
-// src/Cache/CachedMatching.php - уже существует, но нужно улучшить
-public function match(string $uri, RoutesCollectionInterface $collections): MatchResult
-{
-    $cacheKey = 'route_match_' . md5($uri);
-    
-    // Проверяем кеш
-    if ($this->cache->has($cacheKey)) {
-        $cached = $this->cache->get($cacheKey);
-        if ($cached && isset($cached['route'], $cached['params'])) {
-            return new MatchResult($cached['route'], $cached['params']);
-        }
-    }
-    
-    // Делаем обычный match
-    $result = $this->matcher->match($uri, $collections);
-    
-    // Кешируем результат
-    $this->cache->set($cacheKey, [
-        'route' => $result->getRoute(),
-        'params' => $result->getParameters()
-    ], 3600); // 1 час
-    
-    return $result;
-}
-```
-
 ---
 
-### 8. Отсутствие rate limiting и CSRF защиты
+## 🟡 СРЕДНИЕ проблемы
+
+### 4. Отсутствие rate limiting и CSRF защиты
 
 **Приоритет:** СРЕДНИЙ (но КРИТИЧЕСКИЙ для production)
 
 **Отсутствуют:**
 - ❌ Rate Limiting middleware
 - ❌ CSRF Protection middleware
-- ❌ IP Whitelist/Blacklist middleware
 
 **Решение - Rate Limiting:**
 ```php
 // src/Middleware/RateLimitMiddleware.php
-<?php
-
-namespace FaustVik\Router\Middleware;
-
-use FaustVik\Router\Http\Request;
-use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
-
 final class RateLimitMiddleware implements MiddlewareInterface
 {
     public function __construct(
@@ -844,7 +235,6 @@ final class RateLimitMiddleware implements MiddlewareInterface
         
         $response = $next($request);
         
-        // Добавляем заголовки с информацией о лимите
         return $response
             ->withHeader('X-RateLimit-Limit', (string)$this->maxAttempts)
             ->withHeader('X-RateLimit-Remaining', (string)($this->maxAttempts - $attempts - 1));
@@ -854,43 +244,14 @@ final class RateLimitMiddleware implements MiddlewareInterface
     {
         $ip = $request->getClientIp();
         $path = $request->getPath();
-        
         return 'rate_limit:' . sha1($ip . '|' . $path);
     }
 }
 ```
 
-**Использование:**
-```php
-use FaustVik\Router\Middleware\RateLimitMiddleware;
-
-$router->bind(RateLimitMiddleware::class, function($container) {
-    return new RateLimitMiddleware(
-        cache: $container->resolve(CacheInterface::class),
-        maxAttempts: 100,
-        decayMinutes: 1
-    );
-});
-
-// Глобально для всех маршрутов
-$router->prefix('/api', function($r) {
-    // 100 запросов в минуту
-    $r->get('/users', [UserController::class, 'index'])
-      ->middleware([RateLimitMiddleware::class]);
-});
-```
-
 **Решение - CSRF Protection:**
 ```php
 // src/Middleware/CsrfMiddleware.php
-<?php
-
-namespace FaustVik\Router\Middleware;
-
-use FaustVik\Router\Http\Request;
-use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
-
 final class CsrfMiddleware implements MiddlewareInterface
 {
     private const TOKEN_LENGTH = 32;
@@ -898,14 +259,13 @@ final class CsrfMiddleware implements MiddlewareInterface
     
     public function handle(Request $request, callable $next): Response
     {
-        // Запускаем сессию если не запущена
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
         // Генерируем токен если его нет
         if (!isset($_SESSION[self::SESSION_KEY])) {
-            $_SESSION[self::SESSION_KEY] = $this->generateToken();
+            $_SESSION[self::SESSION_KEY] = bin2hex(random_bytes(self::TOKEN_LENGTH));
         }
         
         // Проверяем токен для изменяющих методов
@@ -914,31 +274,19 @@ final class CsrfMiddleware implements MiddlewareInterface
                 ?? $request->getHeader('X-CSRF-Token');
             
             if (!$this->validateToken($token)) {
-                return Response::json([
-                    'error' => 'CSRF token mismatch'
-                ], 419);
+                return Response::json(['error' => 'CSRF token mismatch'], 419);
             }
         }
         
-        // Добавляем токен в атрибуты запроса
-        $request = $request->withAttribute('csrf_token', $_SESSION[self::SESSION_KEY]);
-        
         return $next($request);
-    }
-    
-    private function generateToken(): string
-    {
-        return bin2hex(random_bytes(self::TOKEN_LENGTH));
     }
     
     private function validateToken(?string $token): bool
     {
         $sessionToken = $_SESSION[self::SESSION_KEY] ?? null;
-        
         if (!$token || !$sessionToken) {
             return false;
         }
-        
         return hash_equals($sessionToken, $token);
     }
     
@@ -947,7 +295,6 @@ final class CsrfMiddleware implements MiddlewareInterface
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
         return $_SESSION[self::SESSION_KEY] ?? '';
     }
 }
@@ -955,145 +302,7 @@ final class CsrfMiddleware implements MiddlewareInterface
 
 ---
 
-### 9. Named Routes и URL Generation
-
-**Приоритет:** СРЕДНИЙ  
-**Сложность:** Средняя
-
-**Отсутствует:**
-- Именование маршрутов
-- Генерация URL по имени маршрута
-- Опциональные параметры
-- Regex constraints для параметров
-
-**Примеры чего хочется:**
-```php
-// 1. Named routes
-Route::create('/users/{id}', UserController::class, 'show')
-    ->name('users.show');
-
-// 2. URL generation
-$url = $router->url('users.show', ['id' => 123]); 
-// => /users/123
-
-// 3. Optional parameters
-Route::create('/posts/{id?}', PostController::class, 'index');
-// GET /posts -> index all
-// GET /posts/123 -> show one
-
-// 4. Regex constraints
-Route::create('/users/{id:\d+}', UserController::class, 'show');
-Route::create('/files/{path:.*}', FileController::class, 'show');
-```
-
-**Решение:**
-```php
-// src/Route/Route.php - добавить поля
-private ?string $name = null;
-private array $constraints = [];
-
-public function name(string $name): self
-{
-    $this->name = $name;
-    return $this;
-}
-
-public function getName(): ?string
-{
-    return $this->name;
-}
-
-public function where(string $param, string $pattern): self
-{
-    $this->constraints[$param] = $pattern;
-    return $this;
-}
-
-public function getConstraints(): array
-{
-    return $this->constraints;
-}
-```
-
-```php
-// src/Router/Router.php - добавить
-private array $namedRoutes = [];
-
-public function setCollection(RoutesCollectionInterface $collections): self
-{
-    $this->collections = $collections;
-    
-    // Индексируем именованные маршруты
-    foreach ($collections->get() as $route) {
-        if ($route->getName()) {
-            $this->namedRoutes[$route->getName()] = $route;
-        }
-    }
-    
-    return $this;
-}
-
-public function url(string $name, array $params = []): string
-{
-    if (!isset($this->namedRoutes[$name])) {
-        throw new \InvalidArgumentException("Route '{$name}' not found");
-    }
-    
-    $route = $this->namedRoutes[$name];
-    $uri = $route->getRoute();
-    
-    // Заменяем параметры
-    foreach ($params as $key => $value) {
-        $uri = preg_replace(
-            '/\{' . preg_quote($key) . '(:.*?)?\?\}|\{' . preg_quote($key) . '(:.*?)?\}/',
-            $value,
-            $uri
-        );
-    }
-    
-    // Удаляем опциональные параметры которые не были заполнены
-    $uri = preg_replace('/\{[^}]+\?\}/', '', $uri);
-    
-    // Проверяем что все обязательные параметры заполнены
-    if (preg_match('/\{([^}?]+)\}/', $uri, $matches)) {
-        throw new \InvalidArgumentException(
-            "Missing required parameter '{$matches[1]}' for route '{$name}'"
-        );
-    }
-    
-    return $uri;
-}
-
-public function has(string $name): bool
-{
-    return isset($this->namedRoutes[$name]);
-}
-```
-
-**Использование:**
-```php
-// Определение маршрутов
-Route::create('/users/{id:\d+}', UserController::class, 'show')
-    ->name('users.show')
-    ->where('id', '\d+');
-
-Route::create('/posts/{id?}', PostController::class, 'index')
-    ->name('posts.index');
-
-// Генерация URL
-$userUrl = $router->url('users.show', ['id' => 123]);
-// => /users/123
-
-$postsUrl = $router->url('posts.index');
-// => /posts
-
-$postUrl = $router->url('posts.index', ['id' => 456]);
-// => /posts/456
-```
-
----
-
-### 10. Недостаточное логирование
+### 5. Недостаточное логирование
 
 **Приоритет:** СРЕДНИЙ  
 
@@ -1142,7 +351,6 @@ final class LoggingMiddleware implements MiddlewareInterface
             
             $duration = (microtime(true) - $startTime) * 1000;
             
-            // Логируем успешный ответ
             $this->logger->info('Request completed', [
                 'request_id' => $requestId,
                 'status' => $response->getStatusCode(),
@@ -1154,7 +362,6 @@ final class LoggingMiddleware implements MiddlewareInterface
         } catch (\Throwable $e) {
             $duration = (microtime(true) - $startTime) * 1000;
             
-            // Логируем ошибку
             $this->logger->error('Request failed', [
                 'request_id' => $requestId,
                 'exception' => get_class($e),
@@ -1170,44 +377,118 @@ final class LoggingMiddleware implements MiddlewareInterface
 }
 ```
 
-**Использование с Monolog:**
+---
+
+### 6. Метод handle() для тестирования
+
+**Приоритет:** СРЕДНИЙ  
+**Сложность:** Низкая  
+**Время:** 1 час
+
+**Проблема:**
+Метод `run()` сразу отправляет ответ через `$response->send()`, что затрудняет тестирование.
+
+**Решение:**
 ```php
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Formatter\JsonFormatter;
+// src/Router/Router.php
 
-$logger = new Logger('router');
-$handler = new RotatingFileHandler('logs/router.log', 30); // 30 дней ротации
-$handler->setFormatter(new JsonFormatter());
-$logger->pushHandler($handler);
+/**
+ * Обрабатывает Request и возвращает Response без отправки
+ * 
+ * Полезно для тестирования и создания своих HTTP серверов
+ * 
+ * @param Request $request Входящий запрос
+ * @return Response Ответ
+ */
+public function handle(Request $request): Response
+{
+    // Устанавливаем URI из Request
+    $this->setUri($request->getUri());
+    $this->parse();
+    
+    // Находим маршрут
+    $matchResult = $this->match();
+    $route = $matchResult->getRoute();
+    
+    // Объединяем параметры
+    $urlParams = $matchResult->getParameters();
+    $allParams = array_merge($request->getQuery(), $urlParams);
+    
+    // Проверяем HTTP метод
+    $this->check($route);
+    
+    // Создаем финальный обработчик
+    $finalHandler = function (Request $req) use ($route, $allParams): Response {
+        ob_start();
+        $this->getConfig()->getRunner()->run($route, $allParams, $req);
+        $content = ob_get_clean();
+        return new Response($content ?: '');
+    };
+    
+    // Создаем и выполняем middleware stack
+    $middlewareStack = new MiddlewareStack($finalHandler, $this->container);
+    $middlewareStack->addFromArray($this->globalMiddleware);
+    $middlewareStack->addFromArray($route->getMiddleware());
+    
+    return $middlewareStack->execute($request);
+}
 
-$router = new Router();
-// Используем метод middleware() для глобального применения
-$globalMiddleware = new LoggingMiddleware($logger);
+/**
+ * Обновленный метод run() - теперь использует handle()
+ */
+public function run(): void
+{
+    $this->parse();
+    $matchResult = $this->match();
+    $route = $matchResult->getRoute();
+    
+    $urlParams = $matchResult->getParameters();
+    $allParams = array_merge($this->params ?? [], $urlParams);
+    
+    $this->check($route);
+    
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $headers = function_exists('getallheaders') ? getallheaders() : [];
+    $server = $_SERVER;
+    
+    $request = new Request($method, $this->uri, $allParams, $this->params ?? [], $headers, $server);
+    
+    $response = $this->handle($request);
+    $response->send();
+}
+```
+
+**Использование в тестах:**
+```php
+// tests/Router/RouterTest.php
+public function testHandleReturnsResponse(): void
+{
+    $router = new Router();
+    // ... настройка маршрутов ...
+    
+    $request = new Request('GET', '/users/123', [], [], [], []);
+    $response = $router->handle($request);
+    
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertStringContainsString('User 123', $response->getContent());
+}
 ```
 
 ---
 
 ## 📝 Рекомендации по приоритизации
 
-### Немедленно (эта неделя):
-1. ✅ **Issue #1:** Заменить `unserialize` на `json_encode/json_decode` в FileCache
-2. ✅ **Issue #2:** Добавить валидацию пути и защиту в FileCache
-3. ✅ **Issue #3:** Добавить ErrorHandler в Router
+### Срочно (1-2 недели):
+1. ❌ **Issue #2:** Написать тесты для Router и компонентов (покрытие 80%+)
+2. ❌ **Issue #6:** Добавить метод `handle()` для тестирования
 
-### Краткосрочно (1-2 недели):
-4. ✅ **Issue #4:** ~~Исправить DI в MiddlewareStack~~ **ВЫПОЛНЕНО** (7 октября 2025)
-5. ❌ **Issue #6:** Написать тесты для Router и компонентов (покрытие 60%+)
+### Краткосрочно (2-4 недели):
+3. ❌ **Issue #3:** Оптимизировать Matching (Radix Tree)
+4. ❌ **Issue #4:** Добавить RateLimitMiddleware и CsrfMiddleware
+5. ❌ **Issue #5:** Улучшить LoggingMiddleware (PSR-3)
 
-### Среднесрочно (3-4 недели):
-6. ✅ **Issue #7:** Оптимизировать Matching (Radix Tree или улучшенное кеширование)
-7. ✅ **Issue #8:** Добавить RateLimitMiddleware и CsrfMiddleware
-8. ✅ **Issue #9:** Реализовать Named Routes и URL Generation
-
-### Долгосрочно (1-2 месяца):
-9. ✅ **Issue #5:** Реализовать PSR-7/PSR-15 совместимость
-10. ✅ **Issue #10:** Улучшить логирование (PSR-3)
+### Среднесрочно (1-2 месяца):
+6. ❌ **Issue #1:** Реализовать PSR-7/PSR-15 совместимость
 
 ---
 
@@ -1216,8 +497,8 @@ $globalMiddleware = new LoggingMiddleware($logger);
 | Метрика | Текущее | Целевое | Статус |
 |---------|---------|---------|--------|
 | Test Coverage | ~40% | 80%+ | 🟡 Требует улучшения |
-| PHPStan Level | ? | 8 | ❓ Неизвестно |
-| Security Score | 4/10 | 9/10 | 🔴 Критично |
+| PHPStan Level | 5 | 8 | 🟡 Можно улучшить |
+| Security Score | 9/10 | 10/10 | 🟢 Хорошо |
 | PSR Compliance | 2/7 | 5/7 | 🟠 Недостаточно |
 | Performance | Средняя | Высокая | 🟡 Требует оптимизации |
 
@@ -1225,60 +506,49 @@ $globalMiddleware = new LoggingMiddleware($logger);
 
 ## 🎯 Итоговый план действий
 
-### Sprint 1: Безопасность (1 неделя)
-- [ ] Заменить `unserialize` на JSON в FileCache
-- [ ] Добавить валидацию путей и защиту директории
-- [ ] Создать ErrorHandler
-- [ ] Интегрировать ErrorHandler в Router
-- [ ] Написать тесты безопасности для FileCache
-
-### Sprint 2: Стабильность (2 недели)
-- [ ] Исправить DI в MiddlewareStack
+### Sprint 1: Тестирование (2 недели)
+- [ ] Добавить метод `handle()` в Router
 - [ ] Написать тесты для Router.php
+- [ ] Написать тесты для QuickRouter.php
 - [ ] Написать тесты для Matching.php
-- [ ] Написать тесты для Runner.php
-- [ ] Довести покрытие до 60%+
+- [ ] Написать тесты для FileCache.php
+- [ ] Довести покрытие до 80%+
+
+### Sprint 2: Производительность (1 неделя)
+- [ ] Оптимизировать Matching (Radix Tree)
+- [ ] Провести бенчмарки
+- [ ] Оптимизировать узкие места
 
 ### Sprint 3: Функциональность (2 недели)
-- [ ] Реализовать Named Routes
-- [ ] Реализовать URL Generation
 - [ ] Добавить RateLimitMiddleware
 - [ ] Добавить CsrfMiddleware
 - [ ] Улучшить LoggingMiddleware (PSR-3)
 
-### Sprint 4: Производительность (1 неделя)
-- [ ] Оптимизировать Matching (Radix Tree)
-- [ ] Улучшить кеширование
-- [ ] Провести бенчмарки
-- [ ] Оптимизировать узкие места
-
-### Sprint 5: PSR Совместимость (2-3 недели)
+### Sprint 4: PSR Совместимость (2-3 недели)
 - [ ] Установить PSR пакеты
 - [ ] Создать PSR-7 адаптеры
 - [ ] Создать PSR-15 адаптеры
 - [ ] Документация по PSR интеграции
-- [ ] Примеры использования
 
 ---
 
 ## 📞 Выводы
 
-**Проект в хорошем состоянии**, но требует внимания к:
-1. 🔴 **Безопасности** - критические уязвимости должны быть исправлены немедленно
-2. 🟡 **Тестированию** - нужно довести покрытие до 80%+
-3. 🟡 **Производительности** - оптимизация матчинга улучшит скорость в 10-20 раз
-4. 🟢 **Совместимости** - PSR интеграция расширит аудиторию пользователей
+**Проект в отличном состоянии**, основные проблемы решены:
+- 🟢 **Безопасность** - критические уязвимости исправлены
+- 🟢 **Функциональность** - все основные фичи реализованы
+- 🟡 **Тестирование** - нужно довести покрытие до 80%+
+- 🟡 **Производительность** - оптимизация матчинга улучшит скорость в 10-20 раз
+- 🟡 **Совместимость** - PSR интеграция расширит аудиторию пользователей
 
 **Реалистичный timeline до stable release:**
-- 2-3 месяца активной разработки
-- Beta release через 6-8 недель
-- Stable v2.0.0 через 12-14 недель
+- Beta release через 4-6 недель
+- Stable v2.0.0 через 8-10 недель
 
-**Библиотека имеет хороший потенциал** и современный дизайн. После исправления критических проблем безопасности и добавления тестов, она будет готова для production использования.
+**Библиотека готова для использования**, но рекомендуется увеличить покрытие тестами перед production использованием.
 
 ---
 
-**Последнее обновление:** 6 октября 2025  
-**Версия документа:** 2.0  
+**Последнее обновление:** 8 октября 2025  
+**Версия документа:** 3.0  
 **Статус проекта:** v2.0-alpha (Active Development)
-

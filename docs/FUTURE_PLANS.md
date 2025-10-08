@@ -2,7 +2,7 @@
 
 > Идеи и фичи для будущих версий роутера
 
-**Дата создания:** 3 октября 2025  
+**Дата обновления:** 8 октября 2025  
 **Статус:** v2.0-alpha
 
 ---
@@ -16,278 +16,357 @@
 
 ---
 
-## 🔮 Планы на будущее
+## ✅ Что уже реализовано
 
-### 1. Error Handler (Priority: HIGH) 🔴
-
-**Проблема:**  
-Сейчас роутер просто пробрасывает исключения наверх. Пользователь должен сам ловить и обрабатывать ошибки.
-
-**Решение:**  
-Добавить опциональный ErrorHandler для кастомной обработки ошибок.
-
-**API:**
-```php
-interface ErrorHandlerInterface
-{
-    public function handle(\Throwable $exception): void;
-}
-
-class Router
-{
-    private ?ErrorHandlerInterface $errorHandler = null;
-    
-    public function setErrorHandler(ErrorHandlerInterface $handler): self
-    {
-        $this->errorHandler = $handler;
-        return $this;
-    }
-}
-```
-
-**Использование:**
-```php
-// Вариант 1: Свой класс
-class JsonErrorHandler implements ErrorHandlerInterface
-{
-    public function handle(\Throwable $e): void
-    {
-        http_response_code($e->getCode() ?: 500);
-        echo json_encode([
-            'error' => get_class($e),
-            'message' => $e->getMessage()
-        ]);
-        exit;
-    }
-}
-
-$router->setErrorHandler(new JsonErrorHandler());
-
-// Вариант 2: Анонимный класс
-$router->setErrorHandler(new class implements ErrorHandlerInterface {
-    public function handle(\Throwable $e): void {
-        if ($e instanceof ValidationException) {
-            Response::json(['errors' => $e->getErrors()], 400)->send();
-            exit;
-        }
-        
-        if ($e instanceof NoMatch) {
-            Response::html('<h1>404 Not Found</h1>', 404)->send();
-            exit;
-        }
-        
-        throw $e; // Пробрасываем остальные
-    }
-});
-```
-
-**Преимущества:**
-- ✅ Централизованная обработка ошибок
-- ✅ Не нужно оборачивать `$router->run()` в try-catch
-- ✅ Опционально - по умолчанию просто пробрасывает
-- ✅ Легко переключаться между JSON/HTML/Custom
-
-**Недостатки:**
-- ⚠️ Еще один интерфейс для изучения
-- ⚠️ Может быть избыточно для простых проектов
-
-**Реализация:**
-- [ ] Создать `ErrorHandlerInterface`
-- [ ] Добавить `setErrorHandler()` в Router
-- [ ] Добавить встроенные handlers: `JsonErrorHandler`, `HtmlErrorHandler`
-- [ ] Обновить документацию
-- [ ] Добавить примеры в `examples/`
+- ✅ **Named Routes** - маршруты с именами
+- ✅ **URL Generation** - генерация URL по имени
+- ✅ **Query параметры** - `url($name, $params, $query, $fragment)`
+- ✅ **Якоря/фрагменты** - поддержка `#section`
+- ✅ **Глобальные middleware** - применяются ко всем маршрутам
+- ✅ **DI в middleware** - автоматическое разрешение зависимостей
+- ✅ **Оптимизация parse()** - использование `parse_url()`
 
 ---
 
-### 2. Events System (Priority: MEDIUM) 🟡
+## 🔮 Планы на будущее
+
+### 1. Resource Routes (Priority: MEDIUM) 🟡
+
+**Идея:**  
+Автоматическое создание REST маршрутов для ресурса одной строкой.
+
+**API:**
+```php
+// Вместо 7 маршрутов
+$routes->resource('/posts', PostController::class);
+
+// Создаст автоматически:
+// GET    /posts           -> index()
+// GET    /posts/create    -> create()
+// POST   /posts           -> store()
+// GET    /posts/{id}      -> show()
+// GET    /posts/{id}/edit -> edit()
+// PUT    /posts/{id}      -> update()
+// DELETE /posts/{id}      -> destroy()
+
+// С опциями
+$routes->resource('/posts', PostController::class, [
+    'only' => ['index', 'show'], // Только эти методы
+    'except' => ['destroy'],      // Кроме этих
+    'names' => [                  // Кастомные имена
+        'index' => 'posts.all',
+    ]
+]);
+```
+
+**Преимущества:**
+- Быстрое создание CRUD API
+- Стандартизация именования
+- Меньше кода
+
+---
+
+### 2. Auto Type Casting (Priority: LOW) 🟢
+
+**Идея:**  
+Автоматическое приведение типов параметров URL.
+
+**API:**
+```php
+// Сейчас
+Route::create('/users/{id}', function($id) {
+    $id = (int)$id; // Ручное приведение
+});
+
+// С auto-casting
+Route::create('/users/{id:int}', function(int $id) {
+    // $id уже int!
+});
+
+Route::create('/posts/{slug:string}', function(string $slug) {});
+Route::create('/archive/{date:date}', function(DateTime $date) {});
+
+// Кастомные типы
+$router->registerType('uuid', function($value) {
+    if (!Uuid::isValid($value)) {
+        throw new InvalidParameterException();
+    }
+    return Uuid::fromString($value);
+});
+
+Route::create('/api/{id:uuid}', function(UuidInterface $id) {});
+```
+
+**Реализация:**
+- Парсинг типа из паттерна `{param:type}`
+- Приведение типа перед передачей в controller
+- Выброс исключения при ошибке приведения
+
+---
+
+### 3. Route Model Binding (Priority: LOW) 🟢
+
+**Идея:**  
+Автоматическая загрузка моделей из базы данных по ID.
+
+**API:**
+```php
+// Сейчас
+Route::create('/users/{id}', function($id) {
+    $user = User::find($id);
+    if (!$user) {
+        throw new NotFoundException();
+    }
+    // ...
+});
+
+// С model binding
+Route::create('/users/{user:User}', function(User $user) {
+    // $user уже загружен из БД!
+});
+
+// Кастомная логика загрузки
+$router->bindModel(User::class, function($value) {
+    return User::where('slug', $value)->firstOrFail();
+});
+
+Route::create('/users/{user:User}', function(User $user) {
+    // Загружается по slug вместо id
+});
+```
+
+**Требует:**
+- Интеграция с ORM (Eloquent, Doctrine, или кастомный)
+- Настройка через конфиг или bind
+
+---
+
+### 4. Events System (Priority: LOW) 🟢
 
 **Идея:**  
 Система событий для хуков в жизненном цикле роутера.
 
 **API:**
 ```php
-$router->on('before.route', function($uri) {
-    // Логирование, аналитика
+// События
+$router->on('router.before', function($event) {
+    // До маршрутизации
 });
 
-$router->on('after.route', function($response) {
-    // Модификация ответа
+$router->on('router.matched', function($event) {
+    // После нахождения маршрута
+    $route = $event->getRoute();
 });
 
-$router->on('error', function($exception) {
-    // Обработка ошибок через events
+$router->on('router.after', function($event) {
+    // После выполнения
+    $response = $event->getResponse();
+});
+
+$router->on('router.exception', function($event) {
+    // При исключении
+    $exception = $event->getException();
+});
+
+// Практическое использование
+$router->on('router.matched', function($event) {
+    $route = $event->getRoute();
+    
+    // Автоматическое логирование
+    if ($route->hasTag('log')) {
+        logger()->info("Route matched", ['route' => $route->getName()]);
+    }
 });
 ```
 
-**Приоритет:** Средний  
-**Статус:** Идея
-
 ---
 
-### 3. Middleware Pipelines (Priority: LOW) 🟢
+### 5. Rate Limiter с Redis (Priority: MEDIUM) 🟡
 
 **Идея:**  
-Более гибкая работа с middleware.
+Расширить RateLimitMiddleware поддержкой Redis для распределенных систем.
 
 **API:**
 ```php
-$router->pipeline('api', [
-    AuthMiddleware::class,
-    RateLimitMiddleware::class,
-    JsonMiddleware::class
+// С Redis
+$redis = new Redis();
+$redis->connect('localhost', 6379);
+
+$router->addGlobalMiddleware(
+    new RateLimitMiddleware(
+        cache: new RedisCache($redis),
+        maxAttempts: 100,
+        decayMinutes: 1
+    )
+);
+
+// С разными лимитами для разных маршрутов
+$route->middleware([
+    new RateLimitMiddleware(
+        cache: $cache,
+        maxAttempts: 10,  // Строгий лимит для этого маршрута
+        decayMinutes: 1
+    )
+]);
+```
+
+---
+
+### 6. Request Validation (Priority: LOW) 🟢
+
+**Идея:**  
+Встроенная валидация данных запроса.
+
+**API:**
+```php
+Route::create('/users', [UserController::class, 'store'])
+    ->validate([
+        'name' => 'required|string|min:3',
+        'email' => 'required|email|unique:users',
+        'age' => 'integer|min:18'
+    ]);
+
+// В контроллере
+public function store(Request $request)
+{
+    $validated = $request->validated();
+    // Данные уже валидны!
+}
+
+// Кастомные правила
+$router->addValidationRule('phone', function($value) {
+    return preg_match('/^\+?[0-9]{10,15}$/', $value);
+});
+```
+
+**Или проще - интеграция с существующими:**
+```php
+// Интеграция с Respect\Validation
+Route::create('/users', [UserController::class, 'store'])
+    ->validate(new UserCreateValidator());
+```
+
+---
+
+### 7. API Versioning (Priority: LOW) 🟢
+
+**Идея:**  
+Удобная система версионирования API.
+
+**API:**
+```php
+// Вариант 1: Через префикс
+$router->version('v1', function($r) {
+    $r->get('/users', [V1\UserController::class, 'index']);
+});
+
+$router->version('v2', function($r) {
+    $r->get('/users', [V2\UserController::class, 'index']);
+});
+
+// Вариант 2: Через header
+$router->versionByHeader('X-API-Version', [
+    '1' => function($r) {
+        $r->get('/users', [V1\UserController::class, 'index']);
+    },
+    '2' => function($r) {
+        $r->get('/users', [V2\UserController::class, 'index']);
+    }
 ]);
 
-$router->get('/api/users', [UserController::class, 'index'])
-    ->pipeline('api');
+// Вариант 3: Через subdomain
+$router->versionBySubdomain([
+    'api.v1' => function($r) { /* ... */ },
+    'api.v2' => function($r) { /* ... */ }
+]);
 ```
 
-**Приоритет:** Низкий  
-**Статус:** Идея
-
 ---
 
-### 4. Route Caching Improvements (Priority: MEDIUM) 🟡
+### 8. OpenAPI/Swagger документация (Priority: LOW) 🟢
 
-**Проблема:**  
-Текущий кеш работает, но можно оптимизировать.
-
-**Идеи:**
-- Кеш скомпилированных маршрутов (PHP файл с массивом)
-- Автоматическая инвалидация при изменении роутов
-- Opcache friendly кеш
-
-**Приоритет:** Средний  
-**Статус:** Идея
-
----
-
-### 5. Named Routes (Priority: HIGH) 🔴
-
-**Проблема:**  
-Сложно генерировать URL для роутов.
+**Идея:**  
+Автоматическая генерация OpenAPI спецификации из маршрутов.
 
 **API:**
 ```php
-$router->get('/users/{id}', [UserController::class, 'show'])
-    ->name('user.show');
+Route::create('/users/{id}', [UserController::class, 'show'])
+    ->name('users.show')
+    ->describe([
+        'summary' => 'Get user by ID',
+        'parameters' => [
+            'id' => ['type' => 'integer', 'description' => 'User ID']
+        ],
+        'responses' => [
+            200 => ['description' => 'User found', 'schema' => UserSchema::class],
+            404 => ['description' => 'User not found']
+        ]
+    ]);
 
-// Генерация URL
-$url = $router->route('user.show', ['id' => 123]); // /users/123
+// Генерация документации
+$openapi = $router->generateOpenAPI([
+    'title' => 'My API',
+    'version' => '1.0.0'
+]);
+
+file_put_contents('openapi.json', json_encode($openapi));
 ```
 
-**Приоритет:** Высокий  
-**Статус:** В планах для v2.1
+---
+
+## 📋 Приоритеты
+
+### Высокий приоритет 🔴
+- (Нет в планах - фокус на стабильности)
+
+### Средний приоритет 🟡
+1. **Resource Routes** - популярная фича, экономит время
+2. **Rate Limiter с Redis** - нужно для production
+
+### Низкий приоритет 🟢
+1. **Auto Type Casting** - удобно, но не критично
+2. **Route Model Binding** - требует интеграции с ORM
+3. **Events System** - интересно, но можно обойтись middleware
+4. **Request Validation** - есть готовые библиотеки
+5. **API Versioning** - можно реализовать через middleware
+6. **OpenAPI документация** - nice-to-have
 
 ---
 
-### 6. Resource Routes (Priority: MEDIUM) 🟡
+## 💭 Что точно НЕ будем делать
 
-**Идея:**  
-Автоматическая регистрация CRUD маршрутов.
+### ❌ Полноценный ORM
+**Почему:** Это не задача роутера. Используйте Eloquent, Doctrine, или др.
 
-**API:**
-```php
-$router->resource('posts', PostController::class);
+### ❌ Template Engine
+**Почему:** Используйте Twig, Blade, или нативный PHP.
 
-// Создаст:
-// GET    /posts           -> index
-// GET    /posts/{id}      -> show
-// POST   /posts           -> store
-// PUT    /posts/{id}      -> update
-// DELETE /posts/{id}      -> destroy
-```
+### ❌ Авторизация/Аутентификация
+**Почему:** Слишком специфично для каждого проекта. Реализуйте через middleware.
 
-**Приоритет:** Средний  
-**Статус:** Идея
+### ❌ Session Management
+**Почему:** PHP уже имеет встроенные сессии, не нужно дублировать.
+
+### ❌ Database Migrations
+**Почему:** Это задача ORM или отдельных инструментов (Phinx, Doctrine Migrations).
 
 ---
 
-### 7. Auto Type Casting (Priority: HIGH) 🔴
+## 🎯 Фокус проекта
 
-**Проблема:**  
-Параметры приходят как строки, нужно вручную кастить.
+Router должен оставаться **библиотекой для маршрутизации**, а не превращаться в фреймворк.
 
-**Решение:**
-```php
-class UserController
-{
-    // Автоматический каст $id в int
-    public function show(int $id)
-    {
-        // $id уже int!
-    }
-}
-```
-
-**Приоритет:** Высокий  
-**Статус:** В планах для v2.1
+**Границы ответственности:**
+- ✅ Маршрутизация HTTP запросов
+- ✅ Middleware система
+- ✅ Dependency Injection
+- ✅ Request/Response объекты
+- ✅ Базовая безопасность
+- ❌ База данных
+- ❌ Шаблоны
+- ❌ Авторизация (кроме базовых middleware примеров)
 
 ---
 
-### 8. Route Groups with Attributes (Priority: LOW) 🟢
-
-**Идея:**  
-PHP 8 атрибуты для роутов.
-
-**API:**
-```php
-#[Route('/api')]
-#[Middleware(AuthMiddleware::class)]
-class UserController
-{
-    #[Get('/users')]
-    public function index() {}
-    
-    #[Get('/users/{id}')]
-    public function show(int $id) {}
-}
-```
-
-**Приоритет:** Низкий  
-**Статус:** Идея для v3.0
-
----
-
-### 9. Performance: Radix Tree (Priority: LOW) 🟢
-
-**Проблема:**  
-O(n) поиск маршрутов медленный для больших приложений.
-
-**Решение:**  
-Radix Tree для O(1) поиска (как в FastRoute).
-
-**Приоритет:** Низкий (для мелких проектов O(n) достаточно)  
-**Статус:** Идея для v3.0
-
----
-
-### 10. PSR-7 / PSR-15 Support (Priority: MEDIUM) 🟡
-
-**Идея:**  
-Полная поддержка PSR стандартов.
-
-**Приоритет:** Средний  
-**Статус:** Рассматривается для v2.1
-
----
-
-## 📝 Как предложить идею?
-
-1. Открыть Issue на GitHub
-2. Описать use case
-3. Предложить API
-4. Обсудить с сообществом
-
----
-
-## 🗳️ Голосование за фичи
-
-Если вам нужна какая-то фича - поставьте 👍 на соответствующий Issue в GitHub!
-
----
-
-**Версия:** 1.0  
-**Дата:** 3 октября 2025  
-**Статус:** Living Document (будет обновляться)
-
+**Последнее обновление:** 8 октября 2025  
+**Вклад приветствуется!** Если у вас есть идеи - создайте GitHub Issue.
