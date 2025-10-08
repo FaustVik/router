@@ -23,8 +23,12 @@ final class Cookie implements CookieInterface
     private string $domain = '';
     private bool $secure = false;
     private bool $httpOnly = true;
+    /** @var 'Lax'|'Strict'|'None' */
     private string $sameSite = 'Lax';
 
+    /**
+     * @param 'Lax'|'Strict'|'None' $sameSite
+     */
     public function __construct(
         string $name,
         string $value = '',
@@ -35,6 +39,11 @@ final class Cookie implements CookieInterface
         bool $httpOnly = true,
         string $sameSite = 'Lax'
     ) {
+        // Validate sameSite value
+        if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
+            throw new \InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
+        }
+        
         $this->name = $name;
         $this->value = $value;
         $this->expires = $expires;
@@ -42,6 +51,8 @@ final class Cookie implements CookieInterface
         $this->domain = $domain;
         $this->secure = $secure;
         $this->httpOnly = $httpOnly;
+        // Type already validated above, PHPStan can't track validation
+        assert(in_array($sameSite, ['Lax', 'Strict', 'None'], true));
         $this->sameSite = $sameSite;
     }
 
@@ -118,11 +129,16 @@ final class Cookie implements CookieInterface
     /**
      * Устанавливает SameSite политику
      *
-     * @param string $sameSite 'Strict', 'Lax', или 'None'
+     * @param 'Lax'|'Strict'|'None' $sameSite 'Strict', 'Lax', или 'None'
      */
     public function withSameSite(string $sameSite): self
     {
+        if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
+            throw new \InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
+        }
+        
         $clone = clone $this;
+        assert(in_array($sameSite, ['Lax', 'Strict', 'None'], true));
         $clone->sameSite = $sameSite;
         return $clone;
     }

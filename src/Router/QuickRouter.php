@@ -280,7 +280,7 @@ final class QuickRouter
      * Глобальные middleware выполняются перед middleware конкретного маршрута.
      * Это удобно для CORS, логирования, аутентификации и других общих задач.
      *
-     * @param string|object|callable $middleware Middleware класс, объект или callable
+     * @param string|callable $middleware Middleware класс или callable
      * @return self Возвращает себя для fluent interface
      *
      * @example
@@ -302,7 +302,7 @@ final class QuickRouter
      * $app->get('/', fn() => "Hello World!");
      * $app->run();
      */
-    public function addMiddleware(string|object|callable $middleware): self
+    public function addMiddleware(string|callable $middleware): self
     {
         $this->router->addGlobalMiddleware($middleware);
         return $this;
@@ -313,7 +313,7 @@ final class QuickRouter
      *
      * Заменяет все существующие глобальные middleware на новые.
      *
-     * @param array<int, string|object|callable> $middleware Массив middleware
+     * @param array<int, string|callable> $middleware Массив middleware
      * @return self Возвращает себя для fluent interface
      *
      * @example

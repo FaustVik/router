@@ -36,11 +36,17 @@ class ContainerAdapterFactory
 
         // Detect Symfony container (check for common Symfony container classes)
         if (self::isSymfonyContainer($container)) {
+            if (!$container instanceof ContainerInterface) {
+                throw new \InvalidArgumentException('Symfony container must implement PSR-11 ContainerInterface');
+            }
             return new SymfonyContainerAdapter($container);
         }
 
         // Detect Pimple container
         if (self::isPimpleContainer($container)) {
+            if (!$container instanceof ContainerInterface) {
+                throw new \InvalidArgumentException('Pimple container must implement PSR-11 ContainerInterface');
+            }
             return new PimpleContainerAdapter($container);
         }
 
@@ -110,12 +116,30 @@ class ContainerAdapterFactory
      */
     public static function createByType(string $type, object $container): RouterContainerInterface
     {
-        return match (strtolower($type)) {
-            'php-di', 'phpdi' => new PhpDiContainerAdapter($container),
-            'symfony' => new SymfonyContainerAdapter($container),
-            'pimple' => new PimpleContainerAdapter($container),
-            default => throw new \InvalidArgumentException("Unsupported container type: {$type}")
-        };
+        $lowerType = strtolower($type);
+        
+        if ($lowerType === 'php-di' || $lowerType === 'phpdi') {
+            if (!$container instanceof PHPDIContainer) {
+                throw new \InvalidArgumentException('Container must be an instance of DI\Container for php-di type');
+            }
+            return new PhpDiContainerAdapter($container);
+        }
+        
+        if ($lowerType === 'symfony') {
+            if (!$container instanceof ContainerInterface) {
+                throw new \InvalidArgumentException('Container must implement PSR-11 ContainerInterface for symfony type');
+            }
+            return new SymfonyContainerAdapter($container);
+        }
+        
+        if ($lowerType === 'pimple') {
+            if (!$container instanceof ContainerInterface) {
+                throw new \InvalidArgumentException('Container must implement PSR-11 ContainerInterface for pimple type');
+            }
+            return new PimpleContainerAdapter($container);
+        }
+        
+        throw new \InvalidArgumentException("Unsupported container type: {$type}");
     }
 
     /**

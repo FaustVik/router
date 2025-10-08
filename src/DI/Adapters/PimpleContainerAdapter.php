@@ -85,11 +85,16 @@ class PimpleContainerAdapter implements RouterContainerInterface
     /**
      * Create instance using reflection
      *
+     * @param class-string $class
      * @param array<string, mixed> $parameters
      * @throws \RuntimeException
      */
     private function createInstanceWithReflection(string $class, array $parameters = []): object
     {
+        if (!class_exists($class)) {
+            throw new \RuntimeException("Class {$class} does not exist");
+        }
+        
         $reflectionClass = new \ReflectionClass($class);
 
         if (!$reflectionClass->isInstantiable()) {

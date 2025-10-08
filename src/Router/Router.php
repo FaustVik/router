@@ -39,7 +39,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?string $uri = null;
     private ?string $paramsString = null;
 
-    /** @var array<string, string|int|bool>|null Query параметры из URI */
+    /** 
+     * @var array<string, mixed>|null Query параметры из URI
+     * @phpstan-ignore-next-line property.onlyWritten
+     */
     private ?array $params = null;
 
     private ConfigInterface $config;
@@ -49,7 +52,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     /** @var array<string, RouteInterface> Индексированные именованные маршруты */
     private array $namedRoutes = [];
 
-    /** @var array<int, string|object|callable> Глобальные middleware для всех маршрутов */
+    /** @var array<int, string|callable> Глобальные middleware для всех маршрутов */
     private array $globalMiddleware = [];
 
     /**
@@ -267,7 +270,10 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Парсим query string с помощью parse_str()
         // Это правильно обрабатывает массивы и вложенные параметры
         if ($this->paramsString) {
-            parse_str($this->paramsString, $this->params);
+            $parsedParams = [];
+            parse_str($this->paramsString, $parsedParams);
+            /** @var array<string, mixed> $parsedParams */
+            $this->params = $parsedParams;
         }
     }
 
@@ -713,7 +719,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Глобальные middleware выполняются перед middleware конкретного маршрута.
      * Это удобно для CORS, логирования, аутентификации и других общих задач.
      *
-     * @param string|object|callable $middleware Middleware класс, объект или callable
+     * @param string|callable $middleware Middleware класс или callable
      * @return self Возвращает текущий экземпляр для цепочки вызовов
      *
      * @example
@@ -721,8 +727,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * $router->addGlobalMiddleware(CorsMiddleware::class);
      *
      * @example
-     * // Добавление middleware объекта
-     * $router->addGlobalMiddleware(new LoggingMiddleware($logger));
+     * // Добавление middleware функции
+     * $router->addGlobalMiddleware(fn($request, $next) => $next($request));
      *
      * @example
      * // Цепочка вызовов (рекомендуется)
@@ -730,7 +736,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *        ->addGlobalMiddleware(LoggingMiddleware::class)
      *        ->addGlobalMiddleware(RateLimitMiddleware::class);
      */
-    public function addGlobalMiddleware(string|object|callable $middleware): self
+    public function addGlobalMiddleware(string|callable $middleware): self
     {
         $this->globalMiddleware[] = $middleware;
         return $this;
@@ -741,7 +747,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * Заменяет все существующие глобальные middleware на новые.
      *
-     * @param array<int, string|object|callable> $middleware Массив middleware
+     * @param array<int, string|callable> $middleware Массив middleware
      * @return self Возвращает текущий экземпляр для цепочки вызовов
      *
      * @example
