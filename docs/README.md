@@ -1,106 +1,108 @@
-# Документация Router v2.0-alpha
+# Router v2.0-alpha Documentation
 
-Центр документации проекта Router.
+Documentation center for the Router project.
 
----
-
-## 📚 Основные документы
-
-### [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) - Актуальные проблемы ⭐
-Основной документ с текущими проблемами и планом развития:
-- Сводка по категориям
-- Список актуальных проблем
-- Решения и примеры кода
-- План приоритизации
-- **Обновляется по мере разработки**
-
-### [CONCEPT.md](CONCEPT.md) - Концепция проекта
-Философия и принципы проекта:
-- Миссия и видение
-- Целевая аудитория (новички и опытные разработчики)
-- Философия: простота + мощность
-- Анализ конкурентов
-
-### [QUICK_START.md](QUICK_START.md) - Быстрый старт
-QuickRouter - Hello World за 5 минут:
-- Простой API для новичков
-- Базовые примеры
-- REST API примеры
+[🇷🇺 Русская версия](README.ru.md)
 
 ---
 
-## 🎯 С чего начать?
+## 📚 Main Documents
 
-### Новый пользователь:
-1. Читайте [QUICK_START.md](QUICK_START.md)
-2. Смотрите примеры в `/examples`
+### [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) - Current Issues ⭐
+Main document with current issues and development plan:
+- Summary by categories
+- List of current issues
+- Solutions and code examples
+- Prioritization plan
+- **Updated as development progresses**
 
-### Разработчик проекта:
-1. Читайте [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) - актуальные задачи
-2. Выбирайте задачу из плана приоритизации
-3. Создавайте PR
+### [CONCEPT.md](CONCEPT.md) - Project Concept
+Project philosophy and principles:
+- Mission and vision
+- Target audience (beginners and experienced developers)
+- Philosophy: simplicity + power
+- Competitor analysis
 
-### Контрибьютор:
-1. Читайте [CONCEPT.md](CONCEPT.md) - поймите философию
-2. Читайте [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) - выберите задачу
-3. Создайте GitHub Issue
-4. Создайте PR с решением
+### [QUICK_START.md](QUICK_START.md) - Quick Start
+QuickRouter - Hello World in 5 minutes:
+- Simple API for beginners
+- Basic examples
+- REST API examples
 
 ---
 
-## 📁 Структура документации
+## 🎯 Where to Start?
+
+### New User:
+1. Read [QUICK_START.md](QUICK_START.md)
+2. Check examples in `/examples`
+
+### Project Developer:
+1. Read [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) - current tasks
+2. Choose a task from prioritization plan
+3. Create a PR
+
+### Contributor:
+1. Read [CONCEPT.md](CONCEPT.md) - understand the philosophy
+2. Read [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) - choose a task
+3. Create a GitHub Issue
+4. Create a PR with solution
+
+---
+
+## 📁 Documentation Structure
 
 ```
 docs/
-├── README.md                   # Этот файл - навигация
-├── ROUTER_ISSUES_2025.md      # ⭐ Актуальные проблемы (главный документ)
-├── CONCEPT.md                  # Концепция и философия
-├── QUICK_START.md              # Быстрый старт с QuickRouter
-├── DI_MIDDLEWARE_IMPLEMENTATION.md  # Техническая документация по DI
-├── FUTURE_PLANS.md             # Планы на будущее
-├── ISSUES_SUMMARY.md           # Старая сводка (устарела)
-└── TECHNICAL_ISSUES.md         # Старый детальный анализ (устарел)
+├── README.md                   # This file - navigation
+├── ROUTER_ISSUES_2025.md      # ⭐ Current issues (main document)
+├── CONCEPT.md                  # Concept and philosophy
+├── QUICK_START.md              # Quick start with QuickRouter
+├── DI_MIDDLEWARE_IMPLEMENTATION.md  # Technical DI documentation
+├── FUTURE_PLANS.md             # Future plans
+└── *.ru.md                     # Russian versions
 ```
 
 ---
 
-## 🗂️ Примеры кода
+## 🗂️ Code Examples
 
-Все примеры находятся в `/examples`:
-- `basic-example.php` - базовые возможности
+All examples are in `/examples`:
+- `quick-example.php` - QuickRouter introduction
+- `basic-example.php` - basic features
 - `rest-api-example.php` - REST API
-- `middleware-di-example.php` - DI в middleware
-- `global-middleware-example.php` - глобальные middleware
-- `named-routes-advanced-example.php` - генерация URL с query и якорями
-- И многое другое...
+- `middleware-di-example.php` - DI in middleware
+- `global-middleware-example.php` - global middleware
+- `named-routes-advanced-example.php` - URL generation with query and fragments
+- And much more...
 
-См. [examples/README.md](/examples/README.md) для полного списка.
+See [examples/README.md](/examples/README.md) for full list.
 
 ---
 
-## 📊 Текущий статус проекта
+## 📊 Current Project Status
 
-**Версия:** v2.0-alpha  
-**Статус:** Активная разработка  
+**Version:** v2.0-alpha  
+**Status:** Active development  
 
-**Что работает:**
-- ✅ Базовая маршрутизация
-- ✅ Middleware (глобальные и на уровне маршрута)
+**What works:**
+- ✅ Basic routing
+- ✅ Middleware (global and route-level)
 - ✅ Dependency Injection
-- ✅ Named Routes с генерацией URL
-- ✅ Query параметры и якоря
-- ✅ Кеширование
-- ✅ Request/Response объекты
-- ✅ Безопасность (JSON вместо serialize, защита от Path Traversal)
+- ✅ Named Routes with URL generation
+- ✅ Query parameters and fragments
+- ✅ Caching
+- ✅ Request/Response objects
+- ✅ Security (JSON instead of serialize, Path Traversal protection)
 
-**Что нужно:**
-- ❌ Больше тестов (цель: 80%+ покрытие)
-- ❌ Оптимизация матчинга (Radix Tree)
-- ❌ PSR-7/PSR-15 совместимость
-- ❌ RateLimitMiddleware, CsrfMiddleware
+**What's needed:**
+- ⏳ More tests (goal: 80%+ coverage)
+- ⏳ Matching optimization (Radix Tree)
+- ⏳ PSR-7/PSR-15 compatibility
+- ✅ RateLimitMiddleware, CsrfMiddleware (implemented)
 
-См. [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) для деталей.
+See [ROUTER_ISSUES_2025.md](ROUTER_ISSUES_2025.md) for details.
 
 ---
 
-**Последнее обновление:** 8 октября 2025
+**Last updated:** October 8, 2025

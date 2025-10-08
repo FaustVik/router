@@ -1,112 +1,134 @@
-# Router
+# PHP Router
 
-PHP Router с поддержкой параметров в URL
+Modern, lightweight PHP Router with middleware support, dependency injection, and caching.
 
-## Example
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[🇷🇺 Русская версия](README.ru.md)
+
+## ✨ Features
+
+- 🚀 **Fast & Lightweight** - Optimized route matching with O(1) lookup for static routes
+- 🎯 **Dynamic URL Parameters** - Support for `/users/{id}` patterns with constraints
+- 🔌 **Middleware Support** - Built-in middleware stack with popular implementations
+- 💉 **Dependency Injection** - Automatic dependency resolution for controllers
+- 💾 **Route Caching** - 2-10x performance boost in production
+- 🏷️ **Named Routes** - URL generation by route name
+- 📦 **Route Groups** - Organize routes with prefixes and shared middleware
+- 🎭 **Anonymous Functions** - Use closures as route handlers
+- 🔒 **Security** - Built-in CSRF, CORS, Auth, and Rate Limiting middleware
+- 📝 **PSR-Compatible** - Clean, modern PHP 8.1+ codebase
+
+## 📋 Requirements
+
+- PHP 8.1 or higher
+
+## 📥 Installation
+
+```bash
+composer require faustvijk/router
+```
+
+## 🚀 Quick Start
+
+### Option 1: QuickRouter (Recommended for Beginners)
 
 ```php
-$collections = new RoutesCollection();
+use FaustVik\Router\Router\QuickRouter;
 
-// Обычный маршрут
-$collections->set(
-    Route::create('/', TestController::class, 'actionIndex', [], ['GET']),
+$app = new QuickRouter();
+
+// Simple route
+$app->get('/', fn() => "Hello World!");
+
+// Route with parameters
+$app->get('/users/{id}', fn($id) => "User #$id");
+
+// Route with controller
+$app->get('/posts', [PostController::class, 'index']);
+
+$app->run();
+```
+
+### Option 2: Full Router (Advanced Features)
+
+```php
+use FaustVik\Router\Router\Router;
+use FaustVik\Router\Route\Route;
+use FaustVik\Router\Route\RoutesCollection;
+
+$routes = new RoutesCollection();
+
+// Add routes
+$routes->addGet(
+    Route::create('/', HomeController::class, 'index', methods: ['GET'])
+        ->name('home')
 );
 
-// Маршрут с параметрами
-$collections->set(
-    Route::create('/user/{id}', UserController::class, 'show', [], ['GET']),
-    Route::create('/user/{id}/edit', UserController::class, 'edit', [], ['GET', 'POST']),
-    Route::create('/category/{category}/post/{id}', PostController::class, 'show', [], ['GET']),
+$routes->addGet(
+    Route::create('/users/{id}', UserController::class, 'show', methods: ['GET'])
+        ->where('id', '\d+')
+        ->name('users.show')
 );
-
-// Анонимная функция с параметрами
-$fd = RouteAnonymousFunc::create('/hello/{name}', static function ($name) {
-    echo "Hello, " . $name;
-}, ['GET']);
-
-$collections->set($fd);
-
-$config = new Config();
-$config->setRunner(new Runner());
 
 $router = new Router();
-$router->setConfig($config);
-$router->setCollection($collections);
+$router->setCollection($routes);
 $router->run();
 ```
 
-## Middleware поддержка
+## 📖 Core Concepts
 
-Роутер поддерживает middleware для обработки запросов. Middleware выполняется в порядке добавления.
+### Dynamic URL Parameters
 
-### Основные классы для middleware
+```php
+// Basic parameter
+$app->get('/users/{id}', fn($id) => "User #$id");
 
-- **Request** - объект HTTP запроса
-- **Response** - объект HTTP ответа  
-- **MiddlewareInterface** - интерфейс для создания middleware
-- **MiddlewareStack** - управление стеком middleware
+// Multiple parameters
+$app->get('/posts/{year}/{month}', fn($year, $month) => 
+    "Archive: $year-$month"
+);
 
-### Примеры использования
+// Optional parameters
+$app->get('/posts/{year?}/{month?}', [PostController::class, 'archive']);
+
+// With constraints
+Route::create('/users/{id}', UserController::class, 'show')
+    ->where('id', '\d+')  // Only digits
+    ->where('slug', '[a-z0-9\-]+');  // Alphanumeric and dashes
+```
+
+### Middleware
 
 ```php
 use FaustVik\Router\Middleware\AuthMiddleware;
-use FaustVik\Router\Middleware\LoggingMiddleware;
 use FaustVik\Router\Middleware\CorsMiddleware;
+use FaustVik\Router\Middleware\LoggingMiddleware;
 
-// Маршрут с middleware
-$route = Route::create('/admin/users', AdminController::class, 'index', [], ['GET'])
-    ->middleware([
-        AuthMiddleware::class,
-        LoggingMiddleware::class
-    ]);
+// Route-specific middleware
+$route = Route::create('/admin/users', AdminController::class, 'index')
+    ->middleware([AuthMiddleware::class, LoggingMiddleware::class]);
 
-// Анонимная функция с middleware
-$route = RouteAnonymousFunc::create('/api/data', function() {
-    return Response::json(['data' => 'Hello World']);
-}, ['GET'])
-    ->middleware([
-        CorsMiddleware::class,
-        LoggingMiddleware::class
-    ]);
+// Global middleware (applies to all routes)
+$app->addMiddleware(CorsMiddleware::class)
+    ->addMiddleware(LoggingMiddleware::class);
+
+// Group middleware
+$app->middleware([AuthMiddleware::class], function($app) {
+    $app->get('/admin', [AdminController::class, 'index']);
+    $app->get('/profile', [ProfileController::class, 'show']);
+});
 ```
 
-### Встроенные middleware
+#### Built-in Middleware
 
-#### AuthMiddleware
-Проверяет Authorization заголовок и устанавливает атрибуты пользователя.
+- **AuthMiddleware** - Bearer token authentication
+- **CorsMiddleware** - CORS headers and preflight requests
+- **CsrfMiddleware** - CSRF token protection
+- **RateLimitMiddleware** - Request rate limiting
+- **LoggingMiddleware** - HTTP request logging
 
-```php
-$route->middleware([AuthMiddleware::class]);
-
-// В контроллере можно получить данные пользователя
-function show(Request $request) {
-    $userId = $request->getAttribute('user_id');
-    $isAuthenticated = $request->getAttribute('authenticated');
-}
-```
-
-#### LoggingMiddleware
-Логирует HTTP запросы с информацией о времени выполнения.
-
-```php
-$route->middleware([new LoggingMiddleware('custom.log')]);
-```
-
-#### CorsMiddleware
-Обрабатывает CORS заголовки для API.
-
-```php
-$corsMiddleware = new CorsMiddleware(
-    allowedOrigins: ['https://example.com'],
-    allowedMethods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    allowCredentials: true
-);
-
-$route->middleware([$corsMiddleware]);
-```
-
-### Создание собственного middleware
+#### Custom Middleware
 
 ```php
 use FaustVik\Router\Http\Request;
@@ -117,350 +139,236 @@ class CustomMiddleware implements MiddlewareInterface
 {
     public function handle(Request $request, callable $next): Response
     {
-        // Логика до выполнения действия
+        // Before route execution
         
         $response = $next($request);
         
-        // Логика после выполнения действия
+        // After route execution
         
         return $response;
     }
 }
 ```
 
-## Кеширование
-
-Роутер поддерживает кеширование результатов матчинга для повышения производительности.
-
-### Включение кеширования
+### Route Caching
 
 ```php
 use FaustVik\Router\Cache\FileCache;
 
 $router = new Router();
 
-// Включаем кеширование
+// Enable caching (2-10x performance boost)
 $router->enableCache();
 
-// Настраиваем кеш (опционально)
+// Custom cache configuration
 $cache = new FileCache('cache/routes', 'app_');
 $router->setCache($cache);
+$router->getConfig()->setCacheTtl(3600); // 1 hour
 
-// Настраиваем TTL через конфигурацию
-$config = $router->getConfig();
-$config->setCacheTtl(3600); // 1 час
-```
-
-### Управление кешем
-
-```php
-// Проверяем статус кеша
-if ($router->isCacheEnabled()) {
-    echo "Кеш включен";
-}
-
-// Получаем кеш-драйвер
-$cache = $router->getCache();
-
-// Очищаем кеш
+// Clear cache
 $router->clearRouteCache();
-
-// Отключаем кеш
-$router->disableCache();
 ```
 
-### Конфигурация кеша
+**Performance**: Caching can speed up request processing by 2-10x, especially with many routes.
+
+### Named Routes & URL Generation
 
 ```php
-// Создание кеша с настройками
-$cache = new FileCache(
-    cacheDir: 'cache/routes',  // Папка для кеша
-    prefix: 'my_app_'          // Префикс для файлов
-);
-
-// Настройка TTL
-$config = $router->getConfig();
-$config->setCacheTtl(7200); // 2 часа
-```
-
-### Примеры использования
-
-- **Разработка**: Кеширование обычно отключено для мгновенного отображения изменений
-- **Продакшн**: Кеширование включено для максимальной производительности
-
-```php
-// Настройка для разных окружений
-$isProduction = (getenv('APP_ENV') === 'production');
-
-if ($isProduction) {
-    $router->enableCache();
-    $router->getConfig()->setCacheTtl(3600);
-}
-```
-
-### Производительность
-
-Кеширование может ускорить обработку запросов в 2-10 раз, особенно при большом количестве маршрутов.
-
-## Named Routes и URL Generation
-
-Роутер поддерживает именование маршрутов и генерацию URL по имени маршрута.
-
-### Именование маршрутов
-
-```php
-use FaustVik\Router\Route\Route;
-
-// Именование маршрута
-$route = Route::create('/users/{id}', UserController::class, 'show', [], ['GET'])
+// Define named routes
+Route::create('/users/{id}', UserController::class, 'show')
     ->name('users.show');
 
-// С группами
-$collection->prefix('/api')->group(function($api) {
-    $api->get('/users/{id}', UserController::class, 'show')
-        ->name('api.users.show');
-});
-```
-
-### Генерация URL
-
-```php
-// Простой маршрут
-$url = $router->url('home'); // => /
-
-// С параметрами
-$url = $router->url('users.show', ['id' => 123]); // => /users/123
-
-// С множественными параметрами
-$url = $router->url('posts.show', [
-    'year' => 2025,
-    'slug' => 'my-post'
-]); // => /posts/2025/my-post
-```
-
-### Опциональные параметры
-
-```php
-// Маршрут с опциональными параметрами
-Route::create('/posts/{year?}/{month?}', PostController::class, 'index', [], ['GET'])
-    ->name('posts.archive');
-
-// Генерация URL
-$router->url('posts.archive'); // => /posts
-$router->url('posts.archive', ['year' => 2025]); // => /posts/2025
-$router->url('posts.archive', ['year' => 2025, 'month' => 10]); // => /posts/2025/10
-```
-
-### Constraints для параметров
-
-```php
-// Добавление constraints
-Route::create('/users/{id}', UserController::class, 'show', [], ['GET'])
-    ->where('id', '\d+')  // Только цифры
-    ->name('users.show');
-
-Route::create('/posts/{slug}', PostController::class, 'show', [], ['GET'])
-    ->where('slug', '[a-z0-9\-]+')  // Буквы, цифры и дефисы
+Route::create('/posts/{year}/{slug}', PostController::class, 'show')
     ->name('posts.show');
 
-// Генерация URL с валидацией
-$router->url('users.show', ['id' => 123]); // OK
-$router->url('users.show', ['id' => 'abc']); // InvalidArgumentException
-```
+// Generate URLs
+$router->url('users.show', ['id' => 123]);
+// => /users/123
 
-### Проверка существования маршрута
+$router->url('posts.show', [
+    'year' => 2025,
+    'slug' => 'my-post'
+], ['ref' => 'twitter']);
+// => /posts/2025/my-post?ref=twitter
 
-```php
+// Check route existence
 if ($router->has('users.show')) {
     $url = $router->url('users.show', ['id' => 123]);
 }
-
-// Получить маршрут по имени
-$route = $router->getRouteByName('users.show');
-
-// Получить все именованные маршруты
-$namedRoutes = $router->getNamedRoutes();
 ```
 
-### Пример использования в контроллере
+### Route Groups
 
 ```php
+// Prefix groups
+$app->prefix('/api', function($app) {
+    $app->get('/users', [UserController::class, 'index']);
+    $app->get('/posts', [PostController::class, 'index']);
+});
+// Creates: /api/users and /api/posts
+
+// With RoutesCollection
+$routes->prefix('/admin')->group(function($group) {
+    $group->get('/users', UserController::class, 'index')
+        ->name('admin.users.index');
+    
+    $group->get('/settings', SettingsController::class, 'index')
+        ->name('admin.settings');
+});
+```
+
+### Dependency Injection
+
+```php
+// Enable DI
+$router->enableDI();
+
+// Configure bindings
+$router->enableDI(function($container) {
+    $container->singleton(DatabaseInterface::class, MySQLDatabase::class);
+    $container->bind(LoggerInterface::class, FileLogger::class);
+});
+
+// Controllers with dependencies
 class UserController
 {
-    public function __construct(private Router $router)
+    public function __construct(
+        private DatabaseInterface $db,
+        private LoggerInterface $logger
+    ) {}
+    
+    public function show($id): Response
     {
-    }
-
-    public function index(): void
-    {
-        echo '<h1>Пользователи</h1>';
+        $user = $this->db->find('users', $id);
+        $this->logger->info("User viewed: $id");
         
-        // Генерируем URL для каждого пользователя
-        for ($i = 1; $i <= 10; $i++) {
-            $url = $this->router->url('users.show', ['id' => $i]);
-            echo "<a href='{$url}'>Пользователь #{$i}</a><br>";
+        return Response::json($user);
+    }
+}
+```
+
+### Request & Response
+
+```php
+use FaustVik\Router\Http\Request;
+use FaustVik\Router\Http\Response;
+
+class UserController
+{
+    public function show(Request $request, $id): Response
+    {
+        // Get query parameters
+        $page = $request->getQueryParam('page', 1);
+        
+        // Get JSON body
+        $data = $request->input('name');
+        
+        // Get headers
+        $token = $request->getHeader('Authorization');
+        
+        // Return JSON response
+        return Response::json([
+            'user' => ['id' => $id, 'name' => 'John'],
+            'page' => $page
+        ]);
+    }
+    
+    public function create(Request $request): Response
+    {
+        // Handle file upload
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            move_uploaded_file($file['tmp_name'], 'uploads/' . $file['name']);
         }
-    }
-    
-    public function show($id): void
-    {
-        echo "<h1>Пользователь #{$id}</h1>";
         
-        // Ссылка на редактирование
-        $editUrl = $this->router->url('users.edit', ['id' => $id]);
-        echo "<a href='{$editUrl}'>Редактировать</a>";
+        // Redirect
+        return Response::redirect('/users');
     }
 }
 ```
 
-Подробный пример: [examples/named-routes-example.php](examples/named-routes-example.php)
-
-## Статический анализ кода
-
-Проект использует PHPStan для статического анализа кода:
-
-```bash
-# Анализ кода
-composer phpstan
-
-# Создание baseline (если нужно игнорировать существующие ошибки)
-composer phpstan-baseline
-```
-
-## Параметры в URL
-
-Роутер поддерживает параметры в URL в формате `{parameter_name}`. Примеры:
-
-- `/user/{id}` - будет соответствовать `/user/123`, `/user/456` и т.д.
-- `/category/{category}/post/{id}` - будет соответствовать `/category/tech/post/123`
-- `/hello/{name}` - будет соответствовать `/hello/john`
-
-### Использование в контроллерах
-
-```php
-class UserController 
-{
-    public function show($id) 
-    {
-        echo "User ID: " . $id;
-    }
-    
-    public function edit($id) 
-    {
-        echo "Edit user ID: " . $id;
-    }
-}
-
-class PostController 
-{
-    public function show($category, $id) 
-    {
-        echo "Category: " . $category . ", Post ID: " . $id;
-    }
-}
-```
-
-### Приоритет параметров
-
-1. **Параметры из URL** (например, `/user/{id}`) имеют высший приоритет
-2. **Query параметры** (например, `?name=value`) имеют меньший приоритет
-
-Если у вас есть маршрут `/user/{id}` и запрос `/user/123?id=456`, то в контроллер будет передан `id = 123`.
-
-### Route class
-Route for class methods
-
-- **Route** routing from uri, for example `/test` or `/user/{id}`
-- **Class** Controller class
-- **Action** action (method) controller class
-- **Arg** arguments for constructor controller class (optional)
-- **Methods** list allowed http methods (POST, GET, PUT etc..)
-- **Alias** alias for route (instead of **/test** **/testalias**) (optional)
-
-Example:
-```php
-Route::create('/user/{id}', UserController::class, 'show', [], ['GET']),
-```
-
-### Route Anonymous func
-Route for anonymous functions
-
-- **Route** routing from uri, for example `/test` or `/hello/{name}`
-- **Func** anonymous function for route
-- **Methods** list allowed http methods (POST, GET, PUT etc..)
-- **Alias** alias for route (instead of **/test** **/testalias**) (optional)
-
-Example:
-```php
-RouteAnonymousFunc::create('/hello/{name}', static function ($name) {
-    echo "Hello, " . $name;
-}, ['GET']);
-```
-
-### Router
-
-Router class that parses the uri and run the action
-
-### Runner
-the component is responsible for launching the action for the route
-Class for run action (controller class or anonymous function)
-
-Runs a class method or an anonymous function
-
-### Matcher
-Compares the uri against the list of the route and tries to find a match or throws an exception.
-Supports URL parameters in format `{parameter_name}`.
-
-### CheckerHttpMethod
-
-Сheck for permission for the found route allowed HTTP methods.
-
-### Config
-
-Config router
-
-Methods:
-- `setRunner()`
-- `setCheckerHttpMethod()`
-- `setMatcher()`
-
-You can add (implement the interfaces) custom components for the router (by default, components from the directory `FaustVik\Router\Router\Component` are used):
-
-and set to Config:
-Example:
-```php
-$config = new Config();
-$config->setRunner(new RunnerSmp());
-
-$router = new Router();
-$router->setConfig($config);
-```
-
-## Examples
+## 📚 Examples
 
 Comprehensive examples demonstrating router capabilities from basic to advanced:
 
 ### 🟢 Beginner Level
-- **[basic-example.php](examples/basic-example.php)** - Router introduction with controllers and URL parameters
-- **[url-parameters-example.php](examples/url-parameters-example.php)** - Advanced URL parameter handling
+- **[quick-example.php](examples/quick-example.php)** - QuickRouter introduction (5 minutes to start)
+- **[basic-example.php](examples/basic-example.php)** - Full router with controllers
+- **[url-parameters-example.php](examples/url-parameters-example.php)** - URL parameter handling
 
 ### 🟡 Intermediate Level  
-- **[response-types-example.php](examples/response-types-example.php)** - JSON, HTML, redirects, custom headers, XML, CORS
-- **[rest-api-example.php](examples/rest-api-example.php)** - Full REST API with CRUD operations and relationships
+- **[middleware-example.php](examples/middleware-example.php)** - Middleware basics
+- **[response-types-example.php](examples/response-types-example.php)** - JSON, HTML, redirects
+- **[rest-api-example.php](examples/rest-api-example.php)** - Full REST API with CRUD
+- **[named-routes-example.php](examples/named-routes-example.php)** - URL generation
 
 ### 🟠 Advanced Level
-- **[error-handling-example.php](examples/error-handling-example.php)** - Comprehensive error handling and exception management
+- **[di-basic-example.php](examples/di-basic-example.php)** - Dependency injection
+- **[cache-example.php](examples/cache-example.php)** - Route caching
+- **[error-handling-example.php](examples/error-handling-example.php)** - Error handling
+- **[csrf-protection-example.php](examples/csrf-protection-example.php)** - CSRF protection
 
-### Quick Start
+### Quick Test
 ```bash
 cd examples
-php basic-example.php
+
+# Test basic routing
+php quick-example.php
+
+# Test with specific route
 REQUEST_URI="/users/123" php basic-example.php
-REQUEST_URI="/api" php rest-api-example.php
+
+# Test REST API
+REQUEST_URI="/api/users" php rest-api-example.php
 ```
 
-See **[examples/README.md](examples/README.md)** for detailed documentation, testing commands, and learning path.
+See **[examples/README.md](examples/README.md)** for full documentation.
 
-## License
+## 🏗️ Architecture
 
-MIT
+### Components
+
+- **Router** - Main router class with route matching and execution
+- **Route** - Route definition with controller class
+- **RouteAnonymousFunc** - Route with closure handler
+- **RoutesCollection** - Route registry and management
+- **Config** - Router component configuration
+- **MiddlewareStack** - Chain of Responsibility pattern implementation
+
+### Matching Strategies
+
+- **Matching** - Basic route matching
+- **OptimizedMatching** - Indexed matching with O(1) static route lookup
+- **CachedMatching** - Caching wrapper for matching results
+
+## 🧪 Testing
+
+```bash
+# Run tests
+composer test
+
+# Run with coverage
+composer test-coverage
+
+# Static analysis
+composer phpstan
+```
+
+## 📖 Documentation
+
+- [Quick Start Guide](docs/QUICK_START.md)
+- [Concept & Architecture](docs/CONCEPT.md)
+- [DI & Middleware Implementation](docs/DI_MIDDLEWARE_IMPLEMENTATION.md)
+- [Future Plans](docs/FUTURE_PLANS.md)
+
+## 🤝 Contributing
+
+Contributions are welcome! This library is designed to be accessible for both beginners and experienced developers. We're not trying to replace Symfony or Yii2 routers, but provide a lightweight, easy-to-understand alternative.
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE) file for details.
+
+## 🌟 Acknowledgments
+
+Created with ❤️ for the PHP community.
