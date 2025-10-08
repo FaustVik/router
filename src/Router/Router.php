@@ -150,21 +150,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $queryParams = $request->getQuery();
         $allParams = array_merge($queryParams, $urlParams);
 
-        // Сохраняем текущий метод и временно устанавливаем из Request для проверки
-        $originalMethod = $_SERVER['REQUEST_METHOD'] ?? null;
-        $_SERVER['REQUEST_METHOD'] = $request->getMethod();
-        
-        try {
-            // Проверяем разрешенные HTTP методы
-            $this->check($route);
-        } finally {
-            // Восстанавливаем оригинальный метод
-            if ($originalMethod !== null) {
-                $_SERVER['REQUEST_METHOD'] = $originalMethod;
-            } else {
-                unset($_SERVER['REQUEST_METHOD']);
-            }
-        }
+        // Проверяем разрешенные HTTP методы (передаем метод из Request)
+        $this->check($route, $request->getMethod());
 
         // Обновляем Request с параметрами маршрута
         $request = $request->withParams($allParams);
@@ -305,9 +292,16 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod Если HTTP метод не разрешен
      */
-    protected function check(RouteInterface $route): void
+    /**
+     * Проверяет, разрешён ли HTTP метод для маршрута
+     *
+     * @param RouteInterface $route Маршрут для проверки
+     * @param string|null $httpMethod HTTP метод (если null, берется из $_SERVER)
+     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod
+     */
+    protected function check(RouteInterface $route, ?string $httpMethod = null): void
     {
-        $this->getConfig()->getCheckerHttpMethod()->isAllow($route->getMethods());
+        $this->getConfig()->getCheckerHttpMethod()->isAllow($route->getMethods(), $httpMethod);
     }
 
     /**
