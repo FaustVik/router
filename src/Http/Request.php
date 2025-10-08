@@ -262,6 +262,21 @@ final class Request implements RequestInterface
     }
 
     /**
+     * Создает новый экземпляр запроса с измененным body
+     *
+     * Полезно для тестирования и манипуляции данными запроса
+     *
+     * @param array<string, mixed> $body Данные body
+     * @return self Новый экземпляр запроса
+     */
+    public function withBody(array $body): self
+    {
+        $clone = clone $this;
+        $clone->body = $body;
+        return $clone;
+    }
+
+    /**
      * Получает все данные из body запроса
      *
      * Для POST/PUT/PATCH/DELETE запросов возвращает данные из:
