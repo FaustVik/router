@@ -24,7 +24,7 @@ interface RouterContainerInterface extends ContainerInterface
      * Resolve a class with its dependencies
      *
      * @param string $class Class name to resolve
-     * @param array $parameters Additional parameters to pass to constructor
+     * @param array<string, mixed> $parameters Additional parameters to pass to constructor
      * @return object
      */
     public function resolve(string $class, array $parameters = []): object;

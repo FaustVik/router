@@ -168,7 +168,7 @@ interface RequestInterface
     /**
      * Создает новый экземпляр запроса с измененными параметрами
      *
-     * @param array $params Новые параметры
+     * @param array<string, mixed> $params Новые параметры
      * @return self
      */
     public function withParams(array $params): self;

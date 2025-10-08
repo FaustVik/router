@@ -15,7 +15,7 @@ interface RunnerInterface
      * Common method to run, it will parse what specific type of route it is
      *
      * @param RouteInterface $route
-     * @param array          $params
+     * @param array<string, mixed> $params
      * @param Request|null   $request
      *
      * @return void
@@ -26,7 +26,7 @@ interface RunnerInterface
      * Run only RouteAnonymousFuncInterface route
      *
      * @param RouteAnonymousFuncInterface $route
-     * @param array                       $params
+     * @param array<string, mixed> $params
      * @param Request|null                $request
      *
      * @return void
@@ -41,7 +41,7 @@ interface RunnerInterface
      * Run only RouteClassInterface route
      *
      * @param RouteClassInterface $route
-     * @param array               $params
+     * @param array<string, mixed> $params
      * @param Request|null        $request
      *
      * @return void

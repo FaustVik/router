@@ -25,12 +25,15 @@ final class Response implements ResponseInterface
 {
     private string $content;
     private int $statusCode;
+    /** @var array<string, mixed> */
     private array $headers;
     /** @var array<Cookie> */
     private array $cookies = [];
 
     /**
      * Конструктор HTTP ответа
+     * 
+     * @param array<string, mixed> $headers
      */
     public function __construct(string $content = '', int $statusCode = 200, array $headers = [])
     {
@@ -193,6 +196,8 @@ final class Response implements ResponseInterface
 
     /**
      * Создает новый экземпляр ответа с добавленными заголовками
+     * 
+     * @param array<string, mixed> $headers
      */
     public function withHeaders(array $headers): self
     {

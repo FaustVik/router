@@ -38,6 +38,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     }
 
     /**
+     * @param array<string, mixed> $parameters
      * @throws \RuntimeException
      */
     public function resolve(string $class, array $parameters = []): object
@@ -85,6 +86,7 @@ class SymfonyContainerAdapter implements RouterContainerInterface
     /**
      * Create instance using reflection
      *
+     * @param array<string, mixed> $parameters
      * @throws \RuntimeException
      */
     private function createInstanceWithReflection(string $class, array $parameters = []): object

@@ -86,7 +86,7 @@ final class QuickRouter
      * Добавляет GET маршрут
      *
      * @param string $uri URI маршрута (например '/users/{id}')
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -116,7 +116,7 @@ final class QuickRouter
      * Добавляет POST маршрут
      *
      * @param string $uri URI маршрута
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -136,7 +136,7 @@ final class QuickRouter
      * Добавляет PUT маршрут
      *
      * @param string $uri URI маршрута
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -155,7 +155,7 @@ final class QuickRouter
      * Добавляет DELETE маршрут
      *
      * @param string $uri URI маршрута
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -174,7 +174,7 @@ final class QuickRouter
      * Добавляет PATCH маршрут
      *
      * @param string $uri URI маршрута
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -193,7 +193,7 @@ final class QuickRouter
      * Добавляет маршрут для любых HTTP методов
      *
      * @param string $uri URI маршрута
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -211,9 +211,9 @@ final class QuickRouter
     /**
      * Добавляет маршрут для указанных HTTP методов
      *
-     * @param array $methods Массив HTTP методов ['GET', 'POST']
+     * @param array<int, string> $methods Массив HTTP методов ['GET', 'POST']
      * @param string $uri URI маршрута
-     * @param callable|array $handler Callable функция или [ControllerClass::class, 'method']
+     * @param callable|array<int, mixed> $handler Callable функция или [ControllerClass::class, 'method']
      * @return RouteInterface
      *
      * @example
@@ -255,6 +255,7 @@ final class QuickRouter
      *
      * @param array $middleware Массив middleware классов
      * @param callable $callback Функция для определения маршрутов группы
+     * @param array<int, string|callable> $middleware
      * @return self
      *
      * @example
@@ -397,9 +398,9 @@ final class QuickRouter
      *
      * Использует named arguments для улучшения читаемости.
      *
-     * @param string|array $methods HTTP метод(ы)
+     * @param string|array<int, string> $methods HTTP метод(ы)
      * @param string $uri URI маршрута
-     * @param callable|array $handler Обработчик
+     * @param callable|array<int, mixed> $handler Обработчик
      * @return RouteInterface
      * @throws \InvalidArgumentException Если обработчик имеет неверный формат
      */

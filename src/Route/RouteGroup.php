@@ -10,7 +10,9 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 final class RouteGroup implements RouteGroupInterface
 {
     private string $prefix = '';
+    /** @var array<int, string|callable> */
     private array $middleware = [];
+    /** @var array<int, RouteInterface> */
     private array $routes = [];
 
     public function __construct(
@@ -30,12 +32,18 @@ final class RouteGroup implements RouteGroupInterface
         return $this;
     }
 
+    /**
+     * @param array<int, string|callable> $middleware
+     */
     public function middleware(array $middleware): self
     {
         $this->middleware = array_merge($this->middleware, $middleware);
         return $this;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function get(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -46,6 +54,9 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function post(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -56,6 +67,9 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function put(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -66,6 +80,9 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function delete(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -76,6 +93,9 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function patch(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -86,6 +106,9 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function any(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -96,6 +119,10 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, string> $methods
+     * @param array<int, mixed> $arg
+     */
     public function match(array $methods, string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $fullRoute = $this->prefix . $route;
@@ -166,6 +193,9 @@ final class RouteGroup implements RouteGroupInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, string> $methods
+     */
     public function matchFunc(array $methods, string $route, callable $func): RouteInterface
     {
         $fullRoute = $this->prefix . $route;

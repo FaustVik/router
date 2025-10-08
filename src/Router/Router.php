@@ -459,6 +459,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *         DatabaseConnection::class => DatabaseConnection::class,
      *     ]
      * ]);
+     * 
+     * @param array<string, mixed> $config
      */
     public function configureContainer(array $config): self
     {

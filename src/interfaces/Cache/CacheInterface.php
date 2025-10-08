@@ -33,16 +33,23 @@ interface CacheInterface
 
     /**
      * Получить множественные значения
+     * 
+     * @param array<int, string> $keys
+     * @return array<string, mixed>
      */
     public function getMultiple(array $keys): array;
 
     /**
      * Сохранить множественные значения
+     * 
+     * @param array<string, mixed> $values
      */
     public function setMultiple(array $values, int $ttl = 0): bool;
 
     /**
      * Удалить множественные значения
+     * 
+     * @param array<int, string> $keys
      */
     public function deleteMultiple(array $keys): bool;
 }

@@ -156,6 +156,8 @@ final class OptimizedMatching implements MatchingRouteInterface
 
     /**
      * Пытается сопоставить URI с маршрутом
+     * 
+     * @param array<int, string> $segments
      */
     private function tryMatch(
         string $uri,

@@ -17,7 +17,9 @@ use Psr\Container\NotFoundExceptionInterface;
 class DefaultContainer implements RouterContainerInterface
 {
     private Container $container;
+    /** @var array<string, mixed> */
     private array $bindings = [];
+    /** @var array<string, mixed> */
     private array $singletons = [];
 
     public function __construct()
@@ -27,6 +29,8 @@ class DefaultContainer implements RouterContainerInterface
 
     /**
      * Create container with configuration
+     * 
+     * @param array<string, mixed> $config
      */
     public static function withConfig(array $config = []): self
     {
@@ -73,6 +77,9 @@ class DefaultContainer implements RouterContainerInterface
         return $this->container->has($id) || class_exists($id);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function resolve(string $class, array $parameters = []): object
     {
         try {
@@ -105,6 +112,8 @@ class DefaultContainer implements RouterContainerInterface
 
     /**
      * Get all bindings
+     * 
+     * @return array<string, mixed>
      */
     public function getBindings(): array
     {
@@ -113,6 +122,8 @@ class DefaultContainer implements RouterContainerInterface
 
     /**
      * Get all singletons
+     * 
+     * @return array<string, mixed>
      */
     public function getSingletons(): array
     {

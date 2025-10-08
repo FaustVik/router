@@ -8,6 +8,9 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 final class MatchResult
 {
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function __construct(
         private RouteInterface $route,
         private array $parameters = []
@@ -19,6 +22,9 @@ final class MatchResult
         return $this->route;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParameters(): array
     {
         return $this->parameters;

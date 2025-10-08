@@ -9,7 +9,7 @@ use FaustVik\Router\interfaces\Routes\RouteInterface;
 
 final class RoutesCollection implements RoutesCollectionInterface
 {
-    /**@var RouteInterface[] $collections */
+    /** @var array<int, RouteInterface> */
     private array $collections = [];
 
     public function set(RouteInterface ...$routes): void
@@ -28,6 +28,9 @@ final class RoutesCollection implements RoutesCollectionInterface
     }
 
     /** Helper методы для HTTP методов */
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function addGet(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $routeObject = Route::create($route, $class, $action, $arg, ['GET']);
@@ -35,6 +38,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function addPost(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $routeObject = Route::create($route, $class, $action, $arg, ['POST']);
@@ -42,6 +48,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function addPut(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $routeObject = Route::create($route, $class, $action, $arg, ['PUT']);
@@ -49,6 +58,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function addDelete(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $routeObject = Route::create($route, $class, $action, $arg, ['DELETE']);
@@ -56,6 +68,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function addPatch(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $routeObject = Route::create($route, $class, $action, $arg, ['PATCH']);
@@ -63,6 +78,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     */
     public function addAny(string $route, string $class, string $action, array $arg = []): RouteInterface
     {
         $routeObject = Route::create(
@@ -76,6 +94,10 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, string> $methods
+     * @param array<int, mixed> $arg
+     */
     public function addMatch(
         array $methods,
         string $route,
@@ -135,6 +157,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $routeObject;
     }
 
+    /**
+     * @param array<int, string> $methods
+     */
     public function addMatchFunc(array $methods, string $route, callable $func): RouteInterface
     {
         $routeObject = RouteAnonymousFunc::create($route, $func, $methods);
@@ -150,6 +175,9 @@ final class RoutesCollection implements RoutesCollectionInterface
         return $group;
     }
 
+    /**
+     * @param array<int, string|callable> $middleware
+     */
     public function middleware(array $middleware): RouteGroup
     {
         $group = new RouteGroup($this);

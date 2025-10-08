@@ -12,10 +12,13 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 {
     private string $route = '';
     private Closure $func;
+    /** @var array<int, string> */
     private array $methods = [];
     private ?string $alias = null;
+    /** @var array<int, string|callable> */
     private array $middleware = [];
     private ?string $name = null;
+    /** @var array<string, string> */
     private array $constraints = [];
 
     public function __construct()
@@ -24,6 +27,9 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         };
     }
 
+    /**
+     * @param array<int, string> $methods
+     */
     public static function create(
         string $route,
         callable $func,
@@ -49,6 +55,9 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         return $this->func;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getMethods(): array
     {
         return $this->methods;
@@ -71,11 +80,17 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         return $this;
     }
 
+    /**
+     * @return array<int, string|callable>
+     */
     public function getMiddleware(): array
     {
         return $this->middleware;
     }
 
+    /**
+     * @param array<int, string|callable> $middleware
+     */
     public function middleware(array $middleware): self
     {
         $this->middleware = $middleware;
@@ -93,6 +108,9 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
         return $this;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getConstraints(): array
     {
         return $this->constraints;

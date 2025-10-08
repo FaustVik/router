@@ -28,20 +28,33 @@ final class Request implements RequestInterface
 {
     private string $method;
     private string $uri;
+    /** @var array<string, mixed> */
     private array $params;
+    /** @var array<string, mixed> */
     private array $query;
+    /** @var array<string, mixed> */
     private array $headers;
+    /** @var array<string, mixed> */
     private array $server;
+    /** @var array<string, mixed> */
     private array $attributes = [];
+    /** @var array<string, mixed> */
     private array $body = [];
 // Для POST/PUT данных
+    /** @var array<string, mixed> */
     private array $files = [];
 // Для загруженных файлов
+    /** @var array<string, mixed> */
     private array $cookies = [];
 // Для HTTP cookies
 
     /**
      * Конструктор HTTP запроса
+     * 
+     * @param array<string, mixed> $params
+     * @param array<string, mixed> $query
+     * @param array<string, mixed> $headers
+     * @param array<string, mixed> $server
      */
     public function __construct(
         string $method = '',
@@ -243,6 +256,8 @@ final class Request implements RequestInterface
 
     /**
      * Создает новый экземпляр запроса с измененными параметрами
+     * 
+     * @param array<string, mixed> $params
      */
     public function withParams(array $params): self
     {
@@ -284,7 +299,7 @@ final class Request implements RequestInterface
      * - $_POST (для form-data)
      * - php://input (для других типов)
      *
-     * @return array Данные body запроса
+     * @return array<string, mixed> Данные body запроса
      */
     public function getBody(): array
     {
@@ -320,7 +335,7 @@ final class Request implements RequestInterface
     /**
      * Получает все загруженные файлы
      *
-     * @return array Массив $_FILES
+     * @return array<string, mixed> Массив $_FILES
      */
     public function getFiles(): array
     {
@@ -331,7 +346,7 @@ final class Request implements RequestInterface
      * Получает конкретный загруженный файл
      *
      * @param string $key Ключ файла из формы
-     * @return array|null Данные файла или null если файл не найден
+     * @return array<string, mixed>|null Данные файла или null если файл не найден
      */
     public function file(string $key): ?array
     {

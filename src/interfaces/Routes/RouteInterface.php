@@ -16,7 +16,7 @@ interface RouteInterface
     /**
      * Get allowed http methods for route
      *
-     * @return array
+     * @return array<int, string>
      */
     public function getMethods(): array;
 
@@ -30,14 +30,14 @@ interface RouteInterface
     /**
      * Get middleware for route
      *
-     * @return array
+     * @return array<int, string|callable>
      */
     public function getMiddleware(): array;
 
     /**
      * Set middleware for route
      *
-     * @param array $middleware
+     * @param array<int, string|callable> $middleware
      * @return self
      */
     public function middleware(array $middleware): self;
@@ -60,7 +60,7 @@ interface RouteInterface
     /**
      * Get constraints for route parameters
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getConstraints(): array;
 

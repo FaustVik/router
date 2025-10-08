@@ -10,8 +10,8 @@ interface RouteClassInterface extends RouteInterface
      * @param string      $route
      * @param string      $class
      * @param string      $action
-     * @param array       $arg
-     * @param array       $methods
+     * @param array<int, mixed> $arg
+     * @param array<int, string> $methods
      * @param string|null $alias
      *
      * @return RouteInterface
@@ -42,7 +42,7 @@ interface RouteClassInterface extends RouteInterface
     /**
      * Arguments for init Class
      *
-     * @return array
+     * @return array<int, mixed>
      */
     public function getArg(): array;
 }

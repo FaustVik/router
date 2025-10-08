@@ -38,6 +38,7 @@ final class Runner implements RunnerInterface
     }
 
     /**
+     * @param array<string, mixed> $params
      * @throws InvalidTypeRoute
      */
     public function run(RouteInterface $route, array $params = [], ?Request $request = null): void
@@ -56,6 +57,7 @@ final class Runner implements RunnerInterface
     }
 
     /**
+     * @param array<string, mixed> $params
      * @throws ReflectionException
      */
     public function runAnonymousFunc(
@@ -96,6 +98,7 @@ final class Runner implements RunnerInterface
     }
 
     /**
+     * @param array<string, mixed> $params
      * @throws NotFoundClass
      * @throws NotFoundMethod
      */
@@ -109,7 +112,13 @@ final class Runner implements RunnerInterface
 
         // Use DI container if available
         if ($this->container && $this->container->canResolve($route->getClass())) {
-            $controller = $this->container->resolve($route->getClass(), $route->getArg());
+            // Преобразуем индексированный массив в ассоциативный для совместимости с контейнером
+            $args = $route->getArg();
+            $namedArgs = [];
+            foreach ($args as $key => $value) {
+                $namedArgs[(string)$key] = $value;
+            }
+            $controller = $this->container->resolve($route->getClass(), $namedArgs);
         } else {
             $controller = $reflection_class->newInstanceArgs($route->getArg());
         }

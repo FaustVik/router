@@ -47,6 +47,9 @@ final class Matching implements MatchingRouteInterface
         return null;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function matchPattern(string $uri, string $pattern): ?array
     {
         $uriSegments = $this->getSegments($uri);
@@ -73,6 +76,9 @@ final class Matching implements MatchingRouteInterface
         return $parameters;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getSegments(string $path): array
     {
         return array_values(array_filter(explode('/', $path), fn($segment) => $segment !== ''));

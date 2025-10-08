@@ -120,6 +120,8 @@ class ContainerAdapterFactory
 
     /**
      * Get supported container types
+     * 
+     * @return array<string, class-string>
      */
     public static function getSupportedTypes(): array
     {

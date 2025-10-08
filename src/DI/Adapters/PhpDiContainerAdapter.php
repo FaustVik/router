@@ -38,6 +38,9 @@ class PhpDiContainerAdapter implements RouterContainerInterface
         return $this->container->has($id) || class_exists($id);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function resolve(string $class, array $parameters = []): object
     {
         try {
