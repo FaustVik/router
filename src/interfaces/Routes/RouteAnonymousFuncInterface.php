@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FaustVik\Router\interfaces\Routes;
 
 use Closure;
@@ -9,7 +11,7 @@ interface RouteAnonymousFuncInterface extends RouteInterface
     /**
      * @param string      $route
      * @param callable    $func
-     * @param array       $methods
+     * @param array<int, string> $methods
      * @param string|null $alias
      *
      * @return RouteInterface

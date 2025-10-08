@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FaustVik\Router\exceptions;
 
-class NoMatch extends Exception
+/**
+ * Exception thrown when no route matches the URI
+ *
+ * @package FaustVik\Router\exceptions
+ */
+final class NoMatch extends Exception
 {
     public function __construct(string $uri)
     {

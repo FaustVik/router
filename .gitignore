@@ -1,4 +1,33 @@
 .idea/
+.vscode/
+.cursor/
+!.cursor/rules/
+!.cursor/rules/code_style.mdc
+!.cursor/rules/main.mdc
 index.php
 
 vendor/
+
+# Temporary files and caches
+.var/*
+!.var/.gitkeep
+!.var/README.md
+
+# Cache directories
+/cache/
+/custom_cache/
+*.cache
+
+# Log files
+*.log
+/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local

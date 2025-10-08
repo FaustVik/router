@@ -1,0 +1,20 @@
+parameters:
+    level: 9
+    paths:
+        - src
+    tmpDir: .var/phpstan
+    
+    # Полезные правила для улучшения кода
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkUninitializedProperties: true
+    checkDynamicProperties: true
+    
+    # Исключения для специфических случаев
+    ignoreErrors:
+        # Можно добавить исключения при необходимости
+        # - '#Call to an undefined method#'
+    
+    # Дополнительные расширения (можно добавить позже)
+    # includes:
+    #     - vendor/phpstan/phpstan-phpunit/extension.neon
+    #     - vendor/phpstan/phpstan-strict-rules/rules.neon 

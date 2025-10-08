@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FaustVik\Router\interfaces\Router\Components;
 
 use FaustVik\Router\exceptions\NotAllowedHttpMethod;
@@ -7,20 +9,20 @@ use FaustVik\Router\exceptions\NotAllowedHttpMethod;
 interface CheckHttpMethodInterface
 {
     /**
-     * Adding routes
+     * Проверяет, разрешён ли HTTP метод для маршрута
      *
-     * @param array $methods
-     *
-     * @return bool
-     *
+     * @param array<string> $methods Разрешённые HTTP методы
+     * @param string|null $currentMethod Текущий HTTP метод (если null, берется из $_SERVER)
+     * @return void
      * @throws NotAllowedHttpMethod
      */
-    public static function isAllow(array $methods): bool;
+    public function isAllow(array $methods, ?string $currentMethod = null): void;
 
     /**
-     * Get which method was used
+     * Получает текущий HTTP метод запроса из $_SERVER
      *
      * @return string
+     * @deprecated Используйте передачу метода в isAllow() напрямую
      */
-    public static function getRequestMethod(): string;
+    public function getRequestMethod(): string;
 }
