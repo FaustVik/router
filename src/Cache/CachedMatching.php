@@ -27,7 +27,7 @@ final class CachedMatching implements MatchingRouteInterface
     private bool $cacheEnabled = false;
     private int $cacheTtl = 3600; // 1 hour by default
 
-    public function __construct(MatchingRouteInterface $matcher = null, CacheInterface $cache = null)
+    public function __construct(?MatchingRouteInterface $matcher = null, ?CacheInterface $cache = null)
     {
         $this->originalMatcher = $matcher ?? new Matching();
         $this->cache = $cache ?? new FileCache();

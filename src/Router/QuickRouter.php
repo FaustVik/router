@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router;
 
+use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RouteAnonymousFunc;
@@ -302,7 +303,7 @@ final class QuickRouter
      * $app->get('/', fn() => "Hello World!");
      * $app->run();
      */
-    public function addMiddleware(string|callable $middleware): self
+    public function addMiddleware(string|callable|MiddlewareInterface $middleware): self
     {
         $this->router->addGlobalMiddleware($middleware);
         return $this;
@@ -313,7 +314,7 @@ final class QuickRouter
      *
      * Replaces all existing global middleware with new ones.
      *
-     * @param array<int, string|callable> $middleware Middleware array
+     * @param array<int, string|callable|MiddlewareInterface> $middleware Middleware array
      * @return self Returns self for fluent interface
      *
      * @example
@@ -332,7 +333,7 @@ final class QuickRouter
     /**
      * Gets all global middleware
      *
-     * @return array<int, string|object|callable> Array of global middleware
+     * @return array<int, string|callable|MiddlewareInterface> Array of global middleware
      */
     public function getMiddleware(): array
     {

@@ -103,6 +103,7 @@ final class MiddlewareStack
      * Массив может содержать:
      * - Экземпляры MiddlewareInterface
      * - Имена классов middleware (будут разрешены через DI контейнер или созданы напрямую)
+     * - Callable функции (будут обёрнуты в анонимный middleware)
      *
      * Для middleware с зависимостями в конструкторе необходимо:
      * 1. Передать DI контейнер в конструктор MiddlewareStack
@@ -111,7 +112,7 @@ final class MiddlewareStack
      *
      * Для простых middleware без зависимостей можно просто передать имя класса.
      *
-     * @param array<MiddlewareInterface|class-string<MiddlewareInterface>> $middleware
+     * @param array<MiddlewareInterface|class-string<MiddlewareInterface>|callable> $middleware
      * @return self Для fluent interface
      * @throws \RuntimeException|\InvalidArgumentException If middleware is invalid or cannot be resolved
      */

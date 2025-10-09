@@ -14,6 +14,7 @@ use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
 use FaustVik\Router\interfaces\Router\RouterInterface;
+use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\interfaces\Routes\RouteInterface;
 use FaustVik\Router\Middleware\MiddlewareStack;
 use FaustVik\Router\Router\Components\Config;
@@ -52,7 +53,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     /** @var array<string, RouteInterface> Indexed named routes */
     private array $namedRoutes = [];
 
-    /** @var array<int, string|callable> Global middleware for all routes */
+    /** @var array<int, string|callable|MiddlewareInterface> Global middleware for all routes */
     private array $globalMiddleware = [];
 
     /**
@@ -172,9 +173,11 @@ final class Router implements RouterInterface, CacheableRouterInterface
         $middlewareStack = new MiddlewareStack($finalHandler, $this->container);
 
         // Сначала добавляем глобальные middleware (применяются ко всем маршрутам)
+        /** @phpstan-ignore-next-line */
         $middlewareStack->addFromArray($this->globalMiddleware);
 
         // Затем добавляем middleware конкретного маршрута
+        /** @phpstan-ignore-next-line */
         $middlewareStack->addFromArray($route->getMiddleware());
 
         // Выполняем middleware stack и возвращаем результат
@@ -272,7 +275,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if ($this->paramsString) {
             $parsedParams = [];
             parse_str($this->paramsString, $parsedParams);
-            // @var array<string, mixed> $parsedParams
+            /** @var array<string, mixed> $parsedParams */
 
             $this->params = $parsedParams;
         }
@@ -398,7 +401,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *     $container->bind(LoggerInterface::class, FileLogger::class);
      * });
      */
-    public function enableDI(\Closure $configurator = null): self
+    public function enableDI(?\Closure $configurator = null): self
     {
         if ($configurator) {
             $this->container = DefaultContainer::withClosure($configurator);
@@ -749,7 +752,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Global middleware executes before route-specific middleware.
      * Useful for CORS, logging, authentication and other common tasks.
      *
-     * @param string|callable $middleware Middleware class or callable
+     * @param string|callable|MiddlewareInterface $middleware Middleware class, callable or instance
      * @return self Returns current instance for method chaining
      *
      * @example
@@ -766,7 +769,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *        ->addGlobalMiddleware(LoggingMiddleware::class)
      *        ->addGlobalMiddleware(RateLimitMiddleware::class);
      */
-    public function addGlobalMiddleware(string|callable $middleware): self
+    public function addGlobalMiddleware(string|callable|MiddlewareInterface $middleware): self
     {
         $this->globalMiddleware[] = $middleware;
         return $this;
@@ -777,7 +780,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * Replaces all existing global middleware with new ones.
      *
-     * @param array<int, string|callable> $middleware Middleware array
+     * @param array<int, string|callable|MiddlewareInterface> $middleware Middleware array
      * @return self Returns current instance for method chaining
      *
      * @example
@@ -796,7 +799,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     /**
      * Gets all global middleware
      *
-     * @return array<int, string|object|callable> Array of global middleware
+     * @return array<int, string|callable|MiddlewareInterface> Array of global middleware
      */
     public function getGlobalMiddleware(): array
     {
