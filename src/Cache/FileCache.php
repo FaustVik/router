@@ -8,21 +8,6 @@ use FaustVik\Router\Interfaces\Cache\CacheInterface;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;
-use function dirname;
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
-use function glob;
-use function is_dir;
-use function is_file;
-use function is_writable;
-use function json_decode;
-use function json_encode;
-use function mkdir;
-use function realpath;
-use function strpos;
-use function time;
-use function unlink;
 
 /**
  * File-based cache with security protection

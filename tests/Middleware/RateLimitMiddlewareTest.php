@@ -9,6 +9,8 @@ use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Middleware\RateLimitMiddleware;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Тесты для RateLimitMiddleware
@@ -26,18 +28,27 @@ final class RateLimitMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        // Очищаем кеш после каждого теста
         if (is_dir($this->cacheDir)) {
-            $files = glob($this->cacheDir . '/*');
-            if ($files !== false) {
-                foreach ($files as $file) {
-                    if (is_file($file)) {
-                        unlink($file);
-                    }
-                }
-            }
-            rmdir($this->cacheDir);
+            $this->removeDirectory($this->cacheDir);
         }
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($items as $item) {
+            if ($item->isDir()) {
+                rmdir($item->getRealPath());
+            } else {
+                unlink($item->getRealPath());
+            }
+        }
+
+        rmdir($dir);
     }
 
     public function testAllowsRequestsWithinLimit(): void

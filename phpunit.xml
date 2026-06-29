@@ -19,7 +19,7 @@
             <directory suffix=".php">src</directory>
         </include>
         <exclude>
-            <directory>src/exceptions</directory>
+            <directory>src/Exceptions</directory>
         </exclude>
     </source>
 </phpunit>
