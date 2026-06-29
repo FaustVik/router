@@ -398,7 +398,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *     $container->bind(LoggerInterface::class, FileLogger::class);
      * });
      */
-    public function enableDI(Closure $configurator = null): self
+    public function enableDI(?Closure $configurator = null): self
     {
         if ($configurator) {
             $this->container = DefaultContainer::withClosure($configurator);
