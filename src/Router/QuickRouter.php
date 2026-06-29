@@ -422,7 +422,7 @@ final class QuickRouter
         }
 
         // Если handler - массив [ControllerClass::class, 'method']
-        if (is_array($handler) && count($handler) === 2) {
+        if (count($handler) === 2) {
             [$class, $method] = $handler;
 
             if (!is_string($class) || !is_string($method)) {

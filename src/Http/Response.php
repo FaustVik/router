@@ -25,7 +25,7 @@ final class Response implements ResponseInterface
 {
     private string $content;
     private int $statusCode;
-    /** @var array<string, mixed> */
+    /** @var array<string, string> */
     private array $headers;
     /** @var array<Cookie> */
     private array $cookies = [];
@@ -33,7 +33,7 @@ final class Response implements ResponseInterface
     /**
      * Конструктор HTTP ответа
      *
-     * @param array<string, mixed> $headers
+     * @param array<string, string> $headers
      */
     public function __construct(string $content = '', int $statusCode = 200, array $headers = [])
     {
@@ -50,7 +50,7 @@ final class Response implements ResponseInterface
      *
      * @param string $content Response content
      * @param int $statusCode HTTP status code
-     * @param array<string, string> $headers HTTP headers
+     * @param iterable<string, string> $headers HTTP headers
      * @return self
      *
      * @example
@@ -70,7 +70,7 @@ final class Response implements ResponseInterface
      *
      * @param mixed $data Data to encode as JSON
      * @param int $statusCode HTTP status code
-     * @param array<string, string> $headers Additional HTTP headers
+     * @param iterable<string, string> $headers Additional HTTP headers
      * @return self
      *
      * @example
@@ -95,7 +95,7 @@ final class Response implements ResponseInterface
      *
      * @param string $content HTML content
      * @param int $statusCode HTTP status code
-     * @param array<string, string> $headers Additional HTTP headers
+     * @param iterable<string, string> $headers Additional HTTP headers
      * @return self
      *
      * @example
@@ -170,17 +170,7 @@ final class Response implements ResponseInterface
      */
     public function getHeaders(): array
     {
-        $stringHeaders = [];
-        foreach ($this->headers as $key => $value) {
-            if (is_string($value)) {
-                $stringHeaders[$key] = $value;
-            } elseif (is_scalar($value)) {
-                $stringHeaders[$key] = (string) $value;
-            } else {
-                $stringHeaders[$key] = '';
-            }
-        }
-        return $stringHeaders;
+        return $this->headers;
     }
 
     /**
@@ -307,7 +297,7 @@ final class Response implements ResponseInterface
     /**
      * Creates new response with added headers (immutable)
      *
-     * @param array<string, mixed> $headers Headers to add
+     * @param array<string, string> $headers Headers to add
      * @return self New response instance
      *
      * @example

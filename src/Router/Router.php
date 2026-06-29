@@ -43,11 +43,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
     private ?string $uri = null;
     private ?string $paramsString = null;
 
-    /**
-     * @var array<string, mixed>|null Query parameters from URI
-     * @phpstan-ignore-next-line property.onlyWritten
-     */
-    private ?array $params = null;
+    /** @var array<string, mixed>|null */
+    private ?array $params = null; // @phpstan-ignore property.onlyWritten
 
     private ConfigInterface $config;
     private ?RoutesCollectionInterface $collections = null;
@@ -236,7 +233,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function getUri(): string
     {
         if (!$this->uriRaw) {
-            $this->uriRaw = $_SERVER['REQUEST_URI'] ?? '/';
+            $this->uriRaw = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
         }
 
         return $this->uriRaw;
@@ -276,7 +273,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if ($this->paramsString) {
             $parsedParams = [];
             parse_str($this->paramsString, $parsedParams);
-            /** @var array<string, mixed> $parsedParams */
+            // @phpstan-ignore assign.propertyType
             $this->params = $parsedParams;
         }
     }

@@ -94,11 +94,14 @@ final class Request implements RequestInterface
         // HTTP Method Override для REST API через формы
         if ($method === 'POST') {
             // Из POST параметра _method
-            if (isset($_POST['_method'])) {
+            if (isset($_POST['_method']) && is_string($_POST['_method'])) {
                 $method = strtoupper($_POST['_method']);
             } elseif (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
                 // Из HTTP заголовка X-HTTP-Method-Override
-                $method = strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+                $header = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'];
+                if (is_string($header)) {
+                    $method = strtoupper($header);
+                }
             }
         }
 
@@ -113,7 +116,7 @@ final class Request implements RequestInterface
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
         // Если Content-Type содержит application/json - парсим JSON из php://input
-        if (str_contains(strtolower($contentType), 'application/json')) {
+        if (is_string($contentType) && str_contains(strtolower($contentType), 'application/json')) {
             $rawBody = file_get_contents('php://input');
             if ($rawBody !== false && $rawBody !== '') {
                 try {
@@ -148,7 +151,14 @@ final class Request implements RequestInterface
 
         $files = $_FILES;
 
-        $request = new self($method, $uri, [], $query, $headers, $server);
+        $request = new self(
+            is_string($method) ? $method : 'GET',
+            is_string($uri) ? $uri : '/',
+            [],
+            $query,
+            $headers,
+            $server
+        );
         $request->body = $body;
         $request->files = $files;
         $request->cookies = $cookies;
@@ -490,8 +500,11 @@ final class Request implements RequestInterface
      */
     public function file(string $key): ?array
     {
+        /** @var mixed $file */
         $file = $this->files[$key] ?? null;
-        return is_array($file) ? $file : null;
+        /** @var array<string, mixed>|null $result */
+        $result = is_array($file) ? $file : null;
+        return $result;
     }
 
     /**

@@ -97,6 +97,7 @@ final class AuthMiddleware implements MiddlewareInterface
     private function validateToken(string $token): ?array
     {
         $result = ($this->tokenValidator)($token);
+        /** @var array<string, mixed>|null $result */
         return is_array($result) ? $result : null;
     }
 

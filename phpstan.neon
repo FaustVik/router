@@ -8,25 +8,3 @@ parameters:
     checkUninitializedProperties: true
     checkDynamicProperties: true
     reportUnmatchedIgnoredErrors: false
-
-    ignoreErrors:
-        - '/Parameter #1 \$string of function strtoupper expects string, mixed/'
-        - '/Parameter #1 \$string of function strtolower expects string, mixed/'
-        - '/Parameter #1 \$method of class .*Request constructor expects string, mixed/'
-        - '/Parameter #2 \$uri of class .*Request constructor expects string, mixed/'
-        - '/Call to function is_array\(\) with .* will always evaluate to true/'
-        - '/Binary operation "\." between .* and mixed results/'
-        - '/Method .*::validateToken\(\)/'
-        - '/Method .*::__construct\(\) has/'
-        - '/Method .*::getStoredToken\(\)/'
-        - '/Method .*::getToken\(\)/'
-        - '/Cannot cast mixed to int/'
-        - '/Cannot cast mixed to string/'
-        - '/Comparison operation .* between .* and .* is always/'
-        - '/Unreachable statement/'
-        - '/Instanceof between .* is always/'
-        - '/Instanceof between .*MiddlewareInterface.* will always/'
-        - '/PHPDoc tag @var with type .* is not subtype of native type/'
-        - '/Property .*::\$uriRaw .* does not accept/'
-        - '/Method .*Request::file\(\) should return/'
-        - '/Parameter #2 \$array of function implode expects/'

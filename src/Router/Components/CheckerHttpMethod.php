@@ -53,7 +53,7 @@ final class CheckerHttpMethod implements CheckHttpMethodInterface
      */
     public function getRequestMethod(): string
     {
-        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $method = is_string($_SERVER['REQUEST_METHOD'] ?? null) ? $_SERVER['REQUEST_METHOD'] : 'GET';
         return strtoupper($method);
     }
 }

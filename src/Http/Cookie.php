@@ -244,27 +244,14 @@ final class Cookie implements CookieInterface
     {
         $expires = $this->expires > 0 ? time() + $this->expires : 0;
 
-        if (PHP_VERSION_ID >= 70300) {
-            return setcookie($this->name, $this->value, [
-                'expires' => $expires,
-                'path' => $this->path,
-                'domain' => $this->domain,
-                'secure' => $this->secure,
-                'httponly' => $this->httpOnly,
-                'samesite' => $this->sameSite,
-            ]);
-        }
-
-        // Fallback для PHP < 7.3
-        return setcookie(
-            $this->name,
-            $this->value,
-            $expires,
-            $this->path,
-            $this->domain,
-            $this->secure,
-            $this->httpOnly
-        );
+        return setcookie($this->name, $this->value, [
+            'expires' => $expires,
+            'path' => $this->path,
+            'domain' => $this->domain,
+            'secure' => $this->secure,
+            'httponly' => $this->httpOnly,
+            'samesite' => $this->sameSite,
+        ]);
     }
 
     /**

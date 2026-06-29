@@ -173,20 +173,30 @@ final class LoggingMiddleware implements MiddlewareInterface
             '[' . date('Y-m-d H:i:s') . ']',
         ];
 
-        if (isset($context['ip'])) {
+        if (isset($context['ip']) && is_string($context['ip'])) {
             $parts[] = $context['ip'];
         }
 
-        $parts[] = $context['method'];
-        $parts[] = $context['uri'];
+        if (is_string($context['method'] ?? null)) {
+            $parts[] = $context['method'];
+        }
+        if (is_string($context['uri'] ?? null)) {
+            $parts[] = $context['uri'];
+        }
 
-        if (isset($context['user_agent'])) {
+        if (isset($context['user_agent']) && is_string($context['user_agent'])) {
             $parts[] = '"' . $context['user_agent'] . '"';
         }
 
-        $parts[] = $context['status_code'];
-        $parts[] = (string) $context['duration_ms'] . 'ms';
-        $parts[] = $context['status_text'];
+        if (isset($context['status_code'])) {
+            $parts[] = is_numeric($context['status_code']) ? (string) $context['status_code'] : '';
+        }
+        if (isset($context['duration_ms'])) {
+            $parts[] = (is_numeric($context['duration_ms']) ? (string) $context['duration_ms'] : '0') . 'ms';
+        }
+        if (is_string($context['status_text'] ?? null)) {
+            $parts[] = $context['status_text'];
+        }
 
         return implode(' ', $parts) . "\n";
     }

@@ -55,7 +55,6 @@ final class CsrfMiddleware implements MiddlewareInterface
      * @param int<1, max> $tokenLength Token length in bytes (will be doubled in hex)
      * @param string|null $sessionKey Key for storing token in session
      * @param array<int, string> $excludePaths Paths that don't require CSRF check
-     * @throws InvalidArgumentException If token length is less than 1
      */
     public function __construct(
         private readonly int $tokenLength = self::DEFAULT_TOKEN_LENGTH,
@@ -234,7 +233,9 @@ final class CsrfMiddleware implements MiddlewareInterface
      */
     private function getStoredToken(): ?string
     {
-        return $_SESSION[$this->sessionKey] ?? null;
+        /** @var mixed $token */
+        $token = $_SESSION[$this->sessionKey] ?? null;
+        return is_string($token) ? $token : null;
     }
 
     /**
@@ -276,7 +277,9 @@ final class CsrfMiddleware implements MiddlewareInterface
             $_SESSION[$key] = bin2hex(random_bytes(self::DEFAULT_TOKEN_LENGTH));
         }
 
-        return $_SESSION[$key] ?? '';
+        /** @var mixed $token */
+        $token = $_SESSION[$key] ?? '';
+        return is_string($token) ? $token : '';
     }
 
     /**

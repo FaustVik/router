@@ -122,7 +122,7 @@ final class RateLimitMiddleware implements MiddlewareInterface
             return 0;
         }
 
-        return (int) $data['attempts'];
+        return is_numeric($data['attempts']) ? (int) $data['attempts'] : 0;
     }
 
     /**
@@ -136,7 +136,7 @@ final class RateLimitMiddleware implements MiddlewareInterface
         $data = $this->cache->get($key);
 
         if (is_array($data) && isset($data['reset_time'])) {
-            return (int) $data['reset_time'];
+            return is_numeric($data['reset_time']) ? (int) $data['reset_time'] : time() + $this->decaySeconds;
         }
 
         return time() + $this->decaySeconds;

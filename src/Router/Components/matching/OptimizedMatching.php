@@ -197,9 +197,9 @@ final class OptimizedMatching implements MatchingRouteInterface
         }
 
         foreach ($constraints as $param => $pattern) {
-            if (isset($parameters[$param])) {
+            if (isset($parameters[$param]) && is_string($parameters[$param])) {
                 $regexp = '#^' . $pattern . '$#';
-                if (preg_match($regexp, (string) $parameters[$param]) !== 1) {
+                if (preg_match($regexp, $parameters[$param]) !== 1) {
                     return false;
                 }
             }

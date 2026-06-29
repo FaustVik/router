@@ -142,7 +142,7 @@ final class MiddlewareStack
                 };
             }
 
-            if (!$item instanceof MiddlewareInterface) {
+            if (!$item instanceof MiddlewareInterface) { // @phpstan-ignore instanceof.alwaysTrue
                 throw new InvalidArgumentException(
                     sprintf(
                         'Middleware must implement MiddlewareInterface, got: %s',
