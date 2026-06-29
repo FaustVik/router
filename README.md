@@ -26,7 +26,7 @@ Modern, lightweight PHP Router with middleware support, dependency injection, an
 ## 📥 Installation
 
 ```bash
-composer require faustvijk/router
+composer require faustvik/router
 ```
 
 ## 🚀 Quick Start

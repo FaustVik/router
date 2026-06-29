@@ -26,7 +26,7 @@
 ## 📥 Установка
 
 ```bash
-composer require faustvijk/router
+composer require faustvik/router
 ```
 
 ## 🚀 Быстрый старт

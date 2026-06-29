@@ -487,6 +487,78 @@ final class MatchingTest extends TestCase
     // Тесты производительности (документация поведения)
     // ========================================================================
 
+    // ========================================================================
+    // Тесты валидации constraints
+    // ========================================================================
+
+    public function testConstraintRejectsNonMatchingValue(): void
+    {
+        $route = Route::create('/users/{id}', 'UserController', 'show')
+            ->where('id', '\d+');
+        $this->collection->set($route);
+
+        $this->expectException(NoMatch::class);
+        $this->matching->match('/users/abc', $this->collection);
+    }
+
+    public function testConstraintAcceptsMatchingValue(): void
+    {
+        $route = Route::create('/users/{id}', 'UserController', 'show')
+            ->where('id', '\d+');
+        $this->collection->set($route);
+
+        $result = $this->matching->match('/users/123', $this->collection);
+
+        $this->assertSame($route, $result->getRoute());
+        $this->assertEquals(['id' => '123'], $result->getParameters());
+    }
+
+    public function testConstraintWithoutConstraintMatchesAnything(): void
+    {
+        $route = Route::create('/users/{id}', 'UserController', 'show');
+        $this->collection->set($route);
+
+        $result = $this->matching->match('/users/abc', $this->collection);
+
+        $this->assertSame($route, $result->getRoute());
+        $this->assertEquals(['id' => 'abc'], $result->getParameters());
+    }
+
+    public function testConstraintWithAlias(): void
+    {
+        $route = Route::create('/users/{id}', 'UserController', 'show')
+            ->where('id', '\d+')
+            ->setAlias('/people/{id}');
+        $this->collection->set($route);
+
+        $this->expectException(NoMatch::class);
+        $this->matching->match('/people/abc', $this->collection);
+    }
+
+    public function testConstraintMultipleParameters(): void
+    {
+        $route = Route::create('/posts/{year}/{slug}', 'PostController', 'show')
+            ->where('year', '\d{4}')
+            ->where('slug', '[a-z]+');
+        $this->collection->set($route);
+
+        $this->expectException(NoMatch::class);
+        $this->matching->match('/posts/2025/hello-world', $this->collection);
+    }
+
+    public function testConstraintMultipleParametersValid(): void
+    {
+        $route = Route::create('/posts/{year}/{slug}', 'PostController', 'show')
+            ->where('year', '\d{4}')
+            ->where('slug', '[a-z]+');
+        $this->collection->set($route);
+
+        $result = $this->matching->match('/posts/2025/hello', $this->collection);
+
+        $this->assertSame($route, $result->getRoute());
+        $this->assertEquals(['year' => '2025', 'slug' => 'hello'], $result->getParameters());
+    }
+
     public function testMatchWithManyRoutes(): void
     {
         // Arrange: Добавляем 100 маршрутов

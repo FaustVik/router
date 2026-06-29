@@ -171,19 +171,41 @@ final class OptimizedMatching implements MatchingRouteInterface
     ): ?MatchResult {
         // Проверяем основной паттерн
         $result = $this->matchPattern($segments, $segmentCount, $route->getRoute());
-        if ($result !== null) {
+        if ($result !== null && $this->validateConstraints($result, $route)) {
             return new MatchResult($route, $result);
         }
 
         // Проверяем алиас
         if ($route->alias() !== null) {
             $result = $this->matchPattern($segments, $segmentCount, $route->alias());
-            if ($result !== null) {
+            if ($result !== null && $this->validateConstraints($result, $route)) {
                 return new MatchResult($route, $result);
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    private function validateConstraints(array $parameters, RouteInterface $route): bool
+    {
+        $constraints = $route->getConstraints();
+        if ($constraints === []) {
+            return true;
+        }
+
+        foreach ($constraints as $param => $pattern) {
+            if (isset($parameters[$param])) {
+                $regexp = '#^' . $pattern . '$#';
+                if (preg_match($regexp, (string) $parameters[$param]) !== 1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
