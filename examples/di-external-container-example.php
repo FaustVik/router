@@ -3,11 +3,12 @@
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
+use function DI\autowire;
+
 use DI\ContainerBuilder;
 use FaustVik\Router\DI\ContainerAdapterFactory;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
-use function DI\autowire;
 
 // Интерфейс для демонстрации
 interface DatabaseInterface
