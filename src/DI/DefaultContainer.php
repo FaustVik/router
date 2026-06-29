@@ -6,6 +6,7 @@ namespace FaustVik\Router\DI;
 
 use Closure;
 use DI\Container;
+use Exception;
 use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
@@ -148,13 +149,12 @@ class DefaultContainer implements RouterContainerInterface
      * @param array<string, mixed> $parameters Additional parameters
      * @return object Resolved class instance
      *
-     * @throws \Exception|RuntimeException If class cannot be resolved or resolved value is not an object
+     * @throws Exception|RuntimeException If class cannot be resolved or resolved value is not an object
      *@example
      * // With parameters
      * $service = $container->resolve(EmailService::class, ['config' => $config]);
      * @example
      * $service = $container->resolve(UserService::class);
-     *
      */
     public function resolve(string $class, array $parameters = []): object
     {
