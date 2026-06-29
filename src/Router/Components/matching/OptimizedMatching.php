@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace FaustVik\Router\Router\Components\matching;
 
 use FaustVik\Router\exceptions\NoMatch;
-use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Collections\RoutesCollectionInterface;
+use FaustVik\Router\Interfaces\Router\Components\MatchingRouteInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 
 /**
  * Optimized route matching with indexing
@@ -238,7 +238,7 @@ final class OptimizedMatching implements MatchingRouteInterface
     {
         // Убираем trailing slash
         $path = rtrim($path, '/');
-        return array_values(array_filter(explode('/', $path), fn($segment) => $segment !== ''));
+        return array_values(array_filter(explode('/', $path), fn ($segment) => $segment !== ''));
     }
 
     /**

@@ -8,8 +8,8 @@
 
 declare(strict_types=1);
 
-use FaustVik\Router\interfaces\Routes\RouteInterface;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 
 /**
  * Пример класса с разумным использованием PHPDoc
@@ -84,17 +84,17 @@ class SmartPhpDocExample
     // ✅ ПОЛЕЗЕН PHPDoc для методов с исключениями
 
     /**
-     * @throws \InvalidArgumentException Если маршрут невалидный
-     * @throws \RuntimeException Если маршрут уже существует
+     * @throws InvalidArgumentException Если маршрут невалидный
+     * @throws RuntimeException Если маршрут уже существует
      */
     public function addRoute(RouteInterface $route): void
     {
         if (!$route->getRoute()) {
-            throw new \InvalidArgumentException('Route cannot be empty');
+            throw new InvalidArgumentException('Route cannot be empty');
         }
 
         if (isset($this->routes[$route->getRoute()])) {
-            throw new \RuntimeException('Route already exists');
+            throw new RuntimeException('Route already exists');
         }
 
         $this->routes[$route->getRoute()] = $route;
@@ -185,7 +185,7 @@ class SmartPhpDocExample
         return [
             'routes' => $this->routes,
             'middleware' => $this->middleware,
-            'config' => $this->config
+            'config' => $this->config,
         ];
     }
 
@@ -210,17 +210,7 @@ class SmartPhpDocExample
  * ✅ PHPDoc ПОЛЕЗЕН для:
  *
  * 1. Массивов с типизированными элементами:
- *    - @var RouteInterface[]
- *    - @var array<string, mixed>
- *    - @return User[]
- *
- * 2. Методов с исключениями:
- *    - @throws ValidationException
- *    - @throws \RuntimeException
- *
- * 3. Сложных типов:
  *    - @param mixed $value
- *    - @return mixed
  *    - @param callable $callback
  *
  * 4. Сложного поведения методов:
@@ -229,14 +219,24 @@ class SmartPhpDocExample
  *    - Особенности работы
  *
  * 5. Комплексных типов:
+ *    - @param class-string<T> $className
+ *    - @return User[]
+ *
+ * 2. Методов с исключениями:
+ *    - @return mixed
  *    - @return array{name: string, age: int}
  *    - @param array<string, RouteInterface> $routes
  *
  * 6. Дженерик-подобных конструкций:
  *    - @template T
- *    - @param class-string<T> $className
  *    - @return T
- */
+ *@throws ValidationException
+ *    - @throws RuntimeException
+ *
+ * 3. Сложных типов:
+ *    - @var RouteInterface[]
+ *    - @var array<string, mixed>
+ *    -/
 
 /**
  * ❌ PHPDoc НЕ НУЖЕН для:
@@ -261,5 +261,4 @@ class SmartPhpDocExample
  *    - public function process(): bool
  *    - public function getId(): int
  */
-
 echo "Пример разумного использования PHPDoc завершен!\n";

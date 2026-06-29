@@ -6,6 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\Middleware\CorsMiddleware;
 use FaustVik\Router\Middleware\LoggingMiddleware;
 use FaustVik\Router\Middleware\MiddlewareStack;
@@ -51,7 +52,7 @@ class SimpleLogger
 }
 
 // 2. Создаем кастомный middleware для проверки API ключа
-class ApiKeyMiddleware implements \FaustVik\Router\interfaces\Middleware\MiddlewareInterface
+class ApiKeyMiddleware implements MiddlewareInterface
 {
     private array $validApiKeys;
 
@@ -67,14 +68,14 @@ class ApiKeyMiddleware implements \FaustVik\Router\interfaces\Middleware\Middlew
         if (!$apiKey) {
             return Response::json([
                 'error' => 'Missing API Key',
-                'message' => 'X-Api-Key header is required'
+                'message' => 'X-Api-Key header is required',
             ], 401);
         }
 
         if (!in_array($apiKey, $this->validApiKeys, true)) {
             return Response::json([
                 'error' => 'Invalid API Key',
-                'message' => 'The provided API key is not valid'
+                'message' => 'The provided API key is not valid',
             ], 403);
         }
 
@@ -86,7 +87,7 @@ class ApiKeyMiddleware implements \FaustVik\Router\interfaces\Middleware\Middlew
 }
 
 // 3. Создаем middleware для rate limiting (упрощенный)
-class RateLimitMiddleware implements \FaustVik\Router\interfaces\Middleware\MiddlewareInterface
+class RateLimitMiddleware implements MiddlewareInterface
 {
     private int $maxRequests;
     private int $timeWindow;
@@ -107,7 +108,7 @@ class RateLimitMiddleware implements \FaustVik\Router\interfaces\Middleware\Midd
         if (isset($this->requests[$ip])) {
             $this->requests[$ip] = array_filter(
                 $this->requests[$ip],
-                fn($timestamp) => $currentTime - $timestamp < $this->timeWindow
+                fn ($timestamp) => $currentTime - $timestamp < $this->timeWindow
             );
         }
 
@@ -118,7 +119,7 @@ class RateLimitMiddleware implements \FaustVik\Router\interfaces\Middleware\Midd
             return Response::json([
                 'error' => 'Too Many Requests',
                 'message' => "Rate limit exceeded. Max $this->maxRequests requests per {$this->timeWindow}s",
-                'retry_after' => $this->timeWindow
+                'retry_after' => $this->timeWindow,
             ], 429);
         }
 
@@ -141,7 +142,7 @@ $logger = new SimpleLogger(__DIR__ . '/logs/app.log');
 
 $loggingMiddleware = new LoggingMiddleware(
     logFile: null, // Не используем файл напрямую
-    customLogger: function (string $message, array $context) use ($logger) {
+    customLogger: function (string $message, array $context) use ($logger): void {
         $logger->info($message, $context);
     },
     includeUserAgent: true,
@@ -160,7 +161,7 @@ $corsMiddleware
 $apiKeyMiddleware = new ApiKeyMiddleware([
     'dev-key-12345',
     'prod-key-67890',
-    'test-key-abcde'
+    'test-key-abcde',
 ]);
 
 // 7. Rate limiting
@@ -182,21 +183,21 @@ $router->get('/api/data', function (Request $request): Response {
         ],
         'meta' => [
             'total' => 3,
-            'api_key_validated' => $request->getAttribute('api_key_validated', false)
-        ]
+            'api_key_validated' => $request->getAttribute('api_key_validated', false),
+        ],
     ])->withHeader('X-Total-Count', '3');
 })->setMiddleware([
     $corsMiddleware,
     $loggingMiddleware,
     $apiKeyMiddleware,
-    $rateLimitMiddleware
+    $rateLimitMiddleware,
 ]);
 
 // 10. Эндпоинт для проверки rate limit
 $router->get('/api/test-rate-limit', function (Request $request): Response {
     return Response::json([
         'message' => 'Request successful',
-        'timestamp' => time()
+        'timestamp' => time(),
     ]);
 })->setMiddleware([$rateLimitMiddleware]);
 
@@ -204,7 +205,7 @@ $router->get('/api/test-rate-limit', function (Request $request): Response {
 $router->post('/api/complex', function (Request $request): Response {
     return Response::json([
         'message' => 'Complex operation completed',
-        'data' => $request->getBody()
+        'data' => $request->getBody(),
     ]);
 });
 
@@ -224,16 +225,16 @@ $stack
 try {
     $response = $stack->execute($request);
     $response->send();
-} catch (\Exception $e) {
+} catch (Exception $e) {
     $logger->error('Request processing error: ' . $e->getMessage(), [
         'exception' => get_class($e),
         'file' => $e->getFile(),
-        'line' => $e->getLine()
+        'line' => $e->getLine(),
     ]);
 
     Response::json([
         'error' => 'Internal Server Error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ], 500)->send();
 }
 

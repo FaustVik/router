@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -11,7 +12,7 @@ use FaustVik\Router\Router\Router;
 // Контроллеры для демонстрации параметров
 class BlogController
 {
-    public function showPost($id)
+    public function showPost($id): void
     {
         echo "=== Blog Post ===\n";
         echo "Post ID: $id\n";
@@ -19,7 +20,7 @@ class BlogController
         echo "Content: This is the content of post $id...\n";
     }
 
-    public function showCategoryPost($category, $id)
+    public function showCategoryPost($category, $id): void
     {
         echo "=== Category Post ===\n";
         echo "Category: $category\n";
@@ -31,12 +32,12 @@ class BlogController
 
 class UserController
 {
-    public function show(Request $request, $id)
+    public function show(Request $request, $id): void
     {
         echo "=== User Profile (with Request) ===\n";
         echo "User ID: $id\n";
-        echo "Request Method: " . $request->getMethod() . "\n";
-        echo "Request URI: " . $request->getUri() . "\n";
+        echo 'Request Method: ' . $request->getMethod() . "\n";
+        echo 'Request URI: ' . $request->getUri() . "\n";
 
         // Демонстрируем приоритет параметров URL над query параметрами
         $queryId = $_GET['id'] ?? 'none';
@@ -44,7 +45,7 @@ class UserController
         echo "URL parameter 'id': $id (has priority)\n";
     }
 
-    public function showPosts($userId, $postId)
+    public function showPosts($userId, $postId): void
     {
         echo "=== User Posts ===\n";
         echo "User ID: $userId\n";
@@ -52,14 +53,14 @@ class UserController
         echo "URL pattern: /user/{userId}/posts/{postId}\n";
     }
 
-    public function edit($id)
+    public function edit($id): void
     {
         echo "=== Edit User ===\n";
         echo "Editing user ID: $id\n";
         echo "URL pattern: /user/{id}/edit\n";
     }
 
-    public function editSection($id, $section)
+    public function editSection($id, $section): void
     {
         echo "=== Edit User Section ===\n";
         echo "User ID: $id\n";
@@ -88,16 +89,16 @@ $routes->set(Route::create('/user/{id}/edit', UserController::class, 'edit', [],
 $routes->set(Route::create('/user/{id}/edit/{section}', UserController::class, 'editSection', [], ['GET']));
 
 // === Анонимные функции с параметрами ===
-$routes->set(RouteAnonymousFunc::create('/product/{id}', static function ($id) {
+$routes->set(RouteAnonymousFunc::create('/product/{id}', static function ($id): void {
     echo "=== Product Details ===\n";
     echo "Product ID: $id\n";
     echo "Name: Product #$id\n";
-    echo "Price: $" . ($id * 10) . ".99\n";
+    echo 'Price: $' . ($id * 10) . ".99\n";
     echo "This route uses an anonymous function.\n";
 }, ['GET']));
 
 // === Глубоко вложенные параметры ===
-$routes->set(RouteAnonymousFunc::create('/shop/{category}/{subcategory}/{product}', static function ($category, $subcategory, $product) {
+$routes->set(RouteAnonymousFunc::create('/shop/{category}/{subcategory}/{product}', static function ($category, $subcategory, $product): void {
     echo "=== Shop Product ===\n";
     echo "Category: $category\n";
     echo "Subcategory: $subcategory\n";
@@ -107,7 +108,7 @@ $routes->set(RouteAnonymousFunc::create('/shop/{category}/{subcategory}/{product
 }, ['GET']));
 
 // === Демонстрация приоритета параметров ===
-$routes->set(RouteAnonymousFunc::create('/priority/{id}', static function ($id) {
+$routes->set(RouteAnonymousFunc::create('/priority/{id}', static function ($id): void {
     $queryId = $_GET['id'] ?? 'none';
     echo "=== Parameter Priority Demo ===\n";
     echo "URL parameter 'id': $id\n";
@@ -117,14 +118,14 @@ $routes->set(RouteAnonymousFunc::create('/priority/{id}', static function ($id) 
 }, ['GET']));
 
 // === Валидация параметров ===
-$routes->set(RouteAnonymousFunc::create('/validate/{type}/{value}', static function ($type, $value) {
+$routes->set(RouteAnonymousFunc::create('/validate/{type}/{value}', static function ($type, $value): void {
     echo "=== Parameter Validation Demo ===\n";
     echo "Type: $type\n";
     echo "Value: $value\n";
 
     if ($type === 'number') {
         if (is_numeric($value)) {
-            echo "✅ Valid number: " . (int) $value . "\n";
+            echo '✅ Valid number: ' . (int) $value . "\n";
         } else {
             echo "❌ Invalid number format\n";
         }

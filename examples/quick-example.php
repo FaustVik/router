@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * QuickRouter - Пример быстрого старта
  *
@@ -9,8 +11,8 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FaustVik\Router\Router\QuickRouter;
 use FaustVik\Router\Http\Response;
+use FaustVik\Router\Router\QuickRouter;
 
 // ============================================================================
 // Простейший пример - анонимные функции
@@ -33,13 +35,13 @@ $app->get('/', function () {
 });
 
 // Простой текст
-$app->get('/hello', function () {
-    echo "Hello World!";
+$app->get('/hello', function (): void {
+    echo 'Hello World!';
 });
 
 // С параметрами из URL
-$app->get('/hello/{name}', function ($name) {
-    echo "Hello, " . htmlspecialchars($name) . "!";
+$app->get('/hello/{name}', function ($name): void {
+    echo 'Hello, ' . htmlspecialchars($name) . '!';
 });
 
 // JSON ответ
@@ -47,12 +49,12 @@ $app->get('/api/users/{id}', function ($id) {
     return Response::json([
         'id' => (int) $id,
         'name' => 'John Doe',
-        'email' => 'john@example.com'
+        'email' => 'john@example.com',
     ]);
 });
 
 // Несколько параметров
-$app->get('/posts/{category}/{id}', function ($category, $id) {
+$app->get('/posts/{category}/{id}', function ($category, $id): void {
     echo "Category: $category, Post ID: $id";
 });
 
@@ -63,7 +65,7 @@ $app->get('/posts/{category}/{id}', function ($category, $id) {
 $app->post('/users', function () {
     return Response::json([
         'message' => 'User created',
-        'id' => 123
+        'id' => 123,
     ], 201);
 });
 
@@ -71,9 +73,9 @@ $app->post('/users', function () {
 // Простые API маршруты (без групп для упрощения примера)
 // ============================================================================
 
-$app->get('/api/status', fn() => Response::json(['status' => 'ok']));
-$app->get('/api/version', fn() => Response::json(['version' => '1.0.0']));
-$app->get('/api/v2/status', fn() => Response::json(['status' => 'ok', 'version' => 2]));
+$app->get('/api/status', fn () => Response::json(['status' => 'ok']));
+$app->get('/api/version', fn () => Response::json(['version' => '1.0.0']));
+$app->get('/api/v2/status', fn () => Response::json(['status' => 'ok', 'version' => 2]));
 
 // ============================================================================
 // Использование с контроллерами (если есть)
@@ -82,12 +84,12 @@ $app->get('/api/v2/status', fn() => Response::json(['status' => 'ok', 'version' 
 // Простой контроллер для примера
 class SimpleController
 {
-    public function index()
+    public function index(): void
     {
-        echo "Controller Index Page";
+        echo 'Controller Index Page';
     }
 
-    public function show($id)
+    public function show($id): void
     {
         echo "Showing item #$id from controller";
     }
@@ -179,19 +181,19 @@ function setupRoutes(QuickRouter $app): void
         return Response::html('<h1>Welcome to QuickRouter!</h1>');
     });
 
-    $app->get('/hello/{name}', function ($name) {
-        echo "Hello, " . htmlspecialchars($name) . "!";
+    $app->get('/hello/{name}', function ($name): void {
+        echo 'Hello, ' . htmlspecialchars($name) . '!';
     });
 
     $app->get('/api/users/{id}', function ($id) {
         return Response::json([
             'id' => (int) $id,
             'name' => 'John Doe',
-            'email' => 'john@example.com'
+            'email' => 'john@example.com',
         ]);
     });
 
-    $app->get('/posts/{category}/{id}', function ($category, $id) {
+    $app->get('/posts/{category}/{id}', function ($category, $id): void {
         echo "Category: $category, Post ID: $id";
     });
 }

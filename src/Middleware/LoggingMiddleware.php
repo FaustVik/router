@@ -6,7 +6,7 @@ namespace FaustVik\Router\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 
 /**
  * Middleware for HTTP request logging
@@ -185,7 +185,7 @@ final class LoggingMiddleware implements MiddlewareInterface
         }
 
         $parts[] = $context['status_code'];
-        $parts[] = $context['duration_ms'] . 'ms';
+        $parts[] = (string) $context['duration_ms'] . 'ms';
         $parts[] = $context['status_text'];
 
         return implode(' ', $parts) . "\n";

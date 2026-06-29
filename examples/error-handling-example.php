@@ -1,8 +1,8 @@
 <?php
+
 declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RouteAnonymousFunc;
@@ -92,7 +92,7 @@ class ErrorController
         $errors = [
             'name' => ['Name is required', 'Name must be at least 2 characters'],
             'email' => ['Email is required', 'Email format is invalid'],
-            'age' => ['Age must be a positive number']
+            'age' => ['Age must be a positive number'],
         ];
 
         throw new ValidationException($errors, 'User input validation failed');
@@ -143,7 +143,7 @@ class ErrorController
             500 => 'Internal Server Error - Something went wrong',
             501 => 'Not Implemented - Feature not available',
             502 => 'Bad Gateway - Upstream server error',
-            503 => 'Service Unavailable - Server temporarily down'
+            503 => 'Service Unavailable - Server temporarily down',
         ];
 
         $message = $errorMessages[$statusCode] ?? 'Unknown Error';
@@ -153,7 +153,7 @@ class ErrorController
             'status' => $statusCode,
             'message' => $message,
             'timestamp' => date('c'),
-            'details' => "This is a simulation of HTTP $statusCode error"
+            'details' => "This is a simulation of HTTP $statusCode error",
         ], $statusCode);
     }
 
@@ -167,13 +167,13 @@ class ErrorController
                     'details' => [
                         'timeout' => 5000,
                         'retry_after' => 30,
-                        'endpoint' => 'https://api.example.com'
+                        'endpoint' => 'https://api.example.com',
                     ],
                     'troubleshooting' => [
                         'Check your internet connection',
                         'Verify the endpoint URL',
-                        'Try again in a few minutes'
-                    ]
+                        'Try again in a few minutes',
+                    ],
                 ], 503);
 
             case 'file':
@@ -183,13 +183,13 @@ class ErrorController
                     'details' => [
                         'file_path' => '/uploads/document.pdf',
                         'error_code' => 'PERMISSION_DENIED',
-                        'size_limit' => '10MB'
+                        'size_limit' => '10MB',
                     ],
                     'solutions' => [
                         'Check file permissions',
                         'Verify file size is under limit',
-                        'Ensure file format is supported'
-                    ]
+                        'Ensure file format is supported',
+                    ],
                 ], 422);
 
             case 'payment':
@@ -199,20 +199,20 @@ class ErrorController
                     'details' => [
                         'transaction_id' => 'txn_' . uniqid(),
                         'decline_code' => 'insufficient_funds',
-                        'amount' => '$99.99'
+                        'amount' => '$99.99',
                     ],
                     'next_steps' => [
                         'Check your account balance',
                         'Contact your bank',
-                        'Try a different payment method'
-                    ]
+                        'Try a different payment method',
+                    ],
                 ], 402);
 
             default:
                 return Response::json([
                     'error' => 'unknown_error_type',
                     'message' => "Unknown error type: $type",
-                    'available_types' => ['network', 'file', 'payment']
+                    'available_types' => ['network', 'file', 'payment'],
                 ], 400);
         }
     }
@@ -279,14 +279,14 @@ $routes->set(RouteAnonymousFunc::create('/errors/handler-demo', static function 
             'Try accessing a non-existent route',
             'Use wrong HTTP method',
             'Trigger validation errors',
-            'Simulate server errors'
+            'Simulate server errors',
         ],
         'error_types' => [
             'PHP errors (undefined variables, type errors)',
             'Custom exceptions (ValidationException, etc.)',
             'HTTP status errors (401, 403, 404, etc.)',
-            'Method not allowed errors'
-        ]
+            'Method not allowed errors',
+        ],
     ]);
 }, ['GET']));
 
@@ -349,7 +349,7 @@ try {
     echo "\n\n=== Error Handling Example Complete ===\n";
 } catch (ValidationException $e) {
     echo "\n❌ Validation Error:\n";
-    echo "Message: " . $e->getMessage() . "\n";
+    echo 'Message: ' . $e->getMessage() . "\n";
     echo "Errors:\n";
     foreach ($e->getErrors() as $field => $fieldErrors) {
         echo "  $field:\n";
@@ -359,23 +359,23 @@ try {
     }
 } catch (AuthenticationException $e) {
     echo "\n🔒 Authentication Error: " . $e->getMessage() . "\n";
-    echo "HTTP Status: " . $e->getCode() . "\n";
+    echo 'HTTP Status: ' . $e->getCode() . "\n";
 } catch (AuthorizationException $e) {
     echo "\n⛔ Authorization Error: " . $e->getMessage() . "\n";
-    echo "HTTP Status: " . $e->getCode() . "\n";
+    echo 'HTTP Status: ' . $e->getCode() . "\n";
 } catch (NotFoundException $e) {
     echo "\n🔍 Not Found Error: " . $e->getMessage() . "\n";
-    echo "HTTP Status: " . $e->getCode() . "\n";
+    echo 'HTTP Status: ' . $e->getCode() . "\n";
 } catch (RateLimitException $e) {
     echo "\n⏱️  Rate Limit Error: " . $e->getMessage() . "\n";
-    echo "HTTP Status: " . $e->getCode() . "\n";
+    echo 'HTTP Status: ' . $e->getCode() . "\n";
 } catch (DatabaseException $e) {
     echo "\n💾 Database Error: " . $e->getMessage() . "\n";
-    echo "HTTP Status: " . $e->getCode() . "\n";
+    echo 'HTTP Status: ' . $e->getCode() . "\n";
 } catch (Exception $e) {
     echo "\n❌ Unexpected Error: " . $e->getMessage() . "\n";
-    echo "Type: " . get_class($e) . "\n";
-    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+    echo 'Type: ' . get_class($e) . "\n";
+    echo 'File: ' . $e->getFile() . ':' . $e->getLine() . "\n";
 
     // В продакшене не показывайте stack trace
     if (getenv('APP_DEBUG') === 'true') {

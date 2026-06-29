@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router;
 
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
+use InvalidArgumentException;
 
 /**
  * QuickRouter - Simplified router for quick start
@@ -302,7 +304,7 @@ final class QuickRouter
      * $app->get('/', fn() => "Hello World!");
      * $app->run();
      */
-    public function addMiddleware(string|callable $middleware): self
+    public function addMiddleware(string|callable|MiddlewareInterface $middleware): self
     {
         $this->router->addGlobalMiddleware($middleware);
         return $this;
@@ -402,7 +404,7 @@ final class QuickRouter
      * @param string $uri URI маршрута
      * @param callable|array<int, mixed> $handler Обработчик
      * @return RouteInterface
-     * @throws \InvalidArgumentException Если обработчик имеет неверный формат
+     * @throws InvalidArgumentException Если обработчик имеет неверный формат
      */
     private function addRoute(string|array $methods, string $uri, callable|array $handler): RouteInterface
     {
@@ -424,7 +426,7 @@ final class QuickRouter
             [$class, $method] = $handler;
 
             if (!is_string($class) || !is_string($method)) {
-                throw new \InvalidArgumentException('Handler array must contain [string $class, string $method]');
+                throw new InvalidArgumentException('Handler array must contain [string $class, string $method]');
             }
 
             $route = Route::create(
@@ -438,7 +440,7 @@ final class QuickRouter
             return $route;
         }
 
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
             'Handler must be a callable or array [ControllerClass::class, \'method\']'
         );
     }

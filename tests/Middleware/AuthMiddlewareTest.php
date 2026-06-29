@@ -193,7 +193,7 @@ final class AuthMiddlewareTest extends TestCase
 
     public function testCustomTokenValidatorReturnsNull(): void
     {
-        $customValidator = fn(string $token) => null;
+        $customValidator = fn (string $token) => null;
 
         $middleware = new AuthMiddleware($customValidator);
         $request = new Request(
@@ -248,4 +248,3 @@ final class AuthMiddlewareTest extends TestCase
         $this->assertIsArray($capturedRequest->getAttribute('user'));
     }
 }
-

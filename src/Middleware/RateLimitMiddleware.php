@@ -6,8 +6,8 @@ namespace FaustVik\Router\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Cache\CacheInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 
 /**
  * Middleware for request rate limiting
@@ -156,7 +156,7 @@ final class RateLimitMiddleware implements MiddlewareInterface
             key: $key,
             value: [
                 'attempts' => $attempts,
-                'reset_time' => $resetTime
+                'reset_time' => $resetTime,
             ],
             ttl: $this->decaySeconds
         );
@@ -176,7 +176,7 @@ final class RateLimitMiddleware implements MiddlewareInterface
             data: [
                 'error' => 'Too Many Requests',
                 'message' => 'Rate limit exceeded. Please try again later.',
-                'retry_after' => $retryAfter
+                'retry_after' => $retryAfter,
             ],
             statusCode: 429
         );
@@ -248,7 +248,7 @@ final class RateLimitMiddleware implements MiddlewareInterface
         return [
             'attempts' => $attempts,
             'remaining' => max(0, $this->maxAttempts - $attempts),
-            'reset_time' => $resetTime
+            'reset_time' => $resetTime,
         ];
     }
 }

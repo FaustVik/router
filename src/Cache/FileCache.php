@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Cache;
 
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use RuntimeException;
+use FaustVik\Router\Interfaces\Cache\CacheInterface;
 use InvalidArgumentException;
 use JsonException;
-
+use RuntimeException;
+use function dirname;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -16,11 +16,10 @@ use function glob;
 use function is_dir;
 use function is_file;
 use function is_writable;
-use function mkdir;
-use function json_encode;
 use function json_decode;
+use function json_encode;
+use function mkdir;
 use function realpath;
-use function dirname;
 use function strpos;
 use function time;
 use function unlink;
@@ -75,14 +74,14 @@ final class FileCache implements CacheInterface
 
     /**
      * Валидирует и нормализует путь к директории кеша
-     * 
+     *
      * @throws InvalidArgumentException Если путь небезопасен
      */
     private function validateAndNormalizePath(string $cacheDir): string
     {
         // Удаляем trailing slash
         $cacheDir = rtrim($cacheDir, '/\\');
-        
+
         // Проверка на path traversal атаки
         if (strpos($cacheDir, '..') !== false) {
             throw new InvalidArgumentException(
@@ -125,7 +124,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Защищает директорию кеша от несанкционированного доступа
-     * 
+     *
      * Создает .gitignore и .htaccess для безопасности
      */
     private function protectCacheDirectory(): void
@@ -151,7 +150,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Получает значение из кеша
-     * 
+     *
      * @param string $key Ключ кеша
      * @return mixed|null Значение или null если не найдено/истекло
      */
@@ -194,7 +193,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Сохраняет значение в кеш
-     * 
+     *
      * @param string $key Ключ кеша
      * @param mixed $value Значение для сохранения
      * @param int $ttl Время жизни в секундах (0 = бесконечно)
@@ -207,7 +206,7 @@ final class FileCache implements CacheInterface
         $data = [
             'value' => $value,
             'ttl' => $ttl > 0 ? time() + $ttl : 0,
-            'created' => time()
+            'created' => time(),
         ];
 
         try {
@@ -224,7 +223,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Проверяет существование ключа в кеше
-     * 
+     *
      * @param string $key Ключ кеша
      * @return bool true если существует и не истек
      */
@@ -235,7 +234,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Удаляет значение из кеша
-     * 
+     *
      * @param string $key Ключ кеша
      * @return bool true в случае успеха
      */
@@ -252,7 +251,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Очищает весь кеш
-     * 
+     *
      * @return bool true в случае успеха
      */
     public function clear(): bool
@@ -278,7 +277,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Получает несколько значений из кеша
-     * 
+     *
      * @param array<string> $keys Массив ключей
      * @return array<string, mixed> Массив ключ => значение
      */
@@ -295,7 +294,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Сохраняет несколько значений в кеш
-     * 
+     *
      * @param array<string, mixed> $values Массив ключ => значение
      * @param int $ttl Время жизни в секундах
      * @return bool true если все успешно сохранены
@@ -315,7 +314,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Удаляет несколько значений из кеша
-     * 
+     *
      * @param array<string> $keys Массив ключей
      * @return bool true если все успешно удалены
      */
@@ -334,7 +333,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Получает имя файла кеша для ключа
-     * 
+     *
      * @param string $key Ключ кеша
      * @return string Полный путь к файлу
      */
@@ -346,7 +345,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Получает директорию кеша
-     * 
+     *
      * @return string Путь к директории кеша
      */
     public function getCacheDir(): string
@@ -356,7 +355,7 @@ final class FileCache implements CacheInterface
 
     /**
      * Получает префикс файлов кеша
-     * 
+     *
      * @return string Префикс
      */
     public function getPrefix(): string

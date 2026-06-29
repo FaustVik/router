@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use FaustVik\Router\Cache\FileCache;
+use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Middleware\RateLimitMiddleware;
 use FaustVik\Router\Router\QuickRouter;
@@ -56,7 +57,7 @@ $router->post('/api/auth/login', function () {
     return Response::json([
         'success' => true,
         'message' => 'Login successful',
-        'token' => 'example-jwt-token'
+        'token' => 'example-jwt-token',
     ]);
 })->middleware($strictRateLimit);
 
@@ -76,8 +77,8 @@ $router->get('/api/public/posts', function () {
     return Response::json([
         'posts' => [
             ['id' => 1, 'title' => 'First Post'],
-            ['id' => 2, 'title' => 'Second Post']
-        ]
+            ['id' => 2, 'title' => 'Second Post'],
+        ],
     ]);
 })->middleware($publicRateLimit);
 
@@ -93,7 +94,7 @@ $router->post('/api/posts', function () {
     return Response::json([
         'success' => true,
         'message' => 'Post created',
-        'id' => 123
+        'id' => 123,
     ], 201);
 })->middleware($writeRateLimit);
 
@@ -108,7 +109,7 @@ $monitorRateLimit = new RateLimitMiddleware(
 );
 
 $router->get('/api/rate-limit-status', function () use ($monitorRateLimit) {
-    $request = \FaustVik\Router\Http\Request::createFromGlobals();
+    $request = Request::createFromGlobals();
     $status = $monitorRateLimit->getLimitStatus($request);
 
     return Response::json([
@@ -116,7 +117,7 @@ $router->get('/api/rate-limit-status', function () use ($monitorRateLimit) {
         'attempts' => $status['attempts'],
         'remaining' => $status['remaining'],
         'reset_time' => date('Y-m-d H:i:s', $status['reset_time']),
-        'reset_in_seconds' => max(0, $status['reset_time'] - time())
+        'reset_in_seconds' => max(0, $status['reset_time'] - time()),
     ]);
 });
 
@@ -135,7 +136,7 @@ $router->post('/api/admin/clear-rate-limits', function () use ($cache) {
 
     return Response::json([
         'success' => true,
-        'message' => 'All rate limits have been cleared'
+        'message' => 'All rate limits have been cleared',
     ]);
 })->middleware($adminRateLimit);
 
@@ -153,7 +154,7 @@ $testRateLimit = new RateLimitMiddleware(
 $router->get('/api/test/rate-limit', function () {
     return Response::json([
         'message' => 'Request successful! Check X-RateLimit-* headers.',
-        'tip' => 'Make 4+ requests within a minute to see 429 response'
+        'tip' => 'Make 4+ requests within a minute to see 429 response',
     ]);
 })->middleware($testRateLimit);
 
@@ -163,10 +164,10 @@ $router->get('/api/test/rate-limit', function () {
 
 try {
     $router->run();
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     Response::json([
         'error' => 'Server Error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ], 500)->send();
 }
 

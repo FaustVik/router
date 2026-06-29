@@ -6,7 +6,7 @@ namespace FaustVik\Router\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 
 /**
  * Middleware for Cross-Origin Resource Sharing (CORS) handling

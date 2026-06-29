@@ -4,22 +4,26 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router;
 
+use Closure;
 use FaustVik\Router\DI\ContainerAdapterFactory;
 use FaustVik\Router\DI\DefaultContainer;
+use FaustVik\Router\exceptions\NoMatch;
+use FaustVik\Router\exceptions\NotAllowedHttpMethod;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Cache\CacheableRouterInterface;
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
-use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
-use FaustVik\Router\interfaces\Router\RouterInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Cache\CacheableRouterInterface;
+use FaustVik\Router\Interfaces\Cache\CacheInterface;
+use FaustVik\Router\Interfaces\Collections\RoutesCollectionInterface;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Router\Components\ConfigInterface;
+use FaustVik\Router\Interfaces\Router\RouterInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 use FaustVik\Router\Middleware\MiddlewareStack;
 use FaustVik\Router\Router\Components\Config;
 use FaustVik\Router\Router\Components\matching\MatchResult;
-
-use function str_contains;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Main Router class
@@ -121,8 +125,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * @param Request $request HTTP request to process
      * @return Response HTTP response
-     * @throws \FaustVik\Router\exceptions\NoMatch If route not found
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
+     * @throws NoMatch If route not found
+     * @throws NotAllowedHttpMethod If HTTP method not allowed
      *
      * @example
      * // Route testing
@@ -189,8 +193,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * For testing and more flexible control use handle() directly.
      *
-     * @throws \FaustVik\Router\exceptions\NoMatch If route not found
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
+     * @throws NoMatch If route not found
+     * @throws NotAllowedHttpMethod If HTTP method not allowed
      *
      * @example
      * // Common usage
@@ -272,8 +276,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if ($this->paramsString) {
             $parsedParams = [];
             parse_str($this->paramsString, $parsedParams);
-            // @var array<string, mixed> $parsedParams
-
+            /** @var array<string, mixed> $parsedParams */
             $this->params = $parsedParams;
         }
     }
@@ -284,7 +287,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Uses Matching component to find route
      * that matches current URI.
      *
-     * @throws \FaustVik\Router\exceptions\NoMatch If matching route not found
+     * @throws NoMatch If matching route not found
      */
     protected function match(): MatchResult
     {
@@ -300,7 +303,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Uses CheckerHttpMethod component to verify
      * if current HTTP method is allowed for found route.
      *
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod If HTTP method not allowed
+     * @throws NotAllowedHttpMethod If HTTP method not allowed
      */
 
     /**
@@ -308,7 +311,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *
      * @param RouteInterface $route Route to check
      * @param string|null $httpMethod HTTP method (if null, taken from $_SERVER)
-     * @throws \FaustVik\Router\exceptions\NotAllowedHttpMethod
+     * @throws NotAllowedHttpMethod
      */
     protected function check(RouteInterface $route, ?string $httpMethod = null): void
     {
@@ -389,7 +392,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * Creates built-in DefaultContainer and configures it
      * using passed closure function.
      *
-     * @param \Closure|null $configurator Function to configure container
+     * @param Closure|null $configurator Function to configure container
      * @return self Returns current instance for method chaining
      *
      * @example
@@ -398,7 +401,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *     $container->bind(LoggerInterface::class, FileLogger::class);
      * });
      */
-    public function enableDI(\Closure $configurator = null): self
+    public function enableDI(Closure $configurator = null): self
     {
         if ($configurator) {
             $this->container = DefaultContainer::withClosure($configurator);
@@ -472,7 +475,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * ]);
      *
      * @param array<string, mixed> $config
-     * @throws \InvalidArgumentException If binding/singleton key is not a string
+     * @throws InvalidArgumentException If binding/singleton key is not a string
      */
     public function configureContainer(array $config): self
     {
@@ -485,7 +488,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if (isset($config['bindings']) && is_array($config['bindings'])) {
             foreach ($config['bindings'] as $abstract => $concrete) {
                 if (!is_string($abstract)) {
-                    throw new \InvalidArgumentException('Binding key must be a string');
+                    throw new InvalidArgumentException('Binding key must be a string');
                 }
                 $this->container->bind($abstract, $concrete);
             }
@@ -495,7 +498,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         if (isset($config['singletons']) && is_array($config['singletons'])) {
             foreach ($config['singletons'] as $abstract => $concrete) {
                 if (!is_string($abstract)) {
-                    throw new \InvalidArgumentException('Singleton key must be a string');
+                    throw new InvalidArgumentException('Singleton key must be a string');
                 }
                 $this->container->singleton($abstract, $concrete);
             }
@@ -569,8 +572,8 @@ final class Router implements RouterInterface, CacheableRouterInterface
      * @param array<string, string|int|bool|array<mixed>> $query Query parameters to add to URL (?key=value)
      * @param string|null $fragment Anchor/fragment to add to URL (#fragment)
      * @return string Generated URL
-     * @throws \InvalidArgumentException If route not found or not all required parameters provided
-     * @throws \RuntimeException If URL generation fails
+     * @throws InvalidArgumentException If route not found or not all required parameters provided
+     * @throws RuntimeException If URL generation fails
      *
      * @example
      * // Basic example
@@ -605,7 +608,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
     public function url(string $name, array $params = [], array $query = [], ?string $fragment = null): string
     {
         if (!isset($this->namedRoutes[$name])) {
-            throw new \InvalidArgumentException("Route '{$name}' not found");
+            throw new InvalidArgumentException("Route '{$name}' not found");
         }
 
         $route = $this->namedRoutes[$name];
@@ -617,9 +620,9 @@ final class Router implements RouterInterface, CacheableRouterInterface
             if (isset($constraints[$key])) {
                 $pattern = '#^' . $constraints[$key] . '$#';
                 if (!preg_match($pattern, (string) $value)) {
-                    throw new \InvalidArgumentException(
-                        "Parameter '{$key}' with value '{$value}' does not match constraint pattern " .
-                        "'{$constraints[$key]}' for route '{$name}'"
+                    throw new InvalidArgumentException(
+                        "Parameter '{$key}' with value '{$value}' does not match constraint pattern "
+                        . "'{$constraints[$key]}' for route '{$name}'"
                     );
                 }
             }
@@ -635,13 +638,13 @@ final class Router implements RouterInterface, CacheableRouterInterface
             $replaced = preg_replace(
                 [
                     '/\{' . preg_quote($key, '/') . '\?\}/',
-                // {param?}
+                    // {param?}
                     '/\{' . preg_quote($key, '/') . ':[^}]+\?\}/',
-                // {param:pattern?}
+                    // {param:pattern?}
                     '/\{' . preg_quote($key, '/') . '\}/',
-                // {param}
+                    // {param}
                     '/\{' . preg_quote($key, '/') . ':[^}]+\}/',
-                // {param:pattern}
+                    // {param:pattern}
                 ],
                 $escapedValue,
                 $uri
@@ -649,7 +652,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
 
             // preg_replace can return null on error
             if ($replaced === null) {
-                throw new \RuntimeException("Failed to replace parameter '{$key}' in URI");
+                throw new RuntimeException("Failed to replace parameter '{$key}' in URI");
             }
             $uri = $replaced;
         }
@@ -657,17 +660,17 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Remove remaining optional parameters
         $uri = preg_replace('/\{[^}]+\?\}/', '', $uri);
         if ($uri === null) {
-            throw new \RuntimeException("Failed to process optional parameters in URI");
+            throw new RuntimeException('Failed to process optional parameters in URI');
         }
 
         $uri = preg_replace('/\{[^}]+:[^}]+\?\}/', '', $uri);
         if ($uri === null) {
-            throw new \RuntimeException("Failed to process optional parameters in URI");
+            throw new RuntimeException('Failed to process optional parameters in URI');
         }
 
         // Check that all required parameters were filled
         if (preg_match('/\{([^}?:]+)(?::[^}]+)?\}/', $uri, $matches)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Missing required parameter '{$matches[1]}' for route '{$name}'"
             );
         }
@@ -675,7 +678,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
         // Clean up double slashes and trailing slash
         $uri = preg_replace('#/{2,}#', '/', $uri);
         if ($uri === null) {
-            throw new \RuntimeException("Failed to clean up URI slashes");
+            throw new RuntimeException('Failed to clean up URI slashes');
         }
 
         $uri = rtrim($uri, '/');
@@ -766,7 +769,7 @@ final class Router implements RouterInterface, CacheableRouterInterface
      *        ->addGlobalMiddleware(LoggingMiddleware::class)
      *        ->addGlobalMiddleware(RateLimitMiddleware::class);
      */
-    public function addGlobalMiddleware(string|callable $middleware): self
+    public function addGlobalMiddleware(string|callable|MiddlewareInterface $middleware): self
     {
         $this->globalMiddleware[] = $middleware;
         return $this;

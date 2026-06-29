@@ -163,7 +163,7 @@ final class CookieTest extends TestCase
             'domain' => 'example.com',
             'secure' => true,
             'httpOnly' => true,
-            'sameSite' => 'Strict'
+            'sameSite' => 'Strict',
         ];
 
         $this->assertSame($expected, $cookie->toArray());
@@ -198,4 +198,3 @@ final class CookieTest extends TestCase
         $this->assertSame('None', $modified->getSameSite());
     }
 }
-

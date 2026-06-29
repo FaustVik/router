@@ -13,6 +13,6 @@ final class InvalidTypeRoute extends Exception
 {
     public function __construct()
     {
-        parent::__construct("Invalid type route");
+        parent::__construct('Invalid type route');
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Route;
 
+use Closure;
 use FaustVik\Router\Route\RouteAnonymousFunc;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +30,7 @@ final class RouteAnonymousFuncTest extends TestCase
 
         $this->assertSame('/test', $route->getRoute());
         $this->assertSame(['GET'], $route->getMethods());
-        $this->assertInstanceOf(\Closure::class, $route->getFunc());
+        $this->assertInstanceOf(Closure::class, $route->getFunc());
     }
 
     public function testCreateRouteWithParameters(): void
@@ -42,7 +43,7 @@ final class RouteAnonymousFuncTest extends TestCase
 
         $this->assertSame('/users/{id}', $route->getRoute());
         $this->assertSame(['GET', 'POST'], $route->getMethods());
-        $this->assertInstanceOf(\Closure::class, $route->getFunc());
+        $this->assertInstanceOf(Closure::class, $route->getFunc());
     }
 
     public function testCreateRouteWithAlias(): void
@@ -285,4 +286,3 @@ final class RouteAnonymousFuncTest extends TestCase
         $this->assertSame('ID: 456, Type: premium', $result2);
     }
 }
-

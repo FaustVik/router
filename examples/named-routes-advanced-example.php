@@ -18,7 +18,6 @@ use FaustVik\Router\Router\Router;
  * - Опциональные параметры
  * - Constraints для параметров
  */
-
 echo "=== Продвинутая генерация URL с Named Routes ===\n\n";
 
 $router = new Router();
@@ -153,7 +152,7 @@ echo "\n=== 6. Массивы в query параметрах ===\n\n";
 // Query с массивами
 $url = $router->url('users.index', [], [
     'filters' => ['status' => 'active', 'role' => 'admin'],
-    'ids' => [1, 2, 3]
+    'ids' => [1, 2, 3],
 ]);
 echo "users.index с массивами: $url\n";
 // => /users?filters[status]=active&filters[role]=admin&ids[0]=1&ids[1]=2&ids[2]=3
@@ -163,7 +162,7 @@ echo "\n=== 7. Специальные символы ===\n\n";
 // URL-кодирование специальных символов
 $url = $router->url('search', [], [
     'q' => 'php & javascript',
-    'tags' => 'web, api, rest'
+    'tags' => 'web, api, rest',
 ]);
 echo "search со спецсимволами: $url\n";
 // => /search?q=php+%26+javascript&tags=web%2C+api%2C+rest
@@ -185,21 +184,21 @@ echo "\n=== 9. Обработка ошибок ===\n\n";
 // Попытка сгенерировать URL для несуществующего маршрута
 try {
     $url = $router->url('nonexistent.route');
-} catch (\InvalidArgumentException $e) {
+} catch (InvalidArgumentException $e) {
     echo "❌ Ошибка: {$e->getMessage()}\n";
 }
 
 // Попытка сгенерировать URL без обязательного параметра
 try {
     $url = $router->url('users.show'); // Нужен параметр 'id'
-} catch (\InvalidArgumentException $e) {
+} catch (InvalidArgumentException $e) {
     echo "❌ Ошибка: {$e->getMessage()}\n";
 }
 
 // Попытка использовать неправильный параметр (нарушение constraint)
 try {
     $url = $router->url('users.show', ['id' => 'abc']); // Должно быть число
-} catch (\InvalidArgumentException $e) {
+} catch (InvalidArgumentException $e) {
     echo "❌ Ошибка: {$e->getMessage()}\n";
 }
 
@@ -225,7 +224,7 @@ function generatePaginationLinks(Router $router, int $currentPage, int $totalPag
 
 $pagination = generatePaginationLinks($router, 2, 5);
 echo "Пагинация (страница 2 из 5):\n";
-echo "  Предыдущая: " . ($pagination['prev'] ?? 'нет') . "\n";
+echo '  Предыдущая: ' . ($pagination['prev'] ?? 'нет') . "\n";
 echo "  Текущая: {$pagination['current']}\n";
 echo "  Следующая: {$pagination['next']}\n";
 

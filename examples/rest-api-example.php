@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -14,13 +15,13 @@ class Database
     private static array $users = [
         1 => ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'role' => 'admin'],
         2 => ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'role' => 'user'],
-        3 => ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'role' => 'user']
+        3 => ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'role' => 'user'],
     ];
 
     private static array $posts = [
         1 => ['id' => 1, 'title' => 'First Post', 'content' => 'Hello World', 'user_id' => 1],
         2 => ['id' => 2, 'title' => 'Second Post', 'content' => 'REST API Demo', 'user_id' => 2],
-        3 => ['id' => 3, 'title' => 'Third Post', 'content' => 'Router Example', 'user_id' => 1]
+        3 => ['id' => 3, 'title' => 'Third Post', 'content' => 'Router Example', 'user_id' => 1],
     ];
 
     private static int $nextUserId = 4;
@@ -43,7 +44,7 @@ class Database
             'name' => $data['name'] ?? 'Unknown',
             'email' => $data['email'] ?? 'unknown@example.com',
             'role' => $data['role'] ?? 'user',
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
         ];
 
         self::$users[$user['id']] = $user;
@@ -87,7 +88,7 @@ class Database
 
     public static function getUserPosts(int $userId): array
     {
-        return array_values(array_filter(self::$posts, fn($post) => $post['user_id'] === $userId));
+        return array_values(array_filter(self::$posts, fn ($post) => $post['user_id'] === $userId));
     }
 
     public static function createPost(array $data): array
@@ -97,7 +98,7 @@ class Database
             'title' => $data['title'] ?? 'Untitled',
             'content' => $data['content'] ?? '',
             'user_id' => $data['user_id'] ?? 1,
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
         ];
 
         self::$posts[$post['id']] = $post;
@@ -130,23 +131,23 @@ class ApiController
                     'GET /api/users/{id}' => 'Get specific user',
                     'PUT /api/users/{id}' => 'Update user',
                     'DELETE /api/users/{id}' => 'Delete user',
-                    'GET /api/users/{id}/posts' => "Get user's posts"
+                    'GET /api/users/{id}/posts' => "Get user's posts",
                 ],
                 'posts' => [
                     'GET /api/posts' => 'List all posts',
                     'POST /api/posts' => 'Create new post',
                     'GET /api/posts/{id}' => 'Get specific post',
-                    'DELETE /api/posts/{id}' => 'Delete post'
-                ]
+                    'DELETE /api/posts/{id}' => 'Delete post',
+                ],
             ],
             'features' => [
                 'JSON responses',
                 'Proper HTTP status codes',
                 'Error handling',
                 'Request validation',
-                'Resource relationships'
+                'Resource relationships',
             ],
-            'generated_at' => date('c')
+            'generated_at' => date('c'),
         ];
 
         return Response::json($docs);
@@ -162,7 +163,7 @@ class UsersController
         return Response::json([
             'data' => $users,
             'count' => count($users),
-            'timestamp' => date('c')
+            'timestamp' => date('c'),
         ]);
     }
 
@@ -174,7 +175,7 @@ class UsersController
         if (!$user) {
             return Response::json([
                 'error' => 'User not found',
-                'message' => "User with ID $userId does not exist"
+                'message' => "User with ID $userId does not exist",
             ], 404);
         }
 
@@ -187,14 +188,14 @@ class UsersController
         $data = [
             'name' => 'New User #' . rand(1000, 9999),
             'email' => 'newuser' . rand(100, 999) . '@example.com',
-            'role' => 'user'
+            'role' => 'user',
         ];
 
         // Валидация
         if (empty($data['name']) || empty($data['email'])) {
             return Response::json([
                 'error' => 'Validation failed',
-                'message' => 'Name and email are required'
+                'message' => 'Name and email are required',
             ], 400);
         }
 
@@ -202,7 +203,7 @@ class UsersController
 
         return Response::json([
             'message' => 'User created successfully',
-            'data' => $user
+            'data' => $user,
         ], 201);
     }
 
@@ -213,7 +214,7 @@ class UsersController
         // Симуляция обновления данных
         $data = [
             'name' => 'Updated User #' . $userId,
-            'email' => "updated$userId@example.com"
+            'email' => "updated$userId@example.com",
         ];
 
         $user = Database::updateUser($userId, $data);
@@ -221,13 +222,13 @@ class UsersController
         if (!$user) {
             return Response::json([
                 'error' => 'User not found',
-                'message' => "Cannot update user with ID $userId"
+                'message' => "Cannot update user with ID $userId",
             ], 404);
         }
 
         return Response::json([
             'message' => 'User updated successfully',
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
@@ -239,12 +240,12 @@ class UsersController
         if (!$deleted) {
             return Response::json([
                 'error' => 'User not found',
-                'message' => "User with ID $userId does not exist"
+                'message' => "User with ID $userId does not exist",
             ], 404);
         }
 
         return Response::json([
-            'message' => "User $userId deleted successfully"
+            'message' => "User $userId deleted successfully",
         ]);
     }
 
@@ -256,7 +257,7 @@ class UsersController
         if (!$user) {
             return Response::json([
                 'error' => 'User not found',
-                'message' => "User with ID $userId does not exist"
+                'message' => "User with ID $userId does not exist",
             ], 404);
         }
 
@@ -265,7 +266,7 @@ class UsersController
         return Response::json([
             'user' => $user,
             'posts' => $posts,
-            'count' => count($posts)
+            'count' => count($posts),
         ]);
     }
 }
@@ -279,7 +280,7 @@ class PostsController
         return Response::json([
             'data' => $posts,
             'count' => count($posts),
-            'timestamp' => date('c')
+            'timestamp' => date('c'),
         ]);
     }
 
@@ -291,7 +292,7 @@ class PostsController
         if (!$post) {
             return Response::json([
                 'error' => 'Post not found',
-                'message' => "Post with ID $postId does not exist"
+                'message' => "Post with ID $postId does not exist",
             ], 404);
         }
 
@@ -308,14 +309,14 @@ class PostsController
         $data = [
             'title' => 'New Post #' . rand(1000, 9999),
             'content' => 'This is a sample post content created via API.',
-            'user_id' => rand(1, 3)
+            'user_id' => rand(1, 3),
         ];
 
         $post = Database::createPost($data);
 
         return Response::json([
             'message' => 'Post created successfully',
-            'data' => $post
+            'data' => $post,
         ], 201);
     }
 
@@ -327,12 +328,12 @@ class PostsController
         if (!$deleted) {
             return Response::json([
                 'error' => 'Post not found',
-                'message' => "Post with ID $postId does not exist"
+                'message' => "Post with ID $postId does not exist",
             ], 404);
         }
 
         return Response::json([
-            'message' => "Post $postId deleted successfully"
+            'message' => "Post $postId deleted successfully",
         ]);
     }
 }

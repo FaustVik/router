@@ -6,7 +6,7 @@ namespace FaustVik\Router\Tests\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\Middleware\MiddlewareStack;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +17,7 @@ final class MiddlewareStackTest extends TestCase
 {
     private function createTestMiddleware(string $name): MiddlewareInterface
     {
-        return new class($name) implements MiddlewareInterface {
+        return new class ($name) implements MiddlewareInterface {
             public function __construct(private string $name)
             {
             }
@@ -37,7 +37,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testConstructor(): void
     {
-        $finalHandler = fn(Request $request) => Response::json(['ok' => true]);
+        $finalHandler = fn (Request $request) => Response::json(['ok' => true]);
         $stack = new MiddlewareStack($finalHandler);
 
         $this->assertTrue($stack->isEmpty());
@@ -46,7 +46,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testAdd(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware = $this->createTestMiddleware('test');
 
         $result = $stack->add($middleware);
@@ -58,7 +58,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testPrepend(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
 
         $middleware1 = $this->createTestMiddleware('first');
         $middleware2 = $this->createTestMiddleware('second');
@@ -73,7 +73,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testAddFromArray(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware1 = $this->createTestMiddleware('test1');
         $middleware2 = $this->createTestMiddleware('test2');
 
@@ -84,7 +84,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testRemove(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware1 = $this->createTestMiddleware('test1');
         $middleware2 = $this->createTestMiddleware('test2');
 
@@ -98,7 +98,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testRemoveInvalidIndex(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware = $this->createTestMiddleware('test');
 
         $stack->add($middleware);
@@ -109,7 +109,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testRemoveByClass(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware1 = $this->createTestMiddleware('test1');
         $middleware2 = $this->createTestMiddleware('test2');
 
@@ -124,7 +124,7 @@ final class MiddlewareStackTest extends TestCase
     public function testExecute(): void
     {
         $finalResponse = Response::json(['final' => true]);
-        $stack = new MiddlewareStack(fn(Request $request) => $finalResponse);
+        $stack = new MiddlewareStack(fn (Request $request) => $finalResponse);
 
         $middleware1 = $this->createTestMiddleware('mw1');
         $middleware2 = $this->createTestMiddleware('mw2');
@@ -158,7 +158,7 @@ final class MiddlewareStackTest extends TestCase
     public function testExecuteWithEmptyStack(): void
     {
         $finalResponse = Response::json(['empty' => true]);
-        $stack = new MiddlewareStack(fn(Request $request) => $finalResponse);
+        $stack = new MiddlewareStack(fn (Request $request) => $finalResponse);
 
         $request = new Request('GET', '/test');
         $response = $stack->execute($request);
@@ -168,7 +168,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testClear(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware = $this->createTestMiddleware('test');
 
         $stack->add($middleware);
@@ -183,7 +183,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testGetMiddleware(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware1 = $this->createTestMiddleware('test1');
         $middleware2 = $this->createTestMiddleware('test2');
 
@@ -199,7 +199,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testGetAt(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware = $this->createTestMiddleware('test');
 
         $stack->add($middleware);
@@ -211,7 +211,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testHas(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware = $this->createTestMiddleware('test');
 
         $this->assertFalse($stack->has(get_class($middleware)));
@@ -223,7 +223,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testFindByClass(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware1 = $this->createTestMiddleware('test1');
         $middleware2 = $this->createTestMiddleware('test2');
 
@@ -236,7 +236,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testFindByClassReturnsNull(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware = $this->createTestMiddleware('test');
 
         $found = $stack->findByClass(get_class($middleware));
@@ -248,7 +248,7 @@ final class MiddlewareStackTest extends TestCase
     {
         $stopResponse = Response::json(['stopped' => true], 403);
 
-        $stoppingMiddleware = new class($stopResponse) implements MiddlewareInterface {
+        $stoppingMiddleware = new class ($stopResponse) implements MiddlewareInterface {
             public function __construct(private Response $response)
             {
             }
@@ -276,7 +276,7 @@ final class MiddlewareStackTest extends TestCase
 
     public function testFluentInterface(): void
     {
-        $stack = new MiddlewareStack(fn($r) => new Response());
+        $stack = new MiddlewareStack(fn ($r) => new Response());
         $middleware1 = $this->createTestMiddleware('test1');
         $middleware2 = $this->createTestMiddleware('test2');
         $middleware3 = $this->createTestMiddleware('test3');
@@ -293,4 +293,3 @@ final class MiddlewareStackTest extends TestCase
         $this->assertSame(1, $stack->count());
     }
 }
-

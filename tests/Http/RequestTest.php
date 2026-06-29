@@ -222,7 +222,7 @@ final class RequestTest extends TestCase
     {
         $request = new Request('GET', '/', [], [], [], [
             'REMOTE_ADDR' => '10.0.0.1',
-            'HTTP_X_FORWARDED_FOR' => '203.0.113.1, 10.0.0.1'
+            'HTTP_X_FORWARDED_FOR' => '203.0.113.1, 10.0.0.1',
         ]);
 
         $this->assertSame('10.0.0.1', $request->getClientIp(false));
@@ -233,7 +233,7 @@ final class RequestTest extends TestCase
     {
         $request = new Request('GET', '/', [], [], [], [
             'REMOTE_ADDR' => '10.0.0.1',
-            'HTTP_CF_CONNECTING_IP' => '203.0.113.1'
+            'HTTP_CF_CONNECTING_IP' => '203.0.113.1',
         ]);
 
         $this->assertSame('203.0.113.1', $request->getClientIp(true));
@@ -346,4 +346,3 @@ final class RequestTest extends TestCase
         $this->assertSame('admin', $modified->getAttribute('user'));
     }
 }
-

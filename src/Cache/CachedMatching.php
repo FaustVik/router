@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Cache;
 
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
-use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
-use FaustVik\Router\interfaces\Routes\RouteClassInterface;
+use FaustVik\Router\Interfaces\Cache\CacheInterface;
+use FaustVik\Router\Interfaces\Collections\RoutesCollectionInterface;
+use FaustVik\Router\Interfaces\Router\Components\MatchingRouteInterface;
+use FaustVik\Router\Interfaces\Routes\RouteAnonymousFuncInterface;
+use FaustVik\Router\Interfaces\Routes\RouteClassInterface;
 use FaustVik\Router\Router\Components\matching\Matching;
 use FaustVik\Router\Router\Components\matching\MatchResult;
 
@@ -111,7 +111,7 @@ final class CachedMatching implements MatchingRouteInterface
             $routeData = [
                 'pattern' => $route->getRoute(),
                 'methods' => $route->getMethods(),
-                'middleware' => $route->getMiddleware()
+                'middleware' => $route->getMiddleware(),
             ];
 
             // Добавляем специфичные для RouteClassInterface данные

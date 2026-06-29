@@ -33,7 +33,7 @@ final class CorsMiddlewareTest extends TestCase
         $middleware = new CorsMiddleware(['https://example.com']);
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('https://example.com', $response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -43,7 +43,7 @@ final class CorsMiddlewareTest extends TestCase
         $middleware = new CorsMiddleware(['*']);
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('*', $response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -55,7 +55,7 @@ final class CorsMiddlewareTest extends TestCase
         );
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $allowMethods = $response->getHeader('Access-Control-Allow-Methods');
         $this->assertStringContainsString('GET', $allowMethods);
@@ -70,7 +70,7 @@ final class CorsMiddlewareTest extends TestCase
         );
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $allowHeaders = $response->getHeader('Access-Control-Allow-Headers');
         $this->assertStringContainsString('Content-Type', $allowHeaders);
@@ -83,7 +83,7 @@ final class CorsMiddlewareTest extends TestCase
         $middleware = new CorsMiddleware(maxAge: 7200);
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('7200', $response->getHeader('Access-Control-Max-Age'));
     }
@@ -96,7 +96,7 @@ final class CorsMiddlewareTest extends TestCase
         );
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('true', $response->getHeader('Access-Control-Allow-Credentials'));
         $this->assertSame('https://example.com', $response->getHeader('Access-Control-Allow-Origin'));
@@ -109,7 +109,7 @@ final class CorsMiddlewareTest extends TestCase
         );
         $request = new Request('OPTIONS', '/api/users', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $exposedHeaders = $response->getHeader('Access-Control-Expose-Headers');
         $this->assertStringContainsString('X-Total-Count', $exposedHeaders);
@@ -123,7 +123,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $nextResponse = Response::json(['users' => []]);
 
-        $response = $middleware->handle($request, fn() => $nextResponse);
+        $response = $middleware->handle($request, fn () => $nextResponse);
 
         $this->assertSame($nextResponse->getContent(), $response->getContent());
         $this->assertSame('*', $response->getHeader('Access-Control-Allow-Origin'));
@@ -136,7 +136,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $nextResponse = new Response('', 201);
 
-        $response = $middleware->handle($request, fn() => $nextResponse);
+        $response = $middleware->handle($request, fn () => $nextResponse);
 
         $this->assertSame('https://example.com', $response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -149,7 +149,7 @@ final class CorsMiddlewareTest extends TestCase
         );
         $request = new Request('GET', '/api/profile', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('true', $response->getHeader('Access-Control-Allow-Credentials'));
     }
@@ -159,7 +159,7 @@ final class CorsMiddlewareTest extends TestCase
         $middleware = new CorsMiddleware(['https://allowed.com']);
         $request = new Request('GET', '/api/users', [], [], ['Origin' => 'https://evil.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertNull($response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -169,7 +169,7 @@ final class CorsMiddlewareTest extends TestCase
         $middleware = new CorsMiddleware(['https://*.example.com']);
         $request = new Request('GET', '/api/test', [], [], ['Origin' => 'https://app.example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('https://app.example.com', $response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -179,7 +179,7 @@ final class CorsMiddlewareTest extends TestCase
         $middleware = new CorsMiddleware(['https://*.example.com']);
         $request = new Request('GET', '/api/test', [], [], ['Origin' => 'https://other.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertNull($response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -191,7 +191,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $request = new Request('OPTIONS', '/api/test', [], [], ['Origin' => 'https://new-origin.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('https://new-origin.com', $response->getHeader('Access-Control-Allow-Origin'));
     }
@@ -203,7 +203,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $request = new Request('OPTIONS', '/api/test', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $allowMethods = $response->getHeader('Access-Control-Allow-Methods');
         $this->assertStringContainsString('GET', $allowMethods);
@@ -218,7 +218,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $request = new Request('OPTIONS', '/api/test', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('X-Custom-Header', $response->getHeader('Access-Control-Allow-Headers'));
     }
@@ -230,7 +230,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $request = new Request('OPTIONS', '/api/test', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         $this->assertSame('X-Total-Count', $response->getHeader('Access-Control-Expose-Headers'));
     }
@@ -255,7 +255,7 @@ final class CorsMiddlewareTest extends TestCase
 
         $nextResponse = Response::json(['data' => 'test']);
 
-        $response = $middleware->handle($request, fn() => $nextResponse);
+        $response = $middleware->handle($request, fn () => $nextResponse);
 
         // Когда нет Origin, заголовки CORS все равно добавляются для wildcard
         $this->assertSame('*', $response->getHeader('Access-Control-Allow-Origin'));
@@ -269,11 +269,10 @@ final class CorsMiddlewareTest extends TestCase
         );
         $request = new Request('GET', '/api/test', [], [], ['Origin' => 'https://example.com']);
 
-        $response = $middleware->handle($request, fn() => new Response());
+        $response = $middleware->handle($request, fn () => new Response());
 
         // С credentials не должно быть *, только конкретный origin
         $this->assertSame('https://example.com', $response->getHeader('Access-Control-Allow-Origin'));
         $this->assertSame('true', $response->getHeader('Access-Control-Allow-Credentials'));
     }
 }
-

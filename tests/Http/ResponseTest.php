@@ -202,7 +202,7 @@ final class ResponseTest extends TestCase
         $this->assertSame([
             'X-Old' => 'old',
             'X-New' => 'new',
-            'X-Another' => 'another'
+            'X-Another' => 'another',
         ], $modified->getHeaders());
         $this->assertNotSame($original, $modified);
     }
@@ -230,7 +230,7 @@ final class ResponseTest extends TestCase
             'domain' => 'example.com',
             'secure' => true,
             'httpOnly' => false,
-            'sameSite' => 'Strict'
+            'sameSite' => 'Strict',
         ]);
 
         $cookies = $response->getCookies();
@@ -344,4 +344,3 @@ final class ResponseTest extends TestCase
         $this->assertCount(1, $modified->getCookies());
     }
 }
-

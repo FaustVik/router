@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Пример работы с Cookies и Security функциями
  *
@@ -13,10 +15,10 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FaustVik\Router\Router\Router;
+use FaustVik\Router\Http\Cookie;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\Http\Cookie;
+use FaustVik\Router\Router\Router;
 
 $router = new Router();
 
@@ -51,7 +53,7 @@ $router->get('/cookie/get', function (Request $request) {
         'simple_cookie' => $simpleCookie,
         'timed_cookie' => $timedCookie,
         'has_simple' => $hasSimple,
-        'all_cookies' => $allCookies
+        'all_cookies' => $allCookies,
     ]);
 });
 
@@ -78,7 +80,7 @@ $router->get('/cookie/advanced', function (Request $request) {
         'domain' => '',
         'secure' => true,        // Только HTTPS
         'httpOnly' => true,      // Недоступна для JavaScript
-        'sameSite' => 'Strict'   // CSRF защита
+        'sameSite' => 'Strict',   // CSRF защита
     ]);
 
     return $response;
@@ -126,7 +128,7 @@ $router->get('/security/ip', function (Request $request) {
         'real_ip_with_proxy' => $realIp,
         'remote_addr' => $request->getServerParam('REMOTE_ADDR'),
         'x_forwarded_for' => $request->getServerParam('HTTP_X_FORWARDED_FOR'),
-        'cf_connecting_ip' => $request->getServerParam('HTTP_CF_CONNECTING_IP')
+        'cf_connecting_ip' => $request->getServerParam('HTTP_CF_CONNECTING_IP'),
     ]);
 });
 
@@ -147,7 +149,7 @@ $router->get('/security/https', function (Request $request) {
         'full_url' => $fullUrl,
         'message' => $message,
         'server_port' => $request->getServerParam('SERVER_PORT'),
-        'https_var' => $request->getServerParam('HTTPS')
+        'https_var' => $request->getServerParam('HTTPS'),
     ]);
 });
 
@@ -198,7 +200,7 @@ $router->delete('/users/{id}', function (Request $request) {
         'message' => 'User deleted via method override',
         'user_id' => $userId,
         'original_method' => 'POST (with _method=DELETE)',
-        'effective_method' => $request->getMethod()
+        'effective_method' => $request->getMethod(),
     ]);
 });
 
@@ -212,13 +214,13 @@ $router->post('/api/users/{id}', function (Request $request) {
     if ($method === 'DELETE') {
         return Response::json([
             'message' => 'User deleted via header override',
-            'user_id' => $request->getParam('id')
+            'user_id' => $request->getParam('id'),
         ]);
     }
 
     return Response::json([
         'message' => 'Regular POST request',
-        'user_id' => $request->getParam('id')
+        'user_id' => $request->getParam('id'),
     ]);
 });
 
@@ -238,8 +240,8 @@ $router->post('/auth/login', function (Request $request) {
         'message' => 'Login successful',
         'user' => [
             'email' => $email,
-            'token' => $token
-        ]
+            'token' => $token,
+        ],
     ]);
 
     // Устанавливаем session cookie с токеном
@@ -247,7 +249,7 @@ $router->post('/auth/login', function (Request $request) {
         'expires' => 86400 * 7,  // 7 дней
         'httpOnly' => true,      // Защита от XSS
         'secure' => true,        // Только HTTPS
-        'sameSite' => 'Strict'   // Защита от CSRF
+        'sameSite' => 'Strict',   // Защита от CSRF
     ]);
 
     return $response;
@@ -259,7 +261,7 @@ $router->get('/auth/me', function (Request $request) {
     if (!$token) {
         return Response::json([
             'error' => 'Unauthorized',
-            'message' => 'No auth token found'
+            'message' => 'No auth token found',
         ], 401);
     }
 
@@ -269,8 +271,8 @@ $router->get('/auth/me', function (Request $request) {
         'user' => [
             'id' => 123,
             'email' => 'user@example.com',
-            'token' => $token
-        ]
+            'token' => $token,
+        ],
     ]);
 });
 
@@ -300,7 +302,7 @@ $router->get('/debug/request-info', function (Request $request) {
         'is_json' => $request->isJson(),
         'client_ip' => $request->getClientIp(true),
         'cookies' => $request->getCookies(),
-        'headers' => $request->getHeaders()
+        'headers' => $request->getHeaders(),
     ]);
 });
 
@@ -310,10 +312,10 @@ $router->get('/debug/request-info', function (Request $request) {
 
 try {
     $router->run();
-} catch (\Exception $e) {
+} catch (Exception $e) {
     Response::json([
         'error' => 'Internal server error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ], 500)->send();
 }
 

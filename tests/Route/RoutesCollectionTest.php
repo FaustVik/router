@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Route;
 
 use FaustVik\Router\Route\Route;
-use FaustVik\Router\Route\RouteAnonymousFunc;
+use FaustVik\Router\Route\RouteGroup;
 use FaustVik\Router\Route\RoutesCollection;
 use PHPUnit\Framework\TestCase;
 
@@ -237,20 +237,20 @@ final class RoutesCollectionTest extends TestCase
     {
         $group = $this->collection->prefix('/api');
 
-        $this->assertInstanceOf(\FaustVik\Router\Route\RouteGroup::class, $group);
+        $this->assertInstanceOf(RouteGroup::class, $group);
     }
 
     public function testMiddlewareCreatesGroup(): void
     {
         $group = $this->collection->middleware(['AuthMiddleware']);
 
-        $this->assertInstanceOf(\FaustVik\Router\Route\RouteGroup::class, $group);
+        $this->assertInstanceOf(RouteGroup::class, $group);
     }
 
     public function testGroupMethod(): void
     {
-        $this->collection->group(function ($group) {
-            $group->prefix('/api')->group(function ($api) {
+        $this->collection->group(function ($group): void {
+            $group->prefix('/api')->group(function ($api): void {
                 $api->get('/users', RoutesCollectionTestController::class, 'index');
             });
         });
@@ -262,7 +262,7 @@ final class RoutesCollectionTest extends TestCase
 
     public function testPrefixChaining(): void
     {
-        $this->collection->prefix('/api')->group(function ($group) {
+        $this->collection->prefix('/api')->group(function ($group): void {
             $group->get('/users', RoutesCollectionTestController::class, 'index');
             $group->get('/posts', RoutesCollectionTestController::class, 'posts');
         });
@@ -287,7 +287,7 @@ final class RoutesCollectionTest extends TestCase
         $this->collection
             ->prefix('/api')
             ->middleware(['ApiMiddleware'])
-            ->group(function ($api) {
+            ->group(function ($api): void {
                 $api->get('/posts', RoutesCollectionTestController::class, 'posts')
                     ->name('api.posts.index');
 
@@ -298,7 +298,7 @@ final class RoutesCollectionTest extends TestCase
                 // Admin routes
                 $api->prefix('/admin')
                     ->middleware(['AuthMiddleware'])
-                    ->group(function ($admin) {
+                    ->group(function ($admin): void {
                         $admin->get('/users', RoutesCollectionTestController::class, 'users')
                             ->name('api.admin.users');
 
@@ -343,7 +343,7 @@ final class RoutesCollectionTest extends TestCase
 
     public function testRESTfulResourceRoutes(): void
     {
-        $this->collection->prefix('/users')->group(function ($group) {
+        $this->collection->prefix('/users')->group(function ($group): void {
             $group->get('', RoutesCollectionTestController::class, 'index')->name('users.index');
             $group->get('/{id}', RoutesCollectionTestController::class, 'show')->name('users.show')
                 ->where('id', '\d+');
@@ -432,4 +432,3 @@ class RoutesCollectionTestController
     {
     }
 }
-

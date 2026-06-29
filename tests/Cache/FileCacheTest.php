@@ -93,7 +93,7 @@ final class FileCacheTest extends TestCase
         // Boolean
         $this->cache->set('bool_true', true);
         $this->assertTrue($this->cache->get('bool_true'));
-        
+
         $this->cache->set('bool_false', false);
         $this->assertFalse($this->cache->get('bool_false'));
 
@@ -169,7 +169,7 @@ final class FileCacheTest extends TestCase
     {
         // Устанавливаем TTL 1 секунду
         $this->cache->set('expiring_key', 'test_value', 1);
-        
+
         // Сразу должно быть доступно
         $this->assertEquals('test_value', $this->cache->get('expiring_key'));
         $this->assertTrue($this->cache->has('expiring_key'));
@@ -186,9 +186,9 @@ final class FileCacheTest extends TestCase
     {
         // TTL = 0 означает что кеш не истекает
         $this->cache->set('permanent_key', 'test_value', 0);
-        
+
         sleep(1);
-        
+
         $this->assertEquals('test_value', $this->cache->get('permanent_key'));
         $this->assertTrue($this->cache->has('permanent_key'));
     }
@@ -197,9 +197,9 @@ final class FileCacheTest extends TestCase
     {
         // Без указания TTL кеш не должен истекать
         $this->cache->set('default_ttl_key', 'test_value');
-        
+
         sleep(1);
-        
+
         $this->assertEquals('test_value', $this->cache->get('default_ttl_key'));
     }
 
@@ -219,7 +219,7 @@ final class FileCacheTest extends TestCase
             'key1' => 'value1',
             'key2' => 'value2',
             'key3' => 'value3',
-            'non_existent' => null
+            'non_existent' => null,
         ], $result);
     }
 
@@ -228,7 +228,7 @@ final class FileCacheTest extends TestCase
         $values = [
             'key1' => 'value1',
             'key2' => 'value2',
-            'key3' => 'value3'
+            'key3' => 'value3',
         ];
 
         $result = $this->cache->setMultiple($values);
@@ -243,11 +243,11 @@ final class FileCacheTest extends TestCase
     {
         $values = [
             'key1' => 'value1',
-            'key2' => 'value2'
+            'key2' => 'value2',
         ];
 
         $this->cache->setMultiple($values, 1);
-        
+
         $this->assertTrue($this->cache->has('key1'));
         $this->assertTrue($this->cache->has('key2'));
 
@@ -289,12 +289,12 @@ final class FileCacheTest extends TestCase
         // Попытка использовать path traversal в ключе
         // FileCache использует md5 для имени файла, так что это безопасно
         $maliciousKey = '../../../etc/passwd';
-        
+
         $this->cache->set($maliciousKey, 'test_value');
         $value = $this->cache->get($maliciousKey);
-        
+
         $this->assertEquals('test_value', $value);
-        
+
         // Проверяем что файл создан в правильной директории (нормализуем пути для macOS)
         $expectedDir = realpath($this->testCacheDir) ?: $this->testCacheDir;
         $actualDir = $this->cache->getCacheDir();
@@ -305,19 +305,19 @@ final class FileCacheTest extends TestCase
     {
         // Проверяем что используется JSON, не serialize
         // Это защищает от PHP Object Injection атак
-        
+
         $this->cache->set('test_key', ['foo' => 'bar']);
-        
+
         // Читаем файл напрямую
         $files = glob($this->testCacheDir . '/test_*.cache');
         $this->assertNotEmpty($files);
-        
+
         $content = file_get_contents($files[0]);
-        
+
         // Проверяем что это JSON, а не serialized PHP
         $this->assertStringStartsWith('{', $content);
         $this->assertStringNotContainsString('O:', $content); // serialized object начинается с O:
-        
+
         // Проверяем что это валидный JSON
         $decoded = json_decode($content, true);
         $this->assertIsArray($decoded);
@@ -330,16 +330,16 @@ final class FileCacheTest extends TestCase
     {
         // Создаем валидную запись
         $this->cache->set('test_key', 'test_value');
-        
+
         // Портим файл кеша
         $files = glob($this->testCacheDir . '/test_*.cache');
         $this->assertNotEmpty($files);
         file_put_contents($files[0], 'corrupted data');
-        
+
         // get() должен вернуть null и удалить поврежденный файл
         $value = $this->cache->get('test_key');
         $this->assertNull($value);
-        
+
         // Файл должен быть удален
         clearstatcache();
         $this->assertFileDoesNotExist($files[0]);
@@ -349,16 +349,16 @@ final class FileCacheTest extends TestCase
     {
         // Создаем файл с невалидной структурой данных
         $this->cache->set('test_key', 'test_value');
-        
+
         $files = glob($this->testCacheDir . '/test_*.cache');
         $this->assertNotEmpty($files);
-        
+
         // Записываем JSON без необходимых полей
         file_put_contents($files[0], json_encode(['invalid' => 'structure']));
-        
+
         $value = $this->cache->get('test_key');
         $this->assertNull($value);
-        
+
         clearstatcache();
         $this->assertFileDoesNotExist($files[0]);
     }
@@ -371,20 +371,20 @@ final class FileCacheTest extends TestCase
     {
         // .gitignore должен быть создан
         $this->assertFileExists($this->testCacheDir . '/.gitignore');
-        
+
         $gitignoreContent = file_get_contents($this->testCacheDir . '/.gitignore');
         $this->assertStringContainsString('*', $gitignoreContent);
         $this->assertStringContainsString('!.gitignore', $gitignoreContent);
 
         // .htaccess должен быть создан
         $this->assertFileExists($this->testCacheDir . '/.htaccess');
-        
+
         $htaccessContent = file_get_contents($this->testCacheDir . '/.htaccess');
         $this->assertStringContainsString('Deny from all', $htaccessContent);
 
         // index.php должен быть создан
         $this->assertFileExists($this->testCacheDir . '/index.php');
-        
+
         $indexContent = file_get_contents($this->testCacheDir . '/index.php');
         $this->assertStringContainsString('403', $indexContent);
         $this->assertStringContainsString('Access denied', $indexContent);
@@ -393,18 +393,18 @@ final class FileCacheTest extends TestCase
     public function testCacheDirectoryIsCreatedIfNotExists(): void
     {
         $newCacheDir = $this->testCacheDir . '_new';
-        
+
         $this->assertDirectoryDoesNotExist($newCacheDir);
-        
+
         $cache = new FileCache($newCacheDir);
-        
+
         $this->assertDirectoryExists($newCacheDir);
-        
+
         // Нормализуем пути для сравнения (macOS использует /private/var)
         $expectedDir = realpath($newCacheDir) ?: $newCacheDir;
         $actualDir = $cache->getCacheDir();
         $this->assertEquals($expectedDir, $actualDir);
-        
+
         // Очистка
         $this->recursiveRemoveDirectory($newCacheDir);
     }
@@ -449,11 +449,11 @@ final class FileCacheTest extends TestCase
     public function testCustomPrefix(): void
     {
         $cache = new FileCache($this->testCacheDir, 'custom_prefix_');
-        
+
         $this->assertEquals('custom_prefix_', $cache->getPrefix());
-        
+
         $cache->set('test', 'value');
-        
+
         $files = glob($this->testCacheDir . '/custom_prefix_*.cache');
         $this->assertNotEmpty($files);
     }
@@ -472,7 +472,7 @@ final class FileCacheTest extends TestCase
 
         // clear() очищает только файлы с соответствующим префиксом
         $cache1->clear();
-        
+
         $this->assertNull($cache1->get('shared_key'));
         $this->assertEquals('value2', $cache2->get('shared_key'));
     }
@@ -486,7 +486,7 @@ final class FileCacheTest extends TestCase
     public function testVeryLongKey(): void
     {
         $longKey = str_repeat('a', 1000);
-        
+
         $this->cache->set($longKey, 'long_key_value');
         $this->assertEquals('long_key_value', $this->cache->get($longKey));
     }
@@ -500,7 +500,7 @@ final class FileCacheTest extends TestCase
             'key@with@at',
             'ключ_на_русском',
             'キー日本語',
-            'مفتاح_عربي'
+            'مفتاح_عربي',
         ];
 
         foreach ($specialKeys as $key) {
@@ -513,17 +513,16 @@ final class FileCacheTest extends TestCase
     {
         // Этот тест проверяет что LOCK_EX предотвращает race conditions
         // В реальных условиях нужно больше процессов, но это базовая проверка
-        
+
         $this->cache->set('counter', 0);
-        
+
         // Множественные записи
         for ($i = 0; $i < 10; $i++) {
             $value = $this->cache->get('counter');
             $this->cache->set('counter', $value + 1);
         }
-        
+
         $finalValue = $this->cache->get('counter');
         $this->assertEquals(10, $finalValue);
     }
 }
-

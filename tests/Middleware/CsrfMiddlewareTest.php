@@ -8,7 +8,6 @@ use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Middleware\CsrfMiddleware;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 /**
  * Тесты для CsrfMiddleware
@@ -37,7 +36,7 @@ final class CsrfMiddlewareTest extends TestCase
     {
         $middleware = new CsrfMiddleware();
         $request = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $response = $middleware->handle($request, $next);
 
@@ -49,7 +48,7 @@ final class CsrfMiddlewareTest extends TestCase
     {
         $middleware = new CsrfMiddleware();
         $request = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $middleware->handle($request, $next);
 
@@ -61,7 +60,7 @@ final class CsrfMiddlewareTest extends TestCase
     {
         $middleware = new CsrfMiddleware();
         $request = new Request('POST', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $response = $middleware->handle($request, $next);
 
@@ -75,7 +74,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         // Генерируем токен через GET запрос
         $getRequest = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
         $middleware->handle($getRequest, $next);
 
         $token = $_SESSION['_csrf_token'];
@@ -94,7 +93,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         // Генерируем токен
         $getRequest = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
         $middleware->handle($getRequest, $next);
 
         // POST запрос с неправильным токеном в body
@@ -111,7 +110,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         // Генерируем токен
         $getRequest = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
         $middleware->handle($getRequest, $next);
 
         $token = $_SESSION['_csrf_token'];
@@ -129,7 +128,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         // Генерируем токен
         $getRequest = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
         $middleware->handle($getRequest, $next);
 
         $token = $_SESSION['_csrf_token'];
@@ -151,7 +150,7 @@ final class CsrfMiddlewareTest extends TestCase
     public function testChecksAllMutatingMethods(): void
     {
         $middleware = new CsrfMiddleware();
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Генерируем токен
         $getRequest = new Request('GET', '/test', [], [], [], []);
@@ -173,7 +172,7 @@ final class CsrfMiddlewareTest extends TestCase
             excludePaths: ['/api/webhook', '/public/']
         );
 
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // POST к исключенному пути без токена должен пройти
         $request1 = new Request('POST', '/api/webhook', [], [], [], []);
@@ -197,7 +196,7 @@ final class CsrfMiddlewareTest extends TestCase
         $middleware = new CsrfMiddleware(sessionKey: $customKey);
 
         $request = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $middleware->handle($request, $next);
 
@@ -211,7 +210,7 @@ final class CsrfMiddlewareTest extends TestCase
         $middleware = new CsrfMiddleware(tokenLength: $tokenLength);
 
         $request = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $middleware->handle($request, $next);
 
@@ -223,7 +222,7 @@ final class CsrfMiddlewareTest extends TestCase
         $middleware = new CsrfMiddleware();
 
         $request = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $middleware->handle($request, $next);
         $oldToken = $_SESSION['_csrf_token'];
@@ -290,7 +289,7 @@ final class CsrfMiddlewareTest extends TestCase
 
         // Генерируем токен
         $getRequest = new Request('GET', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
         $middleware->handle($getRequest, $next);
 
         $validToken = $_SESSION['_csrf_token'];
@@ -319,17 +318,17 @@ final class CsrfMiddlewareTest extends TestCase
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        
+
         // Устанавливаем опасное значение токена
         $_SESSION = [];
         $_SESSION['_csrf_token'] = '<script>alert("xss")</script>';
-        
+
         // Имитируем активную сессию
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         $_SESSION['_csrf_token'] = '<script>alert("xss")</script>';
-        
+
         $field = CsrfMiddleware::getTokenField();
 
         // Проверяем что опасные символы экранированы
@@ -343,17 +342,17 @@ final class CsrfMiddlewareTest extends TestCase
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        
+
         // Устанавливаем опасное значение токена
         $_SESSION = [];
         $_SESSION['_csrf_token'] = '<script>alert("xss")</script>';
-        
+
         // Имитируем активную сессию
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         $_SESSION['_csrf_token'] = '<script>alert("xss")</script>';
-        
+
         $meta = CsrfMiddleware::getTokenMeta();
 
         // Проверяем что опасные символы экранированы
@@ -365,11 +364,10 @@ final class CsrfMiddlewareTest extends TestCase
     {
         $middleware = new CsrfMiddleware();
         $request = new Request('POST', '/test', [], [], [], []);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $response = $middleware->handle($request, $next);
 
         $this->assertEquals('token-mismatch', $response->getHeader('X-CSRF-Protection'));
     }
 }
-

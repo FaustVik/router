@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Route;
 
-use FaustVik\Router\interfaces\Routes\RouteGroupInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Routes\RouteGroupInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 
 /**
  * Route group for organizing routes

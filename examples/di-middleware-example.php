@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
 
 // Интерфейс для аутентификации
 interface AuthServiceInterface
@@ -94,7 +95,7 @@ class AdminController
         echo json_encode([
             'status' => 'success',
             'message' => 'Admin dashboard',
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -107,9 +108,9 @@ class AdminController
             'status' => 'success',
             'data' => [
                 ['id' => 1, 'name' => 'Admin User', 'role' => 'admin'],
-                ['id' => 2, 'name' => 'Regular User', 'role' => 'user']
+                ['id' => 2, 'name' => 'Regular User', 'role' => 'user'],
             ],
-            'user' => $user
+            'user' => $user,
         ]);
     }
 }
@@ -118,7 +119,7 @@ class AdminController
 $router = new Router();
 
 // Настройка DI контейнера
-$router->enableDI(function ($container) {
+$router->enableDI(function ($container): void {
     // Сингleton для аутентификации
     $container->singleton(AuthServiceInterface::class, function () {
         return new AuthService();
@@ -189,6 +190,6 @@ $_SERVER['REQUEST_METHOD'] = 'GET';
 $router->run();
 
 echo "\n\n=== Информация о DI ===\n";
-echo "DI включен: " . ($router->isDIEnabled() ? 'Да' : 'Нет') . "\n";
-echo "Может создать AuthMiddleware: " . ($router->getContainer()->canResolve(AuthMiddleware::class) ? 'Да' : 'Нет') . "\n";
-echo "Может создать AdminController: " . ($router->getContainer()->canResolve(AdminController::class) ? 'Да' : 'Нет') . "\n";
+echo 'DI включен: ' . ($router->isDIEnabled() ? 'Да' : 'Нет') . "\n";
+echo 'Может создать AuthMiddleware: ' . ($router->getContainer()->canResolve(AuthMiddleware::class) ? 'Да' : 'Нет') . "\n";
+echo 'Может создать AdminController: ' . ($router->getContainer()->canResolve(AdminController::class) ? 'Да' : 'Нет') . "\n";

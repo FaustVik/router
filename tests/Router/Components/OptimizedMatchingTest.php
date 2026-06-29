@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FaustVik\Router\Tests\Router\Components;
 
 use FaustVik\Router\exceptions\NoMatch;
-use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Components\matching\OptimizedMatching;
@@ -38,7 +37,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchStaticRoute(): void
     {
-        $route = RouteAnonymousFunc::create('/users', fn() => 'Users', ['GET']);
+        $route = RouteAnonymousFunc::create('/users', fn () => 'Users', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/users', $this->routes);
@@ -49,7 +48,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchRootRoute(): void
     {
-        $route = RouteAnonymousFunc::create('/', fn() => 'Home', ['GET']);
+        $route = RouteAnonymousFunc::create('/', fn () => 'Home', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/', $this->routes);
@@ -59,7 +58,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchNestedStaticRoute(): void
     {
-        $route = RouteAnonymousFunc::create('/api/v1/users', fn() => 'API', ['GET']);
+        $route = RouteAnonymousFunc::create('/api/v1/users', fn () => 'API', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/api/v1/users', $this->routes);
@@ -73,7 +72,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchWithSingleParameter(): void
     {
-        $route = RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']);
+        $route = RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/users/123', $this->routes);
@@ -84,7 +83,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchWithMultipleParameters(): void
     {
-        $route = RouteAnonymousFunc::create('/posts/{id}/comments/{commentId}', fn() => 'Comment', ['GET']);
+        $route = RouteAnonymousFunc::create('/posts/{id}/comments/{commentId}', fn () => 'Comment', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/posts/42/comments/7', $this->routes);
@@ -94,7 +93,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchWithParameterAtStart(): void
     {
-        $route = RouteAnonymousFunc::create('/{lang}/about', fn() => 'About', ['GET']);
+        $route = RouteAnonymousFunc::create('/{lang}/about', fn () => 'About', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/en/about', $this->routes);
@@ -104,7 +103,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchWithParameterAtEnd(): void
     {
-        $route = RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']);
+        $route = RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']);
         $this->routes->set($route);
 
         $result = $this->matching->match('/users/999', $this->routes);
@@ -118,7 +117,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchByAlias(): void
     {
-        $route = RouteAnonymousFunc::create('/users', fn() => 'Users', ['GET']);
+        $route = RouteAnonymousFunc::create('/users', fn () => 'Users', ['GET']);
         $route->setAlias('/people');
         $this->routes->set($route);
 
@@ -129,7 +128,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchByParametrizedAlias(): void
     {
-        $route = RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']);
+        $route = RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']);
         $route->setAlias('/people/{id}');
         $this->routes->set($route);
 
@@ -145,9 +144,9 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testStaticRouteHasPriorityOverDynamic(): void
     {
-        $staticRoute = RouteAnonymousFunc::create('/users/admin', fn() => 'Admin', ['GET']);
-        $dynamicRoute = RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']);
-        
+        $staticRoute = RouteAnonymousFunc::create('/users/admin', fn () => 'Admin', ['GET']);
+        $dynamicRoute = RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']);
+
         $this->routes->set($dynamicRoute);
         $this->routes->set($staticRoute);
 
@@ -159,9 +158,9 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testFirstMatchingRouteIsReturned(): void
     {
-        $route1 = RouteAnonymousFunc::create('/users/{id}', fn() => 'Route1', ['GET']);
-        $route2 = RouteAnonymousFunc::create('/users/{userId}', fn() => 'Route2', ['GET']);
-        
+        $route1 = RouteAnonymousFunc::create('/users/{id}', fn () => 'Route1', ['GET']);
+        $route2 = RouteAnonymousFunc::create('/users/{userId}', fn () => 'Route2', ['GET']);
+
         $this->routes->set($route1);
         $this->routes->set($route2);
 
@@ -177,15 +176,15 @@ final class OptimizedMatchingTest extends TestCase
     public function testRoutesGroupedByFirstSegment(): void
     {
         // Эти маршруты должны быть в разных группах
-        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']));
-        $this->routes->set(RouteAnonymousFunc::create('/posts/{id}', fn() => 'Post', ['GET']));
-        $this->routes->set(RouteAnonymousFunc::create('/admin/{id}', fn() => 'Admin', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/posts/{id}', fn () => 'Post', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/admin/{id}', fn () => 'Admin', ['GET']));
 
         // Первый match строит индекс
         $this->matching->match('/users/1', $this->routes);
-        
+
         $stats = $this->matching->getIndexStats();
-        
+
         // Должно быть 3 группы по первому сегменту
         $this->assertGreaterThanOrEqual(3, $stats['groups']);
     }
@@ -196,7 +195,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testThrowsNoMatchForNonexistentRoute(): void
     {
-        $this->routes->set(RouteAnonymousFunc::create('/users', fn() => 'Users', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/users', fn () => 'Users', ['GET']));
 
         $this->expectException(NoMatch::class);
         $this->matching->match('/nonexistent', $this->routes);
@@ -204,7 +203,7 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testThrowsNoMatchForDifferentSegmentCount(): void
     {
-        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']));
 
         $this->expectException(NoMatch::class);
         $this->matching->match('/users/123/extra', $this->routes);
@@ -216,8 +215,8 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testIndexIsBuiltOnFirstMatch(): void
     {
-        $this->routes->set(RouteAnonymousFunc::create('/static', fn() => 'Static', ['GET']));
-        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/static', fn () => 'Static', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']));
 
         $stats = $this->matching->getIndexStats();
         $this->assertEquals(0, $stats['static']); // Индекс еще не построен
@@ -231,22 +230,22 @@ final class OptimizedMatchingTest extends TestCase
     public function testIndexStatsAccurate(): void
     {
         // 2 статических маршрута
-        $this->routes->set(RouteAnonymousFunc::create('/home', fn() => 'Home', ['GET']));
-        $this->routes->set(RouteAnonymousFunc::create('/about', fn() => 'About', ['GET']));
-        
+        $this->routes->set(RouteAnonymousFunc::create('/home', fn () => 'Home', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/about', fn () => 'About', ['GET']));
+
         // 2 динамических маршрута
-        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']));
-        $this->routes->set(RouteAnonymousFunc::create('/posts/{id}', fn() => 'Post', ['GET']));
-        
+        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/posts/{id}', fn () => 'Post', ['GET']));
+
         // 1 маршрут с статическим алиасом
-        $route = RouteAnonymousFunc::create('/contact', fn() => 'Contact', ['GET']);
+        $route = RouteAnonymousFunc::create('/contact', fn () => 'Contact', ['GET']);
         $route->setAlias('/feedback');
         $this->routes->set($route);
 
         $this->matching->match('/home', $this->routes);
-        
+
         $stats = $this->matching->getIndexStats();
-        
+
         $this->assertEquals(3, $stats['static']); // home, about, contact
         $this->assertEquals(2, $stats['dynamic']); // users/{id}, posts/{id}
         $this->assertGreaterThanOrEqual(1, $stats['aliases']); // feedback (может быть больше из-за динамических алиасов)
@@ -254,8 +253,8 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testResetIndexClearsCache(): void
     {
-        $this->routes->set(RouteAnonymousFunc::create('/test', fn() => 'Test', ['GET']));
-        
+        $this->routes->set(RouteAnonymousFunc::create('/test', fn () => 'Test', ['GET']));
+
         $this->matching->match('/test', $this->routes);
         $stats1 = $this->matching->getIndexStats();
         $this->assertGreaterThan(0, $stats1['static']);
@@ -273,12 +272,12 @@ final class OptimizedMatchingTest extends TestCase
     {
         // Создаем 100 статических маршрутов
         for ($i = 0; $i < 100; $i++) {
-            $this->routes->set(RouteAnonymousFunc::create("/route{$i}", fn() => "Route{$i}", ['GET']));
+            $this->routes->set(RouteAnonymousFunc::create("/route{$i}", fn () => "Route{$i}", ['GET']));
         }
 
         // Поиск последнего маршрута должен быть быстрым (O(1))
         $result = $this->matching->match('/route99', $this->routes);
-        
+
         $this->assertNotNull($result);
         $this->assertEquals('/route99', $result->getRoute()->getRoute());
     }
@@ -287,12 +286,12 @@ final class OptimizedMatchingTest extends TestCase
     {
         // Создаем 50 динамических маршрутов с разными префиксами
         for ($i = 0; $i < 50; $i++) {
-            $this->routes->set(RouteAnonymousFunc::create("/group{$i}/{id}", fn() => "Group{$i}", ['GET']));
+            $this->routes->set(RouteAnonymousFunc::create("/group{$i}/{id}", fn () => "Group{$i}", ['GET']));
         }
 
         // Поиск должен проверять только маршруты из нужной группы
         $result = $this->matching->match('/group25/123', $this->routes);
-        
+
         $this->assertNotNull($result);
         $this->assertEquals(['id' => '123'], $result->getParameters());
     }
@@ -303,20 +302,20 @@ final class OptimizedMatchingTest extends TestCase
 
     public function testMatchWithTrailingSlash(): void
     {
-        $this->routes->set(RouteAnonymousFunc::create('/users', fn() => 'Users', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/users', fn () => 'Users', ['GET']));
 
         // Должен правильно обработать trailing slash
         $result = $this->matching->match('/users/', $this->routes);
-        
+
         $this->assertNotNull($result);
     }
 
     public function testParameterWithSpecialCharacters(): void
     {
-        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn() => 'User', ['GET']));
+        $this->routes->set(RouteAnonymousFunc::create('/users/{id}', fn () => 'User', ['GET']));
 
         $result = $this->matching->match('/users/user-123', $this->routes);
-        
+
         $this->assertEquals(['id' => 'user-123'], $result->getParameters());
     }
 
@@ -324,12 +323,12 @@ final class OptimizedMatchingTest extends TestCase
     {
         $this->routes->set(RouteAnonymousFunc::create(
             '/api/{version}/users/{userId}/posts/{postId}/comments',
-            fn() => 'Comments',
+            fn () => 'Comments',
             ['GET']
         ));
 
         $result = $this->matching->match('/api/v1/users/10/posts/20/comments', $this->routes);
-        
+
         $this->assertEquals([
             'version' => 'v1',
             'userId' => '10',
@@ -337,4 +336,3 @@ final class OptimizedMatchingTest extends TestCase
         ], $result->getParameters());
     }
 }
-

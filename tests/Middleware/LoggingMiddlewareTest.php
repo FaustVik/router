@@ -35,7 +35,7 @@ final class LoggingMiddlewareTest extends TestCase
 
         $response = Response::json(['ok' => true], 200);
 
-        $result = $middleware->handle($request, fn() => $response);
+        $result = $middleware->handle($request, fn () => $response);
 
         $this->assertSame($response, $result);
         $this->assertFileExists($this->testLogFile);
@@ -54,7 +54,7 @@ final class LoggingMiddlewareTest extends TestCase
 
         $response = Response::json([], 201);
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $logContent = file_get_contents($this->testLogFile);
         $this->assertStringContainsString('Mozilla/5.0', $logContent);
@@ -67,7 +67,7 @@ final class LoggingMiddlewareTest extends TestCase
 
         $response = new Response('', 200);
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $logContent = file_get_contents($this->testLogFile);
         $this->assertStringNotContainsString('TestAgent', $logContent);
@@ -80,7 +80,7 @@ final class LoggingMiddlewareTest extends TestCase
 
         $response = new Response('', 200);
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $logContent = file_get_contents($this->testLogFile);
         $this->assertStringContainsString('192.168.1.100', $logContent);
@@ -93,7 +93,7 @@ final class LoggingMiddlewareTest extends TestCase
 
         $response = new Response('', 200);
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $logContent = file_get_contents($this->testLogFile);
         $this->assertStringNotContainsString('192.168.1.100', $logContent);
@@ -131,7 +131,7 @@ final class LoggingMiddlewareTest extends TestCase
             $request = new Request('GET', '/test');
             $response = new Response('', $code);
 
-            $middleware->handle($request, fn() => $response);
+            $middleware->handle($request, fn () => $response);
 
             $logContent = file_get_contents($logFile);
             $this->assertStringContainsString((string) $code, $logContent);
@@ -146,7 +146,7 @@ final class LoggingMiddlewareTest extends TestCase
         $loggedMessages = [];
         $loggedContexts = [];
 
-        $customLogger = function (string $message, array $context) use (&$loggedMessages, &$loggedContexts) {
+        $customLogger = function (string $message, array $context) use (&$loggedMessages, &$loggedContexts): void {
             $loggedMessages[] = $message;
             $loggedContexts[] = $context;
         };
@@ -155,7 +155,7 @@ final class LoggingMiddlewareTest extends TestCase
         $request = new Request('POST', '/api/users', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
         $response = Response::json(['id' => 1], 201);
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $this->assertCount(1, $loggedMessages);
         $this->assertCount(1, $loggedContexts);
@@ -172,7 +172,7 @@ final class LoggingMiddlewareTest extends TestCase
     {
         $loggedContext = null;
 
-        $customLogger = function (string $message, array $context) use (&$loggedContext) {
+        $customLogger = function (string $message, array $context) use (&$loggedContext): void {
             $loggedContext = $context;
         };
 
@@ -180,7 +180,7 @@ final class LoggingMiddlewareTest extends TestCase
         $request = new Request('GET', '/test', [], [], ['User-Agent' => 'Test'], ['REMOTE_ADDR' => '1.2.3.4']);
         $response = new Response();
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $this->assertNotNull($loggedContext);
         $this->assertArrayNotHasKey('ip', $loggedContext);
@@ -198,7 +198,7 @@ final class LoggingMiddlewareTest extends TestCase
         $request = new Request('GET', '/test');
         $response = new Response();
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $this->assertFileExists($logFile);
 
@@ -213,7 +213,7 @@ final class LoggingMiddlewareTest extends TestCase
         $request = new Request('GET', '/test');
         $response = new Response('', 999); // Несуществующий код
 
-        $middleware->handle($request, fn() => $response);
+        $middleware->handle($request, fn () => $response);
 
         $logContent = file_get_contents($this->testLogFile);
         $this->assertStringContainsString('999', $logContent);
@@ -227,7 +227,7 @@ final class LoggingMiddlewareTest extends TestCase
         for ($i = 1; $i <= 3; $i++) {
             $request = new Request('GET', '/api/test' . $i);
             $response = new Response('', 200);
-            $middleware->handle($request, fn() => $response);
+            $middleware->handle($request, fn () => $response);
         }
 
         $logContent = file_get_contents($this->testLogFile);
@@ -236,4 +236,3 @@ final class LoggingMiddlewareTest extends TestCase
         $this->assertStringContainsString('/api/test3', $logContent);
     }
 }
-

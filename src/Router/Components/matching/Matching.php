@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace FaustVik\Router\Router\Components\matching;
 
 use FaustVik\Router\exceptions\NoMatch;
-use FaustVik\Router\interfaces\Collections\RoutesCollectionInterface;
-use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Collections\RoutesCollectionInterface;
+use FaustVik\Router\Interfaces\Router\Components\MatchingRouteInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 
 /**
  * Basic route matching implementation
@@ -103,7 +103,7 @@ final class Matching implements MatchingRouteInterface
      */
     private function getSegments(string $path): array
     {
-        return array_values(array_filter(explode('/', $path), fn($segment) => $segment !== ''));
+        return array_values(array_filter(explode('/', $path), fn ($segment) => $segment !== ''));
     }
 
     private function isParameter(string $segment): bool

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -10,13 +11,13 @@ use FaustVik\Router\Router\Router;
 // Простые контроллеры
 class HomeController
 {
-    public function index()
+    public function index(): void
     {
         echo "Welcome to the Home Page!\n";
         echo "This is a simple router example.\n";
     }
 
-    public function about()
+    public function about(): void
     {
         echo "About Page\n";
         echo "Learn more about our application.\n";
@@ -25,7 +26,7 @@ class HomeController
 
 class UserController
 {
-    public function list()
+    public function list(): void
     {
         echo "User List:\n";
         echo "- John Doe (ID: 1)\n";
@@ -33,7 +34,7 @@ class UserController
         echo "- Bob Johnson (ID: 3)\n";
     }
 
-    public function show($id)
+    public function show($id): void
     {
         echo "User Profile\n";
         echo "User ID: $id\n";
@@ -41,7 +42,7 @@ class UserController
         echo "Email: john.doe@example.com\n";
     }
 
-    public function create()
+    public function create(): void
     {
         echo "Create User Form\n";
         echo "Please fill out the form to create a new user.\n";
@@ -61,23 +62,23 @@ $routes->set(Route::create('/users/create', UserController::class, 'create', [],
 $routes->set(Route::create('/users/{id}', UserController::class, 'show', [], ['GET']));
 
 // === Анонимные функции ===
-$routes->set(RouteAnonymousFunc::create('/hello', static function () {
+$routes->set(RouteAnonymousFunc::create('/hello', static function (): void {
     echo "Hello, World!\n";
     echo "This is an anonymous function route.\n";
 }, ['GET']));
 
-$routes->set(RouteAnonymousFunc::create('/hello/{name}', static function ($name) {
+$routes->set(RouteAnonymousFunc::create('/hello/{name}', static function ($name): void {
     echo "Hello, $name!\n";
     echo "Welcome to our router example.\n";
 }, ['GET']));
 
-$routes->set(RouteAnonymousFunc::create('/greet/{greeting}/{name}', static function ($greeting, $name) {
+$routes->set(RouteAnonymousFunc::create('/greet/{greeting}/{name}', static function ($greeting, $name): void {
     echo "$greeting, $name!\n";
     echo "Custom greeting example.\n";
 }, ['GET']));
 
 // === Маршрут с несколькими HTTP методами ===
-$routes->set(RouteAnonymousFunc::create('/contact', static function () {
+$routes->set(RouteAnonymousFunc::create('/contact', static function (): void {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     echo "Contact Form\n";
     echo "HTTP Method: $method\n";

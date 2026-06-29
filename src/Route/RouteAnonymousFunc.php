@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace FaustVik\Router\Route;
 
 use Closure;
-use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Routes\RouteAnonymousFuncInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 
 /**
  * Route with anonymous function handler
@@ -31,7 +31,7 @@ final class RouteAnonymousFunc implements RouteAnonymousFuncInterface
 
     public function __construct()
     {
-        $this->func = static function () {
+        $this->func = static function (): void {
         };
     }
 

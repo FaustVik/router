@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace FaustVik\Router\DI\Adapters;
 
 use DI\Container;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use RuntimeException;
 
 /**
  * PHP-DI Container Adapter
@@ -40,7 +41,7 @@ class PhpDiContainerAdapter implements RouterContainerInterface
 
     /**
      * @param array<string, mixed> $parameters
-     * @throws \RuntimeException If resolved value is not an object or container operation fails
+     * @throws RuntimeException If resolved value is not an object or container operation fails
      */
     public function resolve(string $class, array $parameters = []): object
     {
@@ -52,12 +53,12 @@ class PhpDiContainerAdapter implements RouterContainerInterface
             }
 
             if (!is_object($result)) {
-                throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+                throw new RuntimeException("Resolved value for '{$class}' is not an object");
             }
 
             return $result;
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            throw new RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
     }
 

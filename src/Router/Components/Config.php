@@ -6,12 +6,12 @@ namespace FaustVik\Router\Router\Components;
 
 use FaustVik\Router\Cache\CachedMatching;
 use FaustVik\Router\Cache\FileCache;
-use FaustVik\Router\interfaces\Cache\CacheInterface;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
-use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
-use FaustVik\Router\interfaces\Router\Components\ConfigInterface;
-use FaustVik\Router\interfaces\Router\Components\MatchingRouteInterface;
-use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
+use FaustVik\Router\Interfaces\Cache\CacheInterface;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
+use FaustVik\Router\Interfaces\Router\Components\CheckHttpMethodInterface;
+use FaustVik\Router\Interfaces\Router\Components\ConfigInterface;
+use FaustVik\Router\Interfaces\Router\Components\MatchingRouteInterface;
+use FaustVik\Router\Interfaces\Router\Components\RunnerInterface;
 use FaustVik\Router\Router\Components\matching\OptimizedMatching;
 
 /**
@@ -38,9 +38,9 @@ final class Config implements ConfigInterface
 
     public function __construct()
     {
-        $this->runner  = new Runner();
+        $this->runner = new Runner();
         $this->checker = new CheckerHttpMethod();
-        $this->match   = new CachedMatching(new OptimizedMatching(), new FileCache());
+        $this->match = new CachedMatching(new OptimizedMatching(), new FileCache());
     }
 
     public function setRunner(RunnerInterface $runner): void

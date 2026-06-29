@@ -200,8 +200,8 @@ final class RouteGroupTest extends TestCase
     {
         $group = new RouteGroup($this->collection);
 
-        $group->prefix('/api')->group(function ($g) {
-            $g->prefix('/v1')->group(function ($nested) {
+        $group->prefix('/api')->group(function ($g): void {
+            $g->prefix('/v1')->group(function ($nested): void {
                 $nested->get('/users', RouteGroupTestController::class, 'index');
             });
         });
@@ -218,10 +218,10 @@ final class RouteGroupTest extends TestCase
         $group
             ->prefix('/api')
             ->middleware(['ApiMiddleware'])
-            ->group(function ($g) {
+            ->group(function ($g): void {
                 $g->prefix('/admin')
                     ->middleware(['AuthMiddleware'])
-                    ->group(function ($nested) {
+                    ->group(function ($nested): void {
                         $nested->get('/users', RouteGroupTestController::class, 'index');
                     });
             });
@@ -236,9 +236,9 @@ final class RouteGroupTest extends TestCase
     {
         $group = new RouteGroup($this->collection);
 
-        $group->prefix('/api')->group(function ($g1) {
-            $g1->prefix('/v1')->group(function ($g2) {
-                $g2->prefix('/admin')->group(function ($g3) {
+        $group->prefix('/api')->group(function ($g1): void {
+            $g1->prefix('/v1')->group(function ($g2): void {
+                $g2->prefix('/admin')->group(function ($g3): void {
                     $g3->get('/users', RouteGroupTestController::class, 'index');
                 });
             });
@@ -257,7 +257,7 @@ final class RouteGroupTest extends TestCase
     {
         $group = new RouteGroup($this->collection);
 
-        $group->prefix('/api')->group(function ($g) {
+        $group->prefix('/api')->group(function ($g): void {
             $g->get('/users', RouteGroupTestController::class, 'index');
             $g->get('/users/{id}', RouteGroupTestController::class, 'show');
             $g->post('/users', RouteGroupTestController::class, 'store');
@@ -283,7 +283,7 @@ final class RouteGroupTest extends TestCase
         $collection = new RoutesCollection();
         $group = new RouteGroup($collection);
 
-        $group->prefix('/api')->group(function ($g) {
+        $group->prefix('/api')->group(function ($g): void {
             $g->get('/users', RouteGroupTestController::class, 'index');
             $g->post('/users', RouteGroupTestController::class, 'store');
         });
@@ -339,7 +339,7 @@ final class RouteGroupTest extends TestCase
         $group
             ->prefix('/api/v1')
             ->middleware(['ApiMiddleware', 'VersionMiddleware'])
-            ->group(function ($api) {
+            ->group(function ($api): void {
                 // Public routes
                 $api->get('/posts', RouteGroupTestController::class, 'index')
                     ->name('api.posts.index');
@@ -347,7 +347,7 @@ final class RouteGroupTest extends TestCase
                 // Admin routes
                 $api->prefix('/admin')
                     ->middleware(['AuthMiddleware', 'AdminMiddleware'])
-                    ->group(function ($admin) {
+                    ->group(function ($admin): void {
                         $admin->get('/users', RouteGroupTestController::class, 'index')
                             ->name('api.admin.users.index');
 
@@ -418,4 +418,3 @@ class RouteGroupTestController
     {
     }
 }
-

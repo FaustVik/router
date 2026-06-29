@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FaustVik\Router\Route\RoutesCollection;
-use FaustVik\Router\Router\Router;
-use FaustVik\Router\Middleware\AuthMiddleware;
-use FaustVik\Router\Middleware\LoggingMiddleware;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
+use FaustVik\Router\Middleware\AuthMiddleware;
+use FaustVik\Router\Middleware\LoggingMiddleware;
+use FaustVik\Router\Route\Route;
+use FaustVik\Router\Route\RoutesCollection;
+use FaustVik\Router\Router\Router;
 
 /**
  * Контроллеры для демонстрации
@@ -18,12 +19,12 @@ class HomeController
 {
     public function index(): void
     {
-        echo "Главная страница";
+        echo 'Главная страница';
     }
 
     public function about(): void
     {
-        echo "О нас";
+        echo 'О нас';
     }
 }
 
@@ -34,8 +35,8 @@ class ApiController
         echo json_encode([
             'users' => [
                 ['id' => 1, 'name' => 'John'],
-                ['id' => 2, 'name' => 'Jane']
-            ]
+                ['id' => 2, 'name' => 'Jane'],
+            ],
         ]);
     }
 
@@ -44,8 +45,8 @@ class ApiController
         echo json_encode([
             'posts' => [
                 ['id' => 1, 'title' => 'Hello World'],
-                ['id' => 2, 'title' => 'PHP Router']
-            ]
+                ['id' => 2, 'title' => 'PHP Router'],
+            ],
         ]);
     }
 }
@@ -54,17 +55,17 @@ class AdminController
 {
     public function dashboard(): void
     {
-        echo "Админ панель - Главная";
+        echo 'Админ панель - Главная';
     }
 
     public function users(): void
     {
-        echo "Админ панель - Управление пользователями";
+        echo 'Админ панель - Управление пользователями';
     }
 
     public function settings(): void
     {
-        echo "Админ панель - Настройки";
+        echo 'Админ панель - Настройки';
     }
 }
 
@@ -72,7 +73,7 @@ class BlogController
 {
     public function index(): void
     {
-        echo "Список статей блога";
+        echo 'Список статей блога';
     }
 
     public function show(Request $request): void
@@ -96,16 +97,16 @@ $routes->addGet('/', HomeController::class, 'index');
 $routes->addGet('/about', HomeController::class, 'about');
 
 // === 2. ГРУППИРОВКА С ПРЕФИКСОМ ===
-$routes->prefix('/api')->group(function ($group) {
+$routes->prefix('/api')->group(function ($group): void {
     $group->get('/users', ApiController::class, 'users');
     $group->get('/posts', ApiController::class, 'posts');
 
     // Вложенная группа для версионирования API
-    $group->prefix('/v1')->group(function ($v1) {
+    $group->prefix('/v1')->group(function ($v1): void {
         $v1->get('/users', ApiController::class, 'users');
         $v1->post('/users', ApiController::class, 'createUser');
 
-        $v1->prefix('/admin')->group(function ($admin) {
+        $v1->prefix('/admin')->group(function ($admin): void {
             $admin->get('/stats', ApiController::class, 'adminStats');
         });
     });
@@ -114,12 +115,12 @@ $routes->prefix('/api')->group(function ($group) {
 // === 3. ГРУППИРОВКА С MIDDLEWARE ===
 $routes->middleware([LoggingMiddleware::class])
     ->prefix('/admin')
-    ->group(function ($group) {
+    ->group(function ($group): void {
         // Эти маршруты будут иметь LoggingMiddleware
         $group->get('/dashboard', AdminController::class, 'dashboard');
 
         // Добавляем еще middleware для защищенных маршрутов
-        $group->middleware([AuthMiddleware::class])->group(function ($authGroup) {
+        $group->middleware([AuthMiddleware::class])->group(function ($authGroup): void {
             $authGroup->get('/users', AdminController::class, 'users');
             $authGroup->get('/settings', AdminController::class, 'settings');
             $authGroup->delete('/users/{id}', AdminController::class, 'deleteUser');
@@ -127,7 +128,7 @@ $routes->middleware([LoggingMiddleware::class])
     });
 
 // === 4. ГРУППИРОВКА ДЛЯ БЛОГА С АНОНИМНЫМИ ФУНКЦИЯМИ ===
-$routes->prefix('/blog')->group(function ($group) {
+$routes->prefix('/blog')->group(function ($group): void {
     $group->get('/', BlogController::class, 'index');
     $group->get('/category/{category}', BlogController::class, 'category');
     $group->get('/post/{id}', BlogController::class, 'show');
@@ -145,7 +146,7 @@ $routes->prefix('/blog')->group(function ($group) {
 });
 
 // === 5. ГРУППИРОВКА БЕЗ ПРЕФИКСА (ТОЛЬКО MIDDLEWARE) ===
-$routes->middleware([LoggingMiddleware::class])->group(function ($group) {
+$routes->middleware([LoggingMiddleware::class])->group(function ($group): void {
     $group->getFunc('/health', function (): Response {
         return Response::json(['status' => 'ok', 'timestamp' => time()]);
     });
@@ -156,13 +157,13 @@ $routes->middleware([LoggingMiddleware::class])->group(function ($group) {
 });
 
 // === 6. СЛОЖНАЯ ВЛОЖЕННАЯ ГРУППИРОВКА ===
-$routes->prefix('/api')->group(function ($api) {
-    $api->prefix('/v2')->middleware([LoggingMiddleware::class])->group(function ($v2) {
+$routes->prefix('/api')->group(function ($api): void {
+    $api->prefix('/v2')->middleware([LoggingMiddleware::class])->group(function ($v2): void {
         $v2->getFunc('/info', function (): Response {
             return Response::json(['api_version' => 'v2']);
         });
 
-        $v2->prefix('/users')->middleware([AuthMiddleware::class])->group(function ($users) {
+        $v2->prefix('/users')->middleware([AuthMiddleware::class])->group(function ($users): void {
             $users->getFunc('/', function (): Response {
                 return Response::json(['message' => 'Список пользователей API v2']);
             });
@@ -172,7 +173,7 @@ $routes->prefix('/api')->group(function ($api) {
                 return Response::json(['user_id' => $id, 'api_version' => 'v2']);
             });
 
-            $users->prefix('/{id}')->group(function ($userActions) {
+            $users->prefix('/{id}')->group(function ($userActions): void {
                 $userActions->getFunc('/posts', function (Request $request): Response {
                     $id = $request->getRouteParam('id');
                     return Response::json(['user_id' => $id, 'posts' => []]);
@@ -197,7 +198,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'error' => 'Internal Server Error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ]);
 }
 
@@ -209,7 +210,7 @@ foreach ($routes->get() as $index => $route) {
         $index + 1,
         implode('|', $route->getMethods()),
         $route->getRoute(),
-        $route instanceof \FaustVik\Router\Route\Route ? $route->getClass() . '@' . $route->getAction() : 'Anonymous Function'
+        $route instanceof Route ? $route->getClass() . '@' . $route->getAction() : 'Anonymous Function'
     );
 }
 

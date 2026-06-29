@@ -90,7 +90,7 @@ class UserController
         for ($i = 1; $i <= 3; $i++) {
             $url = $this->router->url('users.posts.show', [
                 'userId' => $userId,
-                'postId' => $i
+                'postId' => $i,
             ]);
             echo "<p><a href='{$url}'>Пост #{$i}</a></p>\n";
         }
@@ -123,7 +123,7 @@ class PostController
             for ($m = 1; $m <= 12; $m++) {
                 $url = $this->router->url('posts.archive', [
                     'year' => $year,
-                    'month' => $m
+                    'month' => $m,
                 ]);
                 echo "<p><a href='{$url}'>Месяц {$m}</a></p>\n";
             }
@@ -229,7 +229,7 @@ $collection->addGet('/', HomeController::class, 'index')
     ->name('home');
 
 // Пользователи с именованными маршрутами
-$collection->prefix('/users')->group(function ($users) use ($router) {
+$collection->prefix('/users')->group(function ($users) use ($router): void {
     $users->get('', UserController::class, 'index', [$router])
         ->name('users.index');
 
@@ -252,7 +252,7 @@ $collection->prefix('/users')->group(function ($users) use ($router) {
 });
 
 // Посты с опциональными параметрами
-$collection->prefix('/posts')->group(function ($posts) use ($router) {
+$collection->prefix('/posts')->group(function ($posts) use ($router): void {
     // Опциональные параметры year и month
     $posts->get('/{year?}/{month?}', PostController::class, 'index', [$router])
         ->where('year', '\d{4}')      // Год: 4 цифры
@@ -269,7 +269,7 @@ $collection->addGet('/posts', PostController::class, 'index', [$router])
     ->name('posts.index');
 
 // API маршруты
-$collection->prefix('/api/v1')->group(function ($api) use ($router) {
+$collection->prefix('/api/v1')->group(function ($api) use ($router): void {
     $api->get('', ApiController::class, 'index', [$router])
         ->name('api.index');
 
@@ -336,8 +336,8 @@ echo "6. Constraints валидация:\n";
 try {
     echo "   url('users.show', ['id' => 'abc']) = ";
     echo $router->url('users.show', ['id' => 'abc']) . "\n";
-} catch (\InvalidArgumentException $e) {
-    echo "   ERROR: " . $e->getMessage() . "\n";
+} catch (InvalidArgumentException $e) {
+    echo '   ERROR: ' . $e->getMessage() . "\n";
 }
 echo "\n";
 
@@ -349,6 +349,6 @@ echo "=== Запуск роутера ===\n\n";
 
 try {
     $router->run();
-} catch (\Throwable $e) {
-    echo "Ошибка: " . $e->getMessage() . "\n";
+} catch (Throwable $e) {
+    echo 'Ошибка: ' . $e->getMessage() . "\n";
 }

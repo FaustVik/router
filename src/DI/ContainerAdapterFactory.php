@@ -8,7 +8,8 @@ use DI\Container as PHPDIContainer;
 use FaustVik\Router\DI\Adapters\PhpDiContainerAdapter;
 use FaustVik\Router\DI\Adapters\PimpleContainerAdapter;
 use FaustVik\Router\DI\Adapters\SymfonyContainerAdapter;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -20,7 +21,7 @@ class ContainerAdapterFactory
     /**
      * Create adapter for given container
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function createFor(object $container): RouterContainerInterface
     {
@@ -37,7 +38,7 @@ class ContainerAdapterFactory
         // Detect Symfony container (check for common Symfony container classes)
         if (self::isSymfonyContainer($container)) {
             if (!$container instanceof ContainerInterface) {
-                throw new \InvalidArgumentException('Symfony container must implement PSR-11 ContainerInterface');
+                throw new InvalidArgumentException('Symfony container must implement PSR-11 ContainerInterface');
             }
             return new SymfonyContainerAdapter($container);
         }
@@ -45,7 +46,7 @@ class ContainerAdapterFactory
         // Detect Pimple container
         if (self::isPimpleContainer($container)) {
             if (!$container instanceof ContainerInterface) {
-                throw new \InvalidArgumentException('Pimple container must implement PSR-11 ContainerInterface');
+                throw new InvalidArgumentException('Pimple container must implement PSR-11 ContainerInterface');
             }
             return new PimpleContainerAdapter($container);
         }
@@ -55,9 +56,9 @@ class ContainerAdapterFactory
             return new SymfonyContainerAdapter($container);
         }
 
-        throw new \InvalidArgumentException(
-            'Unsupported container type: ' . get_class($container) .
-            '. Container must implement PSR-11 ContainerInterface or be a supported container type.'
+        throw new InvalidArgumentException(
+            'Unsupported container type: ' . get_class($container)
+            . '. Container must implement PSR-11 ContainerInterface or be a supported container type.'
         );
     }
 
@@ -112,7 +113,7 @@ class ContainerAdapterFactory
     /**
      * Create adapter by container type name
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function createByType(string $type, object $container): RouterContainerInterface
     {
@@ -120,26 +121,26 @@ class ContainerAdapterFactory
 
         if ($lowerType === 'php-di' || $lowerType === 'phpdi') {
             if (!$container instanceof PHPDIContainer) {
-                throw new \InvalidArgumentException('Container must be an instance of DI\Container for php-di type');
+                throw new InvalidArgumentException('Container must be an instance of DI\Container for php-di type');
             }
             return new PhpDiContainerAdapter($container);
         }
 
         if ($lowerType === 'symfony') {
             if (!$container instanceof ContainerInterface) {
-                throw new \InvalidArgumentException('Container must implement PSR-11 ContainerInterface for symfony type');
+                throw new InvalidArgumentException('Container must implement PSR-11 ContainerInterface for symfony type');
             }
             return new SymfonyContainerAdapter($container);
         }
 
         if ($lowerType === 'pimple') {
             if (!$container instanceof ContainerInterface) {
-                throw new \InvalidArgumentException('Container must implement PSR-11 ContainerInterface for pimple type');
+                throw new InvalidArgumentException('Container must implement PSR-11 ContainerInterface for pimple type');
             }
             return new PimpleContainerAdapter($container);
         }
 
-        throw new \InvalidArgumentException("Unsupported container type: {$type}");
+        throw new InvalidArgumentException("Unsupported container type: {$type}");
     }
 
     /**
@@ -164,7 +165,7 @@ class ContainerAdapterFactory
         try {
             self::createFor($container);
             return true;
-        } catch (\InvalidArgumentException) {
+        } catch (InvalidArgumentException) {
             return false;
         }
     }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Route;
 
-use FaustVik\Router\interfaces\Routes\RouteClassInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
+use FaustVik\Router\Interfaces\Routes\RouteClassInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 
 /**
  * Route with controller class handler

@@ -38,7 +38,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleReturnsResponse(): void
     {
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'Hello World';
         });
 
@@ -52,7 +52,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleWithParameters(): void
     {
-        $this->routes->addGetFunc('/users/{id}', function ($id) {
+        $this->routes->addGetFunc('/users/{id}', function ($id): void {
             echo "User ID: {$id}";
         });
 
@@ -65,7 +65,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleWithMultipleParameters(): void
     {
-        $this->routes->addGetFunc('/users/{userId}/posts/{postId}', function ($userId, $postId) {
+        $this->routes->addGetFunc('/users/{userId}/posts/{postId}', function ($userId, $postId): void {
             echo "User {$userId}, Post {$postId}";
         });
 
@@ -78,7 +78,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleWithPostData(): void
     {
-        $this->routes->addPostFunc('/users', function (Request $request) {
+        $this->routes->addPostFunc('/users', function (Request $request): void {
             $name = $request->input('name');
             echo "Created user: {$name}";
         });
@@ -93,7 +93,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleThrowsNoMatchException(): void
     {
-        $this->routes->addGetFunc('/existing', function () {
+        $this->routes->addGetFunc('/existing', function (): void {
             echo 'OK';
         });
 
@@ -105,7 +105,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleThrowsNotAllowedHttpMethodException(): void
     {
-        $this->routes->addGetFunc('/users', function () {
+        $this->routes->addGetFunc('/users', function (): void {
             echo 'Users list';
         });
 
@@ -117,7 +117,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleWithEchoResponse(): void
     {
-        $this->routes->addGetFunc('/json', function () {
+        $this->routes->addGetFunc('/json', function (): void {
             echo json_encode(['status' => 'success', 'data' => ['id' => 1]]);
         });
 
@@ -130,12 +130,12 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleDoesNotSendResponse(): void
     {
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'Test Content';
         });
 
         $request = new Request('GET', '/test');
-        
+
         // Начинаем output buffering чтобы поймать любой вывод
         ob_start();
         $response = $this->router->handle($request);
@@ -143,7 +143,7 @@ final class RouterHandleTest extends TestCase
 
         // handle() не должен ничего выводить напрямую (все захватывается в Response)
         $this->assertEmpty($output);
-        
+
         // Но Response должен содержать контент
         $this->assertEquals('Test Content', $response->getContent());
     }
@@ -151,16 +151,16 @@ final class RouterHandleTest extends TestCase
     public function testHandleWithDifferentHttpMethods(): void
     {
         // Создаем отдельные маршруты для каждого метода
-        $this->routes->addGetFunc('/get-resource', function () {
+        $this->routes->addGetFunc('/get-resource', function (): void {
             echo 'GET';
         });
-        $this->routes->addPostFunc('/post-resource', function () {
+        $this->routes->addPostFunc('/post-resource', function (): void {
             echo 'POST';
         });
-        $this->routes->addPutFunc('/put-resource', function () {
+        $this->routes->addPutFunc('/put-resource', function (): void {
             echo 'PUT';
         });
-        $this->routes->addDeleteFunc('/delete-resource', function () {
+        $this->routes->addDeleteFunc('/delete-resource', function (): void {
             echo 'DELETE';
         });
 
@@ -180,13 +180,13 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleAllowsMultipleCalls(): void
     {
-        $this->routes->addGetFunc('/counter', function () {
+        $this->routes->addGetFunc('/counter', function (): void {
             static $counter = 0;
             echo 'Count: ' . ++$counter;
         });
 
         $request = new Request('GET', '/counter');
-        
+
         $response1 = $this->router->handle($request);
         $this->assertEquals('Count: 1', $response1->getContent());
 
@@ -196,7 +196,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleWithEmptyResponse(): void
     {
-        $this->routes->addGetFunc('/empty', function () {
+        $this->routes->addGetFunc('/empty', function (): void {
             // Ничего не выводим
         });
 
@@ -209,7 +209,7 @@ final class RouterHandleTest extends TestCase
 
     public function testHandleWithNamedRoute(): void
     {
-        $this->routes->addGetFunc('/users/{id}', function ($id) {
+        $this->routes->addGetFunc('/users/{id}', function ($id): void {
             echo "User {$id}";
         })->name('users.show');
 

@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\DI\Adapters;
 
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
-use Psr\Container\ContainerInterface;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionClass;
+use ReflectionNamedType;
+use RuntimeException;
 
 /**
  * Pimple Container Adapter
@@ -39,7 +42,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
 
     /**
      * @param array<string, mixed> $parameters
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function resolve(string $class, array $parameters = []): object
     {
@@ -47,7 +50,7 @@ class PimpleContainerAdapter implements RouterContainerInterface
             if ($this->container->has($class)) {
                 $result = $this->container->get($class);
                 if (!is_object($result)) {
-                    throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+                    throw new RuntimeException("Resolved value for '{$class}' is not an object");
                 }
                 return $result;
             }
@@ -57,27 +60,27 @@ class PimpleContainerAdapter implements RouterContainerInterface
                 return $this->createInstanceWithReflection($class, $parameters);
             }
 
-            throw new \RuntimeException("Cannot resolve class: {$class}");
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
+            throw new RuntimeException("Cannot resolve class: {$class}");
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            throw new RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
     }
 
     public function bind(string $abstract, mixed $concrete): void
     {
         // Pimple doesn't support runtime binding through PSR-11 interface
-        throw new \RuntimeException(
-            "Runtime binding is not supported in Pimple container adapter. " .
-            "Use Pimple native API or configure services before creating adapter."
+        throw new RuntimeException(
+            'Runtime binding is not supported in Pimple container adapter. '
+            . 'Use Pimple native API or configure services before creating adapter.'
         );
     }
 
     public function singleton(string $abstract, mixed $concrete): void
     {
         // Same as bind - not supported at runtime
-        throw new \RuntimeException(
-            "Runtime binding is not supported in Pimple container adapter. " .
-            "Use Pimple native API or configure services before creating adapter."
+        throw new RuntimeException(
+            'Runtime binding is not supported in Pimple container adapter. '
+            . 'Use Pimple native API or configure services before creating adapter.'
         );
     }
 
@@ -91,18 +94,18 @@ class PimpleContainerAdapter implements RouterContainerInterface
      *
      * @param class-string $class
      * @param array<string, mixed> $parameters
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function createInstanceWithReflection(string $class, array $parameters = []): object
     {
         if (!class_exists($class)) {
-            throw new \RuntimeException("Class {$class} does not exist");
+            throw new RuntimeException("Class {$class} does not exist");
         }
 
-        $reflectionClass = new \ReflectionClass($class);
+        $reflectionClass = new ReflectionClass($class);
 
         if (!$reflectionClass->isInstantiable()) {
-            throw new \RuntimeException("Class {$class} is not instantiable");
+            throw new RuntimeException("Class {$class} is not instantiable");
         }
 
         $constructor = $reflectionClass->getConstructor();
@@ -115,14 +118,14 @@ class PimpleContainerAdapter implements RouterContainerInterface
         foreach ($constructor->getParameters() as $parameter) {
             $type = $parameter->getType();
 
-            if ($type && $type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+            if ($type && $type instanceof ReflectionNamedType && !$type->isBuiltin()) {
                 $typeName = $type->getName();
                 if ($this->container->has($typeName)) {
                     $dependencies[] = $this->container->get($typeName);
                 } elseif (class_exists($typeName)) {
                     $dependencies[] = $this->createInstanceWithReflection($typeName);
                 } else {
-                    throw new \RuntimeException("Cannot resolve dependency: {$typeName}");
+                    throw new RuntimeException("Cannot resolve dependency: {$typeName}");
                 }
             } else {
                 // For built-in types, use provided parameters or default

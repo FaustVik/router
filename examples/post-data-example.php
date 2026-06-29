@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Пример работы с POST/PUT данными и JSON body
  *
@@ -12,10 +14,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FaustVik\Router\Router\Router;
-use FaustVik\Router\Route\Route;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
+use FaustVik\Router\Router\Router;
 
 $router = new Router();
 
@@ -37,14 +38,14 @@ $router->post('/api/users', function (Request $request) {
     // Проверяем наличие полей
     if (!$request->has('name')) {
         return Response::json([
-            'error' => 'Name is required'
+            'error' => 'Name is required',
         ], 400);
     }
 
     // Проверяем является ли запрос JSON
     if (!$request->isJson()) {
         return Response::json([
-            'error' => 'Content-Type must be application/json'
+            'error' => 'Content-Type must be application/json',
         ], 415);
     }
 
@@ -53,8 +54,8 @@ $router->post('/api/users', function (Request $request) {
         'user' => [
             'name' => $name,
             'email' => $email,
-            'age' => $age
-        ]
+            'age' => $age,
+        ],
     ], 201);
 });
 
@@ -76,8 +77,8 @@ $router->put('/api/users/{id}', function (Request $request) {
         'user_id' => $userId,
         'updated_fields' => [
             'name' => $name,
-            'age' => $age
-        ]
+            'age' => $age,
+        ],
     ]);
 });
 
@@ -91,7 +92,7 @@ $router->post('/api/upload', function (Request $request) {
     // Проверяем наличие файла
     if (!$request->hasFile('avatar')) {
         return Response::json([
-            'error' => 'Avatar file is required'
+            'error' => 'Avatar file is required',
         ], 400);
     }
 
@@ -107,7 +108,7 @@ $router->post('/api/upload', function (Request $request) {
         'type' => $file['type'],
         'size' => $file['size'],
         'tmp_name' => $file['tmp_name'],
-        'error' => $file['error']
+        'error' => $file['error'],
     ];
 
     // В реальном приложении здесь была бы логика сохранения файла
@@ -116,7 +117,7 @@ $router->post('/api/upload', function (Request $request) {
     return Response::json([
         'message' => 'File uploaded successfully',
         'description' => $description,
-        'file' => $fileInfo
+        'file' => $fileInfo,
     ]);
 });
 
@@ -132,7 +133,7 @@ $router->post('/api/posts', function (Request $request) {
     foreach ($required as $field) {
         if (!$request->has($field)) {
             return Response::json([
-                'error' => "Field '{$field}' is required"
+                'error' => "Field '{$field}' is required",
             ], 400);
         }
     }
@@ -145,12 +146,12 @@ $router->post('/api/posts', function (Request $request) {
         'category' => $request->input('category', 'general'),
         'tags' => $request->input('tags', []),
         'published' => $request->input('published', false),
-        'created_at' => date('Y-m-d H:i:s')
+        'created_at' => date('Y-m-d H:i:s'),
     ];
 
     return Response::json([
         'message' => 'Post created successfully',
-        'post' => $post
+        'post' => $post,
     ], 201);
 });
 
@@ -166,7 +167,7 @@ $router->patch('/api/posts/{id}', function (Request $request) {
     return Response::json([
         'message' => 'Post updated successfully',
         'post_id' => $postId,
-        'updated_fields' => $updates
+        'updated_fields' => $updates,
     ]);
 });
 
@@ -182,7 +183,7 @@ $router->delete('/api/users/{id}', function (Request $request) {
     return Response::json([
         'message' => 'User deleted successfully',
         'user_id' => $userId,
-        'reason' => $reason
+        'reason' => $reason,
     ]);
 });
 
@@ -195,7 +196,7 @@ $router->post('/api/data', function (Request $request) {
         'is_ajax' => $request->isAjax(),
         'method' => $request->getMethod(),
         'content_type' => $request->getHeader('Content-Type'),
-        'body_data' => $request->getBody()
+        'body_data' => $request->getBody(),
     ];
 
     return Response::json($info);
@@ -206,10 +207,10 @@ $router->post('/api/data', function (Request $request) {
 // ============================================
 try {
     $router->run();
-} catch (\Exception $e) {
+} catch (Exception $e) {
     Response::json([
         'error' => 'Internal server error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ], 500)->send();
 }
 

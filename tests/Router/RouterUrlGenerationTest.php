@@ -8,6 +8,7 @@ use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -70,7 +71,7 @@ final class RouterUrlGenerationTest extends TestCase
         $url = $this->router->url('posts.show', [
             'year' => 2025,
             'month' => 10,
-            'slug' => 'my-post'
+            'slug' => 'my-post',
         ]);
         $this->assertSame('/posts/2025/10/my-post', $url);
     }
@@ -163,7 +164,7 @@ final class RouterUrlGenerationTest extends TestCase
         $this->collection->set($route);
         $this->router->setCollection($this->collection);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Parameter 'id' with value 'abc' does not match constraint pattern");
 
         $this->router->url('users.show', ['id' => 'abc']);
@@ -191,7 +192,7 @@ final class RouterUrlGenerationTest extends TestCase
     {
         $this->router->setCollection($this->collection);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Route 'non.existent' not found");
 
         $this->router->url('non.existent');
@@ -205,7 +206,7 @@ final class RouterUrlGenerationTest extends TestCase
         $this->collection->set($route);
         $this->router->setCollection($this->collection);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Missing required parameter 'id'");
 
         $this->router->url('users.show');
@@ -219,7 +220,7 @@ final class RouterUrlGenerationTest extends TestCase
         $this->collection->set($route);
         $this->router->setCollection($this->collection);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Missing required parameter 'id'");
 
         $this->router->url('posts.show', ['slug' => 'my-post']);
@@ -284,7 +285,7 @@ final class RouterUrlGenerationTest extends TestCase
         $this->collection->addGet('/', RouterUrlGenerationTestController::class, 'home')
             ->name('home');
 
-        $this->collection->prefix('/api')->group(function ($api) {
+        $this->collection->prefix('/api')->group(function ($api): void {
             $api->get('/posts', RouterUrlGenerationTestController::class, 'posts')
                 ->name('api.posts.index');
 
@@ -292,7 +293,7 @@ final class RouterUrlGenerationTest extends TestCase
                 ->where('id', '\d+')
                 ->name('api.posts.show');
 
-            $api->prefix('/users')->group(function ($users) {
+            $api->prefix('/users')->group(function ($users): void {
                 $users->get('', RouterUrlGenerationTestController::class, 'users')
                     ->name('api.users.index');
 
@@ -385,7 +386,7 @@ final class RouterUrlGenerationTest extends TestCase
         $this->assertSame('/archive/2025/10', $url2);
 
         // Invalid value should throw exception
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->router->url('archive', ['year' => 'abc']);
     }
 }
@@ -443,4 +444,3 @@ class RouterUrlGenerationTestController
     {
     }
 }
-

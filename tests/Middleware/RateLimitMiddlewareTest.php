@@ -49,7 +49,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $response = $middleware->handle($request, $next);
 
@@ -68,7 +68,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Делаем 3 разрешенных запроса
         for ($i = 0; $i < 3; $i++) {
@@ -95,7 +95,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         $response = $middleware->handle($request, $next);
 
@@ -112,7 +112,7 @@ final class RateLimitMiddlewareTest extends TestCase
             decaySeconds: 60
         );
 
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Первый IP делает 2 запроса
         $request1 = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
@@ -136,7 +136,7 @@ final class RateLimitMiddlewareTest extends TestCase
             includePathInKey: true
         );
 
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Исчерпываем лимит на /api/users
         $request1 = new Request('GET', '/api/users', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
@@ -160,7 +160,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Исчерпываем лимит
         $middleware->handle($request, $next);
@@ -185,7 +185,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Начальный статус
         $status = $middleware->getLimitStatus($request);
@@ -209,7 +209,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Делаем несколько запросов сверх лимита
         for ($i = 0; $i < 5; $i++) {
@@ -228,7 +228,7 @@ final class RateLimitMiddlewareTest extends TestCase
         );
 
         $request = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Исчерпываем лимит
         $middleware->handle($request, $next);
@@ -249,7 +249,7 @@ final class RateLimitMiddlewareTest extends TestCase
             decaySeconds: 60
         );
 
-        $next = fn(Request $req) => new Response('OK');
+        $next = fn (Request $req) => new Response('OK');
 
         // Тестируем различные способы получения IP
         $request1 = new Request('GET', '/test', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
@@ -262,4 +262,3 @@ final class RateLimitMiddlewareTest extends TestCase
         $this->assertEquals('0', $response2->getHeader('X-RateLimit-Remaining'));
     }
 }
-

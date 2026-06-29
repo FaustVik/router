@@ -7,12 +7,12 @@ namespace FaustVik\Router\Router\Components;
 use FaustVik\Router\exceptions\InvalidTypeRoute;
 use FaustVik\Router\exceptions\NotFoundClass;
 use FaustVik\Router\exceptions\NotFoundMethod;
-use FaustVik\Router\interfaces\Router\Components\RunnerInterface;
-use FaustVik\Router\interfaces\Routes\RouteAnonymousFuncInterface;
-use FaustVik\Router\interfaces\Routes\RouteClassInterface;
-use FaustVik\Router\interfaces\Routes\RouteInterface;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\Http\Request;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
+use FaustVik\Router\Interfaces\Router\Components\RunnerInterface;
+use FaustVik\Router\Interfaces\Routes\RouteAnonymousFuncInterface;
+use FaustVik\Router\Interfaces\Routes\RouteClassInterface;
+use FaustVik\Router\Interfaces\Routes\RouteInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -83,13 +83,13 @@ final class Runner implements RunnerInterface
 
                 // Если параметр типа Request, используем переданный Request или создаем новый
                 if (
-                    $paramType && $paramType instanceof ReflectionNamedType &&
-                    $paramType->getName() === 'FaustVik\Router\Http\Request'
+                    $paramType && $paramType instanceof ReflectionNamedType
+                    && $paramType->getName() === 'FaustVik\Router\Http\Request'
                 ) {
                     if ($request) {
                         $args[] = $request;
                     } else {
-                        $req = \FaustVik\Router\Http\Request::createFromGlobals();
+                        $req = Request::createFromGlobals();
                         $req = $req->withParams($params);
                         $args[] = $req;
                     }
@@ -144,13 +144,13 @@ final class Runner implements RunnerInterface
 
                 // Если параметр типа Request, используем переданный Request или создаем новый
                 if (
-                    $paramType && $paramType instanceof ReflectionNamedType &&
-                    $paramType->getName() === 'FaustVik\Router\Http\Request'
+                    $paramType && $paramType instanceof ReflectionNamedType
+                    && $paramType->getName() === 'FaustVik\Router\Http\Request'
                 ) {
                     if ($request) {
                         $atr[] = $request;
                     } else {
-                        $req = \FaustVik\Router\Http\Request::createFromGlobals();
+                        $req = Request::createFromGlobals();
                         $req = $req->withParams($params);
                         $atr[] = $req;
                     }

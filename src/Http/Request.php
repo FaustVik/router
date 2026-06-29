@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Http;
 
-use FaustVik\Router\interfaces\Http\RequestInterface;
+use FaustVik\Router\Interfaces\Http\RequestInterface;
+use JsonException;
 
 /**
  * HTTP Request representation class
@@ -40,13 +41,13 @@ final class Request implements RequestInterface
     private array $attributes = [];
     /** @var array<string, mixed> */
     private array $body = [];
-// Для POST/PUT данных
+    // Для POST/PUT данных
     /** @var array<string, mixed> */
     private array $files = [];
-// Для загруженных файлов
+    // Для загруженных файлов
     /** @var array<string, mixed> */
     private array $cookies = [];
-// Для HTTP cookies
+    // Для HTTP cookies
 
     /**
      * Конструктор HTTP запроса
@@ -120,7 +121,7 @@ final class Request implements RequestInterface
                     if (is_array($decoded)) {
                         $body = $decoded;
                     }
-                } catch (\JsonException $e) {
+                } catch (JsonException $e) {
                     // JSON невалиден - оставляем body пустым
                     // В production можно залогировать ошибку
                 }
@@ -138,7 +139,7 @@ final class Request implements RequestInterface
                     if (is_array($decoded)) {
                         $body = $decoded;
                     }
-                } catch (\JsonException $e) {
+                } catch (JsonException $e) {
                     // Если не JSON, парсим как query string
                     parse_str($rawBody, $body);
                 }
@@ -688,13 +689,13 @@ final class Request implements RequestInterface
         // Проверяем заголовки прокси в порядке приоритета
         $headers = [
             'HTTP_CF_CONNECTING_IP',
-// Cloudflare
+            // Cloudflare
             'HTTP_X_REAL_IP',
-// Nginx proxy
+            // Nginx proxy
             'HTTP_X_FORWARDED_FOR',
-// Стандартный прокси заголовок
+            // Стандартный прокси заголовок
             'HTTP_CLIENT_IP',
-// Некоторые прокси
+            // Некоторые прокси
             'HTTP_X_FORWARDED',
             'HTTP_FORWARDED_FOR',
             'HTTP_FORWARDED',

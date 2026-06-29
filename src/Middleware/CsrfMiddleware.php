@@ -6,7 +6,8 @@ namespace FaustVik\Router\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -54,7 +55,7 @@ final class CsrfMiddleware implements MiddlewareInterface
      * @param int<1, max> $tokenLength Token length in bytes (will be doubled in hex)
      * @param string|null $sessionKey Key for storing token in session
      * @param array<int, string> $excludePaths Paths that don't require CSRF check
-     * @throws \InvalidArgumentException If token length is less than 1
+     * @throws InvalidArgumentException If token length is less than 1
      */
     public function __construct(
         private readonly int $tokenLength = self::DEFAULT_TOKEN_LENGTH,
@@ -64,7 +65,7 @@ final class CsrfMiddleware implements MiddlewareInterface
         // Validation is redundant due to PHPDoc type, but kept for runtime safety
         // @phpstan-ignore-next-line
         if ($tokenLength < 1) {
-            throw new \InvalidArgumentException('Token length must be at least 1');
+            throw new InvalidArgumentException('Token length must be at least 1');
         }
 
         $this->sessionKey = $sessionKey ?? self::DEFAULT_SESSION_KEY;
@@ -248,11 +249,11 @@ final class CsrfMiddleware implements MiddlewareInterface
         return Response::json(
             data: [
                 'error' => 'CSRF Token Mismatch',
-                'message' => 'CSRF token validation failed. Please refresh the page and try again.'
+                'message' => 'CSRF token validation failed. Please refresh the page and try again.',
             ],
             statusCode: 419,
             headers: [
-                'X-CSRF-Protection' => 'token-mismatch'
+                'X-CSRF-Protection' => 'token-mismatch',
             ]
         );
     }

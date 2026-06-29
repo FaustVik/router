@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use FaustVik\Router\Cache\FileCache;
-use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
 
@@ -56,7 +55,7 @@ $routesCollection->addGet('/blog/{slug}', WebController::class, 'blogPost');
 
 // Группы маршрутов (без middleware для простоты примера)
 $routesCollection->prefix('/admin')
-    ->group(function ($group) {
+    ->group(function ($group): void {
         $group->get('/dashboard', AdminController::class, 'dashboard');
         $group->get('/users', AdminController::class, 'users');
         $group->get('/settings', AdminController::class, 'settings');
@@ -71,7 +70,7 @@ $testUrls = [
     '/user/456/profile',
     '/blog/my-first-post',
     '/admin/dashboard',
-    '/about'
+    '/about',
 ];
 
 foreach ($testUrls as $url) {
@@ -91,7 +90,7 @@ foreach ($testUrls as $url) {
             echo "✓ Результат кеширован\n";
         }
     } catch (Exception $e) {
-        echo "✗ Ошибка: " . $e->getMessage() . "\n";
+        echo '✗ Ошибка: ' . $e->getMessage() . "\n";
     }
 
     echo "---\n";
@@ -101,9 +100,9 @@ foreach ($testUrls as $url) {
 echo "\n=== Статистика кеша ===\n";
 $cacheInstance = $router->getCache();
 if ($cacheInstance) {
-    echo "Кеш-драйвер: " . get_class($cacheInstance) . "\n";
-    echo "Статус кеша: " . ($router->isCacheEnabled() ? "включен" : "отключен") . "\n";
-    echo "TTL: " . $router->getConfig()->getCacheTtl() . " секунд\n";
+    echo 'Кеш-драйвер: ' . get_class($cacheInstance) . "\n";
+    echo 'Статус кеша: ' . ($router->isCacheEnabled() ? 'включен' : 'отключен') . "\n";
+    echo 'TTL: ' . $router->getConfig()->getCacheTtl() . " секунд\n";
 
     // Показываем содержимое кеша
     echo "\nФайлы кеша:\n";
@@ -112,7 +111,7 @@ if ($cacheInstance) {
         foreach ($cacheFiles as $file) {
             $size = filesize($file);
             $modified = date('Y-m-d H:i:s', filemtime($file));
-            echo "- " . basename($file) . " ({$size} байт, изменен: {$modified})\n";
+            echo '- ' . basename($file) . " ({$size} байт, изменен: {$modified})\n";
         }
     } else {
         echo "Файлы кеша не найдены\n";

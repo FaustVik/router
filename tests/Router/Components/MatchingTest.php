@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Тесты для класса Matching - ядра системы маршрутизации
- * 
+ *
  * Покрывает:
  * - Точное совпадение маршрутов
  * - Совпадение по alias
@@ -60,7 +60,7 @@ final class MatchingTest extends TestCase
 
         // Act & Assert
         $result = $this->matching->match('/', $this->collection);
-        
+
         $this->assertSame($route, $result->getRoute());
         $this->assertEmpty($result->getParameters());
     }
@@ -73,7 +73,7 @@ final class MatchingTest extends TestCase
 
         // Act & Assert
         $result = $this->matching->match('/api/v1/users', $this->collection);
-        
+
         $this->assertSame($route, $result->getRoute());
         $this->assertEmpty($result->getParameters());
     }
@@ -86,7 +86,7 @@ final class MatchingTest extends TestCase
 
         // Act: Проверяем что trailing slash игнорируется
         $result = $this->matching->match('/users/', $this->collection);
-        
+
         // Assert
         $this->assertSame($route, $result->getRoute());
     }
@@ -157,7 +157,7 @@ final class MatchingTest extends TestCase
         $this->assertSame($route, $result->getRoute());
         $this->assertEquals([
             'userId' => '42',
-            'postId' => '777'
+            'postId' => '777',
         ], $result->getParameters());
     }
 
@@ -216,7 +216,7 @@ final class MatchingTest extends TestCase
         $this->assertSame($route, $result->getRoute());
         $this->assertEquals([
             'version' => 'v1',
-            'resource' => 'users'
+            'resource' => 'users',
         ], $result->getParameters());
     }
 
@@ -279,7 +279,7 @@ final class MatchingTest extends TestCase
         // Arrange: Несколько подходящих маршрутов (должен выбрать первый)
         $route1 = Route::create('/users/{id}', 'UserController', 'show');
         $route2 = Route::create('/users/{slug}', 'UserController', 'showBySlug');
-        
+
         $this->collection->set($route1);
         $this->collection->set($route2);
 
@@ -295,7 +295,7 @@ final class MatchingTest extends TestCase
         // Arrange: Специфичный маршрут должен быть приоритетнее параметризованного
         $paramRoute = Route::create('/users/{id}', 'UserController', 'show');
         $specificRoute = Route::create('/users/profile', 'UserController', 'profile');
-        
+
         // Добавляем сначала параметризованный
         $this->collection->set($paramRoute);
         $this->collection->set($specificRoute);
@@ -314,7 +314,7 @@ final class MatchingTest extends TestCase
         // Arrange: Меняем порядок - специфичный первым
         $specificRoute = Route::create('/users/profile', 'UserController', 'profile');
         $paramRoute = Route::create('/users/{id}', 'UserController', 'show');
-        
+
         // Добавляем сначала специфичный
         $this->collection->set($specificRoute);
         $this->collection->set($paramRoute);
@@ -440,7 +440,7 @@ final class MatchingTest extends TestCase
         $this->assertEquals([
             'version' => 'v2',
             'userId' => '42',
-            'postId' => '777'
+            'postId' => '777',
         ], $result->getParameters());
     }
 
@@ -464,7 +464,7 @@ final class MatchingTest extends TestCase
         $route1 = Route::create('/users/{id}', 'UserController', 'show');
         $route2 = Route::create('/posts/{slug}', 'PostController', 'show');
         $route3 = Route::create('/api/{version}/status', 'ApiController', 'status');
-        
+
         $this->collection->set($route1);
         $this->collection->set($route2);
         $this->collection->set($route3);
@@ -512,4 +512,3 @@ final class MatchingTest extends TestCase
         $this->assertLessThan(10, $duration, "Matching 101 routes took {$duration}ms, should be < 10ms");
     }
 }
-

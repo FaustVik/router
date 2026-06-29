@@ -6,13 +6,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\Middleware\CorsMiddleware;
 use FaustVik\Router\Middleware\LoggingMiddleware;
-use FaustVik\Router\Route\Route;
+use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
-use FaustVik\Router\Router\Router;
 use FaustVik\Router\Router\QuickRouter;
+use FaustVik\Router\Router\Router;
 
 /**
  * Пример использования глобальных middleware
@@ -25,7 +25,6 @@ use FaustVik\Router\Router\QuickRouter;
  * - Аутентификации
  * - И других задач, которые нужны для всех маршрутов
  */
-
 echo "=== Пример 1: Router с глобальными middleware ===\n\n";
 
 // Создаем простой middleware для логирования
@@ -75,10 +74,10 @@ $routes = new RoutesCollection();
 
 // Маршрут без своих middleware - использует только глобальные
 $routes->set(
-    \FaustVik\Router\Route\RouteAnonymousFunc::create(
+    RouteAnonymousFunc::create(
         route: '/',
         func: function () {
-            return "Hello World!";
+            return 'Hello World!';
         },
         methods: ['GET']
     )
@@ -86,10 +85,10 @@ $routes->set(
 
 // Маршрут со своими middleware - использует глобальные + свои
 $routes->set(
-    \FaustVik\Router\Route\RouteAnonymousFunc::create(
+    RouteAnonymousFunc::create(
         route: '/protected',
         func: function () {
-            return "Protected resource";
+            return 'Protected resource';
         },
         methods: ['GET']
     )->middleware([RouteSpecificMiddleware::class])
@@ -105,7 +104,7 @@ try {
     $router->run();
     $output = ob_get_clean();
     echo "Результат: $output\n\n";
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     ob_end_clean();
     echo "Ошибка: {$e->getMessage()}\n\n";
 }
@@ -118,7 +117,7 @@ try {
     $router->run();
     $output = ob_get_clean();
     echo "Результат: $output\n\n";
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     ob_end_clean();
     echo "Ошибка: {$e->getMessage()}\n\n";
 }
@@ -132,11 +131,11 @@ $app->addMiddleware(SimpleLoggingMiddleware::class)
     ->addMiddleware(HeaderMiddleware::class);
 
 // Простые маршруты
-$app->get('/', fn() => "QuickRouter Home");
-$app->get('/api/users', fn() => "Users API");
+$app->get('/', fn () => 'QuickRouter Home');
+$app->get('/api/users', fn () => 'Users API');
 
 // Маршрут с собственным middleware
-$app->get('/admin', fn() => "Admin Panel")
+$app->get('/admin', fn () => 'Admin Panel')
     ->middleware([RouteSpecificMiddleware::class]);
 
 echo "--- Запрос к / ---\n";
@@ -146,7 +145,7 @@ try {
     $app->run();
     $output = ob_get_clean();
     echo "Результат: $output\n\n";
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     ob_end_clean();
     echo "Ошибка: {$e->getMessage()}\n\n";
 }
@@ -158,7 +157,7 @@ try {
     $app->run();
     $output = ob_get_clean();
     echo "Результат: $output\n\n";
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     ob_end_clean();
     echo "Ошибка: {$e->getMessage()}\n\n";
 }
@@ -170,7 +169,7 @@ try {
     $app->run();
     $output = ob_get_clean();
     echo "Результат: $output\n\n";
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     ob_end_clean();
     echo "Ошибка: {$e->getMessage()}\n\n";
 }
@@ -183,18 +182,18 @@ $router2 = new Router();
 $router2->addGlobalMiddleware(SimpleLoggingMiddleware::class)
         ->addGlobalMiddleware(HeaderMiddleware::class);
 
-echo "Глобальных middleware: " . count($router2->getGlobalMiddleware()) . "\n";
+echo 'Глобальных middleware: ' . count($router2->getGlobalMiddleware()) . "\n";
 
 // Можно заменить все middleware сразу
 $router2->setGlobalMiddleware([
     SimpleLoggingMiddleware::class,
 ]);
 
-echo "После замены: " . count($router2->getGlobalMiddleware()) . "\n";
+echo 'После замены: ' . count($router2->getGlobalMiddleware()) . "\n";
 
 // Или очистить все
 $router2->clearGlobalMiddleware();
-echo "После очистки: " . count($router2->getGlobalMiddleware()) . "\n\n";
+echo 'После очистки: ' . count($router2->getGlobalMiddleware()) . "\n\n";
 
 echo "\n=== Пример 4: Использование с реальными middleware (CORS, Logging) ===\n\n";
 
@@ -209,7 +208,7 @@ $app2->addMiddleware(new CorsMiddleware(
 
 $app2->addMiddleware(new LoggingMiddleware());
 
-$app2->get('/api/data', fn() => json_encode(['data' => 'Some data']));
+$app2->get('/api/data', fn () => json_encode(['data' => 'Some data']));
 
 echo "--- API запрос с CORS и логированием ---\n";
 $app2->advanced()->setUri('/api/data');
@@ -218,7 +217,7 @@ try {
     $app2->run();
     $output = ob_get_clean();
     echo "Результат: $output\n\n";
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     ob_end_clean();
     echo "Ошибка: {$e->getMessage()}\n\n";
 }

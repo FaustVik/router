@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Tests\Router;
 
-use FaustVik\Router\Cache\FileCache;
 use FaustVik\Router\DI\DefaultContainer;
 use FaustVik\Router\exceptions\NoMatch;
 use FaustVik\Router\exceptions\NotAllowedHttpMethod;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Components\Config;
 use FaustVik\Router\Router\Router;
@@ -55,16 +54,16 @@ final class RouterTest extends TestCase
     {
         $router = new Router();
         $config = $router->getConfig();
-        
+
         $this->assertInstanceOf(Config::class, $config);
     }
 
     public function testSetAndGetConfig(): void
     {
         $customConfig = new Config();
-        
+
         $this->router->setConfig($customConfig);
-        
+
         $this->assertSame($customConfig, $this->router->getConfig());
     }
 
@@ -74,23 +73,23 @@ final class RouterTest extends TestCase
 
     public function testSetCollection(): void
     {
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'Test';
         });
 
         $result = $this->router->setCollection($this->routes);
-        
+
         // Проверяем fluent interface
         $this->assertSame($this->router, $result);
     }
 
     public function testSetCollectionIndexesNamedRoutes(): void
     {
-        $this->routes->addGetFunc('/home', function () {
+        $this->routes->addGetFunc('/home', function (): void {
             echo 'Home';
         })->name('home');
 
-        $this->routes->addGetFunc('/users/{id}', function ($id) {
+        $this->routes->addGetFunc('/users/{id}', function ($id): void {
             echo "User {$id}";
         })->name('users.show');
 
@@ -106,14 +105,16 @@ final class RouterTest extends TestCase
     {
         // Первая коллекция
         $collection1 = new RoutesCollection();
-        $collection1->addGetFunc('/old', function () {})->name('route1');
+        $collection1->addGetFunc('/old', function (): void {
+        })->name('route1');
         $this->router->setCollection($collection1);
-        
+
         $this->assertTrue($this->router->has('route1'));
 
         // Вторая коллекция (заменяет первую)
         $collection2 = new RoutesCollection();
-        $collection2->addGetFunc('/new', function () {})->name('route2');
+        $collection2->addGetFunc('/new', function (): void {
+        })->name('route2');
         $this->router->setCollection($collection2);
 
         $this->assertFalse($this->router->has('route1'));
@@ -127,30 +128,30 @@ final class RouterTest extends TestCase
     public function testSetAndGetUri(): void
     {
         $this->router->setUri('/test/path');
-        
+
         $this->assertEquals('/test/path', $this->router->getUri());
     }
 
     public function testSetUriReturnsFluentInterface(): void
     {
         $result = $this->router->setUri('/test');
-        
+
         $this->assertSame($this->router, $result);
     }
 
     public function testParseExtractsQueryParameters(): void
     {
-        $this->routes->addGetFunc('/search', function (Request $request) {
+        $this->routes->addGetFunc('/search', function (Request $request): void {
             $query = $request->getQuery();
             echo json_encode($query);
         });
 
         $this->router->setCollection($this->routes);
         $request = new Request('GET', '/search?q=test&page=2', [], ['q' => 'test', 'page' => '2']);
-        
+
         $response = $this->router->handle($request);
         $data = json_decode($response->getContent(), true);
-        
+
         $this->assertEquals('test', $data['q']);
         $this->assertEquals('2', $data['page']);
     }
@@ -161,7 +162,7 @@ final class RouterTest extends TestCase
 
     public function testMatchSimpleRoute(): void
     {
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'Test';
         });
 
@@ -174,7 +175,7 @@ final class RouterTest extends TestCase
 
     public function testMatchParametrizedRoute(): void
     {
-        $this->routes->addGetFunc('/users/{id}', function ($id) {
+        $this->routes->addGetFunc('/users/{id}', function ($id): void {
             echo "User: {$id}";
         });
 
@@ -187,14 +188,14 @@ final class RouterTest extends TestCase
 
     public function testMatchThrowsNoMatchException(): void
     {
-        $this->routes->addGetFunc('/existing', function () {
+        $this->routes->addGetFunc('/existing', function (): void {
             echo 'OK';
         });
 
         $this->router->setCollection($this->routes);
-        
+
         $this->expectException(NoMatch::class);
-        
+
         $request = new Request('GET', '/nonexistent');
         $this->router->handle($request);
     }
@@ -205,7 +206,7 @@ final class RouterTest extends TestCase
 
     public function testCheckAllowedHttpMethod(): void
     {
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'GET';
         });
 
@@ -218,14 +219,14 @@ final class RouterTest extends TestCase
 
     public function testCheckThrowsNotAllowedHttpMethodException(): void
     {
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'GET only';
         });
 
         $this->router->setCollection($this->routes);
-        
+
         $this->expectException(NotAllowedHttpMethod::class);
-        
+
         $request = new Request('POST', '/test');
         $this->router->handle($request);
     }
@@ -233,10 +234,10 @@ final class RouterTest extends TestCase
     public function testCheckAllowsMultipleHttpMethods(): void
     {
         // Используем отдельные маршруты для разных методов на одном пути
-        $this->routes->addGetFunc('/resource', function () {
+        $this->routes->addGetFunc('/resource', function (): void {
             echo 'GET-OK';
         });
-        $this->routes->addPostFunc('/resource-post', function () {
+        $this->routes->addPostFunc('/resource-post', function (): void {
             echo 'POST-OK';
         });
 
@@ -265,7 +266,7 @@ final class RouterTest extends TestCase
     public function testEnableCache(): void
     {
         $this->router->enableCache();
-        
+
         // После enableCache() кеширование должно быть активно
         $this->assertTrue($this->router->isCacheEnabled());
     }
@@ -274,14 +275,14 @@ final class RouterTest extends TestCase
     {
         $this->router->enableCache();
         $this->router->disableCache();
-        
+
         $this->assertFalse($this->router->isCacheEnabled());
     }
 
     public function testCacheEnabledByDefault(): void
     {
         $router = new Router();
-        
+
         // По умолчанию кеш должен быть отключен
         $this->assertFalse($router->isCacheEnabled());
     }
@@ -293,16 +294,16 @@ final class RouterTest extends TestCase
     public function testSetContainer(): void
     {
         $container = new DefaultContainer();
-        
+
         $this->router->setContainer($container);
-        
+
         $this->assertSame($container, $this->router->getContainer());
     }
 
     public function testGetContainerReturnsNullByDefault(): void
     {
         $router = new Router();
-        
+
         $this->assertNull($router->getContainer());
     }
 
@@ -312,7 +313,7 @@ final class RouterTest extends TestCase
 
     public function testAddGlobalMiddleware(): void
     {
-        $middleware = new class implements MiddlewareInterface {
+        $middleware = new class () implements MiddlewareInterface {
             public function handle(Request $request, callable $next): Response
             {
                 $response = $next($request);
@@ -321,10 +322,10 @@ final class RouterTest extends TestCase
         };
 
         $result = $this->router->addGlobalMiddleware($middleware);
-        
+
         // Проверяем fluent interface
         $this->assertSame($this->router, $result);
-        
+
         // Проверяем что middleware добавлен
         $globalMiddleware = $this->router->getGlobalMiddleware();
         $this->assertCount(1, $globalMiddleware);
@@ -332,7 +333,7 @@ final class RouterTest extends TestCase
 
     public function testGlobalMiddlewareIsExecuted(): void
     {
-        $middleware = new class implements MiddlewareInterface {
+        $middleware = new class () implements MiddlewareInterface {
             public function handle(Request $request, callable $next): Response
             {
                 $response = $next($request);
@@ -342,7 +343,7 @@ final class RouterTest extends TestCase
 
         $this->router->addGlobalMiddleware($middleware);
 
-        $this->routes->addGetFunc('/test', function () {
+        $this->routes->addGetFunc('/test', function (): void {
             echo 'Test';
         });
 
@@ -355,53 +356,71 @@ final class RouterTest extends TestCase
 
     public function testSetGlobalMiddleware(): void
     {
-        $middleware1 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware1 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
-        $middleware2 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware2 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
 
         $result = $this->router->setGlobalMiddleware([$middleware1, $middleware2]);
-        
+
         $this->assertSame($this->router, $result);
-        
+
         $globalMiddleware = $this->router->getGlobalMiddleware();
         $this->assertCount(2, $globalMiddleware);
     }
 
     public function testSetGlobalMiddlewareReplacesExisting(): void
     {
-        $middleware1 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware1 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
-        $middleware2 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware2 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
-        
+
         $this->router->addGlobalMiddleware($middleware1);
         $this->router->addGlobalMiddleware($middleware2);
-        
+
         $this->assertCount(2, $this->router->getGlobalMiddleware());
 
-        $middleware3 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware3 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
         $this->router->setGlobalMiddleware([$middleware3]);
-        
+
         $this->assertCount(1, $this->router->getGlobalMiddleware());
     }
 
     public function testGetGlobalMiddleware(): void
     {
-        $middleware = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
-        
+
         $this->router->addGlobalMiddleware($middleware);
-        
+
         $globalMiddleware = $this->router->getGlobalMiddleware();
-        
+
         $this->assertIsArray($globalMiddleware);
         $this->assertCount(1, $globalMiddleware);
         $this->assertSame($middleware, $globalMiddleware[0]);
@@ -409,20 +428,26 @@ final class RouterTest extends TestCase
 
     public function testClearGlobalMiddleware(): void
     {
-        $middleware1 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware1 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
-        $middleware2 = new class implements MiddlewareInterface {
-            public function handle(Request $request, callable $next): Response { return $next($request); }
+        $middleware2 = new class () implements MiddlewareInterface {
+            public function handle(Request $request, callable $next): Response
+            {
+                return $next($request);
+            }
         };
-        
+
         $this->router->addGlobalMiddleware($middleware1);
         $this->router->addGlobalMiddleware($middleware2);
-        
+
         $this->assertCount(2, $this->router->getGlobalMiddleware());
 
         $result = $this->router->clearGlobalMiddleware();
-        
+
         $this->assertSame($this->router, $result);
         $this->assertCount(0, $this->router->getGlobalMiddleware());
     }
@@ -431,8 +456,10 @@ final class RouterTest extends TestCase
     {
         $order = [];
 
-        $middleware1 = new class($order) implements MiddlewareInterface {
-            public function __construct(private array &$order) {}
+        $middleware1 = new class ($order) implements MiddlewareInterface {
+            public function __construct(private array &$order)
+            {
+            }
             public function handle(Request $request, callable $next): Response
             {
                 $this->order[] = 'global1';
@@ -440,8 +467,10 @@ final class RouterTest extends TestCase
             }
         };
 
-        $middleware2 = new class($order) implements MiddlewareInterface {
-            public function __construct(private array &$order) {}
+        $middleware2 = new class ($order) implements MiddlewareInterface {
+            public function __construct(private array &$order)
+            {
+            }
             public function handle(Request $request, callable $next): Response
             {
                 $this->order[] = 'global2';
@@ -452,7 +481,7 @@ final class RouterTest extends TestCase
         $this->router->addGlobalMiddleware($middleware1);
         $this->router->addGlobalMiddleware($middleware2);
 
-        $this->routes->addGetFunc('/test', function () use (&$order) {
+        $this->routes->addGetFunc('/test', function () use (&$order): void {
             $order[] = 'handler';
             echo 'Test';
         });
@@ -475,7 +504,7 @@ final class RouterTest extends TestCase
         $container = new DefaultContainer();
         $this->router->setContainer($container);
 
-        $globalMiddleware = new class implements MiddlewareInterface {
+        $globalMiddleware = new class () implements MiddlewareInterface {
             public function handle(Request $request, callable $next): Response
             {
                 $response = $next($request);
@@ -484,7 +513,7 @@ final class RouterTest extends TestCase
         };
         $this->router->addGlobalMiddleware($globalMiddleware);
 
-        $this->routes->addGetFunc('/users/{id}', function ($id) {
+        $this->routes->addGetFunc('/users/{id}', function ($id): void {
             echo "User ID: {$id}";
         })->name('users.show');
 
@@ -503,16 +532,16 @@ final class RouterTest extends TestCase
     public function testMultipleRoutesWithDifferentMethods(): void
     {
         // Создаем отдельные маршруты для разных методов
-        $this->routes->addGetFunc('/resource-get', function () {
+        $this->routes->addGetFunc('/resource-get', function (): void {
             echo 'GET';
         });
-        $this->routes->addPostFunc('/resource-post', function () {
+        $this->routes->addPostFunc('/resource-post', function (): void {
             echo 'POST';
         });
-        $this->routes->addPutFunc('/resource-put', function () {
+        $this->routes->addPutFunc('/resource-put', function (): void {
             echo 'PUT';
         });
-        $this->routes->addDeleteFunc('/resource-delete', function () {
+        $this->routes->addDeleteFunc('/resource-delete', function (): void {
             echo 'DELETE';
         });
 
@@ -534,9 +563,12 @@ final class RouterTest extends TestCase
 
     public function testNamedRoutesAccessibility(): void
     {
-        $this->routes->addGetFunc('/home', function () {})->name('home');
-        $this->routes->addGetFunc('/about', function () {})->name('about');
-        $this->routes->addGetFunc('/no-name', function () {});
+        $this->routes->addGetFunc('/home', function (): void {
+        })->name('home');
+        $this->routes->addGetFunc('/about', function (): void {
+        })->name('about');
+        $this->routes->addGetFunc('/no-name', function (): void {
+        });
 
         $this->router->setCollection($this->routes);
 
@@ -547,4 +579,3 @@ final class RouterTest extends TestCase
         $this->assertArrayNotHasKey('no-name', $namedRoutes);
     }
 }
-

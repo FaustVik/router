@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -21,8 +22,8 @@ class ApiController
             'created_at' => date('Y-m-d H:i:s'),
             'meta' => [
                 'request_method' => $request->getMethod(),
-                'request_uri' => $request->getUri()
-            ]
+                'request_uri' => $request->getUri(),
+            ],
         ];
 
         return Response::json($userData);
@@ -33,7 +34,7 @@ class ApiController
         $users = [
             ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com'],
             ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com'],
-            ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com']
+            ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com'],
         ];
 
         return Response::json($users, 200);
@@ -44,7 +45,7 @@ class ApiController
         return Response::json([
             'error' => 'Something went wrong',
             'code' => 'DEMO_ERROR',
-            'timestamp' => date('c')
+            'timestamp' => date('c'),
         ], 500);
     }
 
@@ -53,7 +54,7 @@ class ApiController
         return Response::json([
             'error' => 'Resource not found',
             'code' => 'NOT_FOUND',
-            'message' => 'The requested resource does not exist'
+            'message' => 'The requested resource does not exist',
         ], 404);
     }
 }
@@ -137,7 +138,7 @@ $routes->set(RouteAnonymousFunc::create('/redirect-permanent', static function (
 $routes->set(RouteAnonymousFunc::create('/custom-headers', static function (): Response {
     $data = [
         'message' => 'Response with custom headers',
-        'timestamp' => date('c')
+        'timestamp' => date('c'),
     ];
 
     $response = Response::json($data);
@@ -158,7 +159,7 @@ $routes->set(RouteAnonymousFunc::create('/status/{code}', static function ($code
         401 => 'Unauthorized',
         403 => 'Forbidden',
         404 => 'Not Found',
-        500 => 'Internal Server Error'
+        500 => 'Internal Server Error',
     ];
 
     $statusCode = (int) $code;
@@ -167,7 +168,7 @@ $routes->set(RouteAnonymousFunc::create('/status/{code}', static function ($code
     return Response::json([
         'status' => $statusCode,
         'message' => $message,
-        'description' => "This is a demo of HTTP $statusCode status code"
+        'description' => "This is a demo of HTTP $statusCode status code",
     ], $statusCode);
 }, ['GET']));
 
@@ -208,7 +209,7 @@ $routes->set(RouteAnonymousFunc::create('/text', static function (): Response {
     $text = "Plain Text Response\n";
     $text .= "===================\n\n";
     $text .= "This is a simple text response.\n";
-    $text .= "Generated at: " . date('Y-m-d H:i:s') . "\n";
+    $text .= 'Generated at: ' . date('Y-m-d H:i:s') . "\n";
     $text .= "Content-Type: text/plain\n";
 
     $response = Response::create($text, 200);
@@ -223,7 +224,7 @@ $routes->set(RouteAnonymousFunc::create('/cors', static function (): Response {
         'message' => 'CORS enabled response',
         'timestamp' => date('c'),
         'allowed_origins' => ['*'],
-        'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE']
+        'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE'],
     ];
 
     $response = Response::json($data);

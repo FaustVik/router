@@ -9,7 +9,6 @@ use FaustVik\Router\Http\Response;
 use FaustVik\Router\Middleware\AuthMiddleware;
 use FaustVik\Router\Middleware\CorsMiddleware;
 use FaustVik\Router\Middleware\LoggingMiddleware;
-use FaustVik\Router\Middleware\MiddlewareStack;
 use FaustVik\Router\Router\QuickRouter;
 
 /**
@@ -34,14 +33,14 @@ $tokenValidator = function (string $token): ?array {
             'username' => 'admin',
             'email' => 'admin@example.com',
             'role' => 'admin',
-            'permissions' => ['read', 'write', 'delete']
+            'permissions' => ['read', 'write', 'delete'],
         ],
         'secret-user-token-2024' => [
             'id' => 2,
             'username' => 'john_doe',
             'email' => 'john@example.com',
             'role' => 'user',
-            'permissions' => ['read']
+            'permissions' => ['read'],
         ],
     ];
 
@@ -74,7 +73,7 @@ $router->get('/api/public/status', function (Request $request): Response {
     return Response::json([
         'status' => 'ok',
         'timestamp' => time(),
-        'server' => 'FaustVik Router v2.0'
+        'server' => 'FaustVik Router v2.0',
     ]);
 });
 
@@ -87,7 +86,7 @@ $router->get('/api/protected/profile', function (Request $request): Response {
     return Response::json([
         'authenticated' => $isAuthenticated,
         'user' => $user,
-        'message' => 'This is protected data'
+        'message' => 'This is protected data',
     ]);
 })->setMiddleware([$authMiddleware]);
 
@@ -99,7 +98,7 @@ $router->get('/api/admin/users', function (Request $request): Response {
     if ($user['role'] !== 'admin') {
         return Response::json([
             'error' => 'Forbidden',
-            'message' => 'Admin access required'
+            'message' => 'Admin access required',
         ], 403);
     }
 
@@ -107,8 +106,8 @@ $router->get('/api/admin/users', function (Request $request): Response {
         'users' => [
             ['id' => 1, 'name' => 'Admin User'],
             ['id' => 2, 'name' => 'John Doe'],
-            ['id' => 3, 'name' => 'Jane Smith']
-        ]
+            ['id' => 3, 'name' => 'Jane Smith'],
+        ],
     ]);
 })->setMiddleware([$authMiddleware]);
 
@@ -121,7 +120,7 @@ $router->post('/api/protected/data', function (Request $request): Response {
         'success' => true,
         'message' => 'Data received',
         'user' => $user['username'],
-        'data' => $data
+        'data' => $data,
     ], 201);
 })->setMiddleware([$corsMiddleware, $authMiddleware, $loggingMiddleware]);
 
@@ -134,10 +133,10 @@ try {
 
     // 10. Отправляем ответ
     $response->send();
-} catch (\Exception $e) {
+} catch (Exception $e) {
     $errorResponse = Response::json([
         'error' => 'Internal Server Error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ], 500);
 
     $errorResponse->send();

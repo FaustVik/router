@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\DI;
 
+use Closure;
 use DI\Container;
-use DI\ContainerBuilder;
-use FaustVik\Router\interfaces\DI\RouterContainerInterface;
+use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
+use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use RuntimeException;
 
 /**
  * Default Container implementation using PHP-DI
@@ -46,7 +48,7 @@ class DefaultContainer implements RouterContainerInterface
      *         DatabaseConnection::class => DatabaseConnection::class
      *     ]
      * ]);
-     * @throws \InvalidArgumentException If binding/singleton key is not a string
+     * @throws InvalidArgumentException If binding/singleton key is not a string
      */
     public static function withConfig(array $config = []): self
     {
@@ -56,7 +58,7 @@ class DefaultContainer implements RouterContainerInterface
         if (isset($config['bindings']) && is_array($config['bindings'])) {
             foreach ($config['bindings'] as $abstract => $concrete) {
                 if (!is_string($abstract)) {
-                    throw new \InvalidArgumentException('Binding key must be a string');
+                    throw new InvalidArgumentException('Binding key must be a string');
                 }
                 $instance->bind($abstract, $concrete);
             }
@@ -65,7 +67,7 @@ class DefaultContainer implements RouterContainerInterface
         if (isset($config['singletons']) && is_array($config['singletons'])) {
             foreach ($config['singletons'] as $abstract => $concrete) {
                 if (!is_string($abstract)) {
-                    throw new \InvalidArgumentException('Singleton key must be a string');
+                    throw new InvalidArgumentException('Singleton key must be a string');
                 }
                 $instance->singleton($abstract, $concrete);
             }
@@ -77,7 +79,7 @@ class DefaultContainer implements RouterContainerInterface
     /**
      * Creates container with closure configuration
      *
-     * @param \Closure $configurator Function to configure the container
+     * @param Closure $configurator Function to configure the container
      * @return self New container instance
      *
      * @example
@@ -86,7 +88,7 @@ class DefaultContainer implements RouterContainerInterface
      *     $c->singleton(CacheInterface::class, RedisCache::class);
      * });
      */
-    public static function withClosure(\Closure $configurator): self
+    public static function withClosure(Closure $configurator): self
     {
         $instance = new self();
         $configurator($instance);
@@ -146,13 +148,13 @@ class DefaultContainer implements RouterContainerInterface
      * @param array<string, mixed> $parameters Additional parameters
      * @return object Resolved class instance
      *
+     * @throws \Exception|RuntimeException If class cannot be resolved or resolved value is not an object
+     *@example
+     * // With parameters
+     * $service = $container->resolve(EmailService::class, ['config' => $config]);
      * @example
      * $service = $container->resolve(UserService::class);
      *
-     * @example
-     * // With parameters
-     * $service = $container->resolve(EmailService::class, ['config' => $config]);
-     * @throws \Exception|\RuntimeException If class cannot be resolved or resolved value is not an object
      */
     public function resolve(string $class, array $parameters = []): object
     {
@@ -164,12 +166,12 @@ class DefaultContainer implements RouterContainerInterface
             }
 
             if (!is_object($result)) {
-                throw new \RuntimeException("Resolved value for '{$class}' is not an object");
+                throw new RuntimeException("Resolved value for '{$class}' is not an object");
             }
 
             return $result;
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            throw new \RuntimeException("Cannot resolve class: {$class}", 0, $e);
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            throw new RuntimeException("Cannot resolve class: {$class}", 0, $e);
         }
     }
 
@@ -280,12 +282,12 @@ class DefaultContainer implements RouterContainerInterface
      * Sets a factory for creating instances
      *
      * @param string $abstract Abstract type
-     * @param \Closure $factory Factory function
+     * @param Closure $factory Factory function
      *
      * @example
      * $container->factory(UserService::class, fn() => new UserService($db));
      */
-    public function factory(string $abstract, \Closure $factory): void
+    public function factory(string $abstract, Closure $factory): void
     {
         $this->bind($abstract, $factory);
     }
@@ -308,12 +310,12 @@ class DefaultContainer implements RouterContainerInterface
      * Registers a singleton factory
      *
      * @param string $abstract Abstract type
-     * @param \Closure $factory Factory function
+     * @param Closure $factory Factory function
      *
      * @example
      * $container->singletonFactory('db', fn() => new PDO('mysql:...'));
      */
-    public function singletonFactory(string $abstract, \Closure $factory): void
+    public function singletonFactory(string $abstract, Closure $factory): void
     {
         $this->singleton($abstract, $factory);
     }

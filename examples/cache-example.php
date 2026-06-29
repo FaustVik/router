@@ -20,18 +20,18 @@ $routesCollection = new RoutesCollection();
 // Добавляем много маршрутов для демонстрации кеша
 for ($i = 1; $i <= 10; $i++) {
     $routesCollection->set(
-        Route::create("/user/{id}/profile/{section}", UserController::class, 'profile', [], ['GET'])
+        Route::create('/user/{id}/profile/{section}', UserController::class, 'profile', [], ['GET'])
     );
     $routesCollection->set(
-        Route::create("/api/v1/users/{id}", UserController::class, 'getUser', [], ['GET'])
+        Route::create('/api/v1/users/{id}', UserController::class, 'getUser', [], ['GET'])
     );
     $routesCollection->set(
-        Route::create("/api/v1/users/{id}/posts", UserController::class, 'getUserPosts', [], ['GET'])
+        Route::create('/api/v1/users/{id}/posts', UserController::class, 'getUserPosts', [], ['GET'])
     );
 }
 
 // Создаем маршрут с параметрами
-$route = Route::create("/user/{id}/profile/{section}", UserController::class, 'profile', [], ['GET']);
+$route = Route::create('/user/{id}/profile/{section}', UserController::class, 'profile', [], ['GET']);
 $routesCollection->set($route);
 
 // Устанавливаем коллекцию маршрутов
@@ -46,8 +46,8 @@ $router->setUri('/user/123/profile/settings');
 $router->run();
 $endTime = microtime(true);
 
-echo "Время выполнения без кеша: " . round(($endTime - $startTime) * 1000, 2) . " мс\n";
-echo "Статус кеша: " . ($router->isCacheEnabled() ? "включен" : "отключен") . "\n\n";
+echo 'Время выполнения без кеша: ' . round(($endTime - $startTime) * 1000, 2) . " мс\n";
+echo 'Статус кеша: ' . ($router->isCacheEnabled() ? 'включен' : 'отключен') . "\n\n";
 
 // === С кешированием ===
 echo "2. Работа С кешированием:\n";
@@ -65,8 +65,8 @@ $router->setUri('/user/123/profile/settings');
 $router->run();
 $endTime = microtime(true);
 
-echo "Время выполнения: " . round(($endTime - $startTime) * 1000, 2) . " мс\n";
-echo "Статус кеша: " . ($router->isCacheEnabled() ? "включен" : "отключен") . "\n\n";
+echo 'Время выполнения: ' . round(($endTime - $startTime) * 1000, 2) . " мс\n";
+echo 'Статус кеша: ' . ($router->isCacheEnabled() ? 'включен' : 'отключен') . "\n\n";
 
 echo "Второй запрос (из кеша):\n";
 $startTime = microtime(true);
@@ -74,8 +74,8 @@ $router->setUri('/user/123/profile/settings');
 $router->run();
 $endTime = microtime(true);
 
-echo "Время выполнения: " . round(($endTime - $startTime) * 1000, 2) . " мс\n";
-echo "Статус кеша: " . ($router->isCacheEnabled() ? "включен" : "отключен") . "\n\n";
+echo 'Время выполнения: ' . round(($endTime - $startTime) * 1000, 2) . " мс\n";
+echo 'Статус кеша: ' . ($router->isCacheEnabled() ? 'включен' : 'отключен') . "\n\n";
 
 // === Управление кешем ===
 echo "3. Управление кешем:\n";
@@ -83,11 +83,11 @@ echo "3. Управление кешем:\n";
 // Получаем кеш
 $cacheInstance = $router->getCache();
 if ($cacheInstance) {
-    echo "Кеш-драйвер: " . get_class($cacheInstance) . "\n";
+    echo 'Кеш-драйвер: ' . get_class($cacheInstance) . "\n";
 
     // Проверяем существование в кеше
     $cacheKey = $router->getCacheKey();
-    echo "Кеш-ключ: " . $cacheKey . "\n";
+    echo 'Кеш-ключ: ' . $cacheKey . "\n";
 
     // Очищаем кеш
     echo "Очищаем кеш роутов...\n";

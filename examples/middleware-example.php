@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/vendor/autoload.php';
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Middleware\AuthMiddleware;
-use FaustVik\Router\Middleware\LoggingMiddleware;
 use FaustVik\Router\Middleware\CorsMiddleware;
+use FaustVik\Router\Middleware\LoggingMiddleware;
 use FaustVik\Router\Route\Route;
 use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
@@ -15,17 +17,17 @@ use FaustVik\Router\Router\Router;
 // Пример контроллера
 class UserController
 {
-    public function index(Request $request)
+    public function index(Request $request): void
     {
         $userId = $request->getAttribute('user_id', 'Guest');
         $isAuthenticated = $request->getAttribute('authenticated', false);
 
-        echo "User ID: " . $userId . "\n";
-        echo "Authenticated: " . ($isAuthenticated ? 'Yes' : 'No') . "\n";
-        echo "Users list here...";
+        echo 'User ID: ' . $userId . "\n";
+        echo 'Authenticated: ' . ($isAuthenticated ? 'Yes' : 'No') . "\n";
+        echo 'Users list here...';
     }
 
-    public function show(Request $request, $id)
+    public function show(Request $request, $id): void
     {
         $userId = $request->getAttribute('user_id', 'Guest');
         echo "Showing user $id (requested by user $userId)";
@@ -45,7 +47,7 @@ $collections->set(
     Route::create('/users', UserController::class, 'index', [], ['GET'])
         ->middleware([
             LoggingMiddleware::class,
-            CorsMiddleware::class
+            CorsMiddleware::class,
         ])
 );
 
@@ -54,7 +56,7 @@ $collections->set(
     Route::create('/admin/users', UserController::class, 'index', [], ['GET'])
         ->middleware([
             AuthMiddleware::class,
-            LoggingMiddleware::class
+            LoggingMiddleware::class,
         ])
 );
 
@@ -62,7 +64,7 @@ $collections->set(
 $collections->set(
     Route::create('/users/{id}', UserController::class, 'show', [], ['GET'])
         ->middleware([
-            LoggingMiddleware::class
+            LoggingMiddleware::class,
         ])
 );
 
@@ -73,12 +75,12 @@ $collections->set(
             'status' => 'ok',
             'timestamp' => time(),
             'method' => $request->getMethod(),
-            'uri' => $request->getUri()
+            'uri' => $request->getUri(),
         ]);
     }, ['GET'])
         ->middleware([
             CorsMiddleware::class,
-            LoggingMiddleware::class
+            LoggingMiddleware::class,
         ])
 );
 

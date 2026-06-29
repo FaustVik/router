@@ -133,7 +133,7 @@ $app->middleware([AuthMiddleware::class], function($app) {
 ```php
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 
 class CustomMiddleware implements MiddlewareInterface
 {

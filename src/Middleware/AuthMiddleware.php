@@ -6,7 +6,7 @@ namespace FaustVik\Router\Middleware;
 
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
-use FaustVik\Router\interfaces\Middleware\MiddlewareInterface;
+use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;
 
 /**
  * Middleware for basic HTTP authentication
@@ -111,7 +111,7 @@ final class AuthMiddleware implements MiddlewareInterface
         return Response::json(
             [
                 'error' => 'Unauthorized',
-                'message' => $message
+                'message' => $message,
             ],
             401,
             ['WWW-Authenticate' => 'Bearer realm="API"']

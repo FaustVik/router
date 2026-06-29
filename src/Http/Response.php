@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Http;
 
-use FaustVik\Router\interfaces\Http\ResponseInterface;
+use FaustVik\Router\Interfaces\Http\ResponseInterface;
 
 /**
  * HTTP Response representation class

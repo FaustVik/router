@@ -43,7 +43,8 @@ $router->get('/', function () {
     $csrfTokenField = CsrfMiddleware::getTokenField();
     $csrfTokenMeta = CsrfMiddleware::getTokenMeta();
 
-    return new Response(<<<HTML
+    return new Response(
+        <<<HTML
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -159,8 +160,8 @@ $router->post('/posts', function (Request $request) {
         'data' => [
             'id' => rand(1, 1000),
             'title' => $title,
-            'content' => $content
-        ]
+            'content' => $content,
+        ],
     ], 201);
 });
 
@@ -176,8 +177,8 @@ $router->post('/auth/login', function (Request $request) {
         'message' => 'Успешный вход в систему',
         'user' => [
             'email' => $email,
-            'name' => 'John Doe'
-        ]
+            'name' => 'John Doe',
+        ],
     ]);
 });
 
@@ -191,7 +192,7 @@ $router->post('/api/profile/update', function (Request $request) {
     return Response::json([
         'success' => true,
         'message' => 'Профиль успешно обновлен!',
-        'data' => $body
+        'data' => $body,
     ]);
 });
 
@@ -206,7 +207,7 @@ $router->post('/api/webhook', function (Request $request) {
 
     return Response::json([
         'success' => true,
-        'message' => 'Webhook received'
+        'message' => 'Webhook received',
     ]);
 });
 
@@ -218,7 +219,7 @@ $router->post('/test/no-csrf', function () {
     // Этот код не выполнится, т.к. middleware заблокирует запрос
     return Response::json([
         'success' => true,
-        'message' => 'This should never execute'
+        'message' => 'This should never execute',
     ]);
 });
 
@@ -233,7 +234,7 @@ $router->post('/auth/logout', function () use ($csrfMiddleware) {
     return Response::json([
         'success' => true,
         'message' => 'Выход выполнен успешно',
-        'new_csrf_token' => $newToken
+        'new_csrf_token' => $newToken,
     ]);
 });
 
@@ -247,7 +248,7 @@ $apiCsrfMiddleware = new CsrfMiddleware(
     excludePaths: []  // для API нет исключений
 );
 
-$router->group('/api/admin', function ($group) {
+$router->group('/api/admin', function ($group): void {
     $group->post('/users', function () {
         return Response::json(['message' => 'User created']);
     });
@@ -267,10 +268,10 @@ $router->group('/api/admin', function ($group) {
 
 try {
     $router->run();
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     Response::json([
         'error' => 'Server Error',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
     ], 500)->send();
 }
 

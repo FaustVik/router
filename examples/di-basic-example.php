@@ -1,9 +1,9 @@
 <?php
+
 declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 use FaustVik\Router\Http\Request;
-use FaustVik\Router\Http\Response;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Router;
 
@@ -39,16 +39,16 @@ class UserService
         return [
             'id' => $id,
             'name' => 'John Doe',
-            'email' => 'john@example.com'
+            'email' => 'john@example.com',
         ];
     }
 
     public function getAllUsers(): array
     {
-        $this->logger->log("Getting all users");
+        $this->logger->log('Getting all users');
         return [
             ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com'],
-            ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com']
+            ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com'],
         ];
     }
 }
@@ -67,12 +67,12 @@ class UserController
 
     public function index(): void
     {
-        $this->logger->log("UserController::index called");
+        $this->logger->log('UserController::index called');
         $users = $this->userService->getAllUsers();
 
         echo json_encode([
             'status' => 'success',
-            'data' => $users
+            'data' => $users,
         ]);
     }
 
@@ -83,16 +83,16 @@ class UserController
 
         echo json_encode([
             'status' => 'success',
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
     public function create(Request $request): void
     {
-        $this->logger->log("UserController::create called");
+        $this->logger->log('UserController::create called');
         echo json_encode([
             'status' => 'success',
-            'message' => 'User created successfully'
+            'message' => 'User created successfully',
         ]);
     }
 }
@@ -107,7 +107,7 @@ function createRouter(): Router
     $router = new Router();
 
     // Включаем DI с конфигурацией
-    $router->enableDI(function ($container) {
+    $router->enableDI(function ($container): void {
         // Настройка зависимостей
         $container->singleton(Logger::class, function () {
             return new Logger('app.log');
@@ -155,9 +155,9 @@ $_SERVER['REQUEST_METHOD'] = 'POST';
 try {
     $router->run();
 } catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
+    echo 'Error: ' . $e->getMessage() . "\n";
 }
 
 echo "\n\n=== Информация о DI контейнере ===\n";
-echo "DI включен: " . ($router->isDIEnabled() ? 'Да' : 'Нет') . "\n";
-echo "Контейнер: " . get_class($router->getContainer()) . "\n";
+echo 'DI включен: ' . ($router->isDIEnabled() ? 'Да' : 'Нет') . "\n";
+echo 'Контейнер: ' . get_class($router->getContainer()) . "\n";

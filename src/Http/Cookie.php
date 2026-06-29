@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Http;
 
-use FaustVik\Router\interfaces\Http\CookieInterface;
+use FaustVik\Router\Interfaces\Http\CookieInterface;
+use InvalidArgumentException;
 
 /**
  * HTTP Cookie management class
@@ -28,7 +29,7 @@ final class Cookie implements CookieInterface
 
     /**
      * @param 'Lax'|'Strict'|'None' $sameSite
-     * @throws \InvalidArgumentException If sameSite value is invalid
+     * @throws InvalidArgumentException If sameSite value is invalid
      */
     public function __construct(
         string $name,
@@ -42,7 +43,7 @@ final class Cookie implements CookieInterface
     ) {
         // Validate sameSite value
         if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
-            throw new \InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
+            throw new InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
         }
 
         $this->name = $name;
@@ -176,12 +177,12 @@ final class Cookie implements CookieInterface
      *
      * @example
      * $cookie = Cookie::create('csrf', 'token')->withSameSite('Strict');
-     * @throws \InvalidArgumentException If sameSite value is invalid
+     * @throws InvalidArgumentException If sameSite value is invalid
      */
     public function withSameSite(string $sameSite): self
     {
         if (!in_array($sameSite, ['Lax', 'Strict', 'None'], true)) {
-            throw new \InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
+            throw new InvalidArgumentException("Invalid sameSite value. Must be 'Lax', 'Strict', or 'None'");
         }
 
         $clone = clone $this;
@@ -250,7 +251,7 @@ final class Cookie implements CookieInterface
                 'domain' => $this->domain,
                 'secure' => $this->secure,
                 'httponly' => $this->httpOnly,
-                'samesite' => $this->sameSite
+                'samesite' => $this->sameSite,
             ]);
         }
 
@@ -286,7 +287,7 @@ final class Cookie implements CookieInterface
             'domain' => $this->domain,
             'secure' => $this->secure,
             'httpOnly' => $this->httpOnly,
-            'sameSite' => $this->sameSite
+            'sameSite' => $this->sameSite,
         ];
     }
 }
