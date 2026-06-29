@@ -1,4 +1,10 @@
 .idea/
-index.php
-
+.vscode/
+.cursor/
 vendor/
+var/
+cache/
+custom_cache/
+*.log
+
+composer.lock

@@ -1,0 +1,76 @@
+# Coding Standards
+
+## PHP Version
+- Minimum: PHP 8.1+
+- Use strict types: `declare(strict_types=1);`
+
+## Code Style
+- Follow PSR-12 coding standard
+- Run: `composer cs-check` and `composer cs-fix`
+
+## Named Arguments
+Use named arguments in `src/Http/` for better readability:
+
+```php
+// ✅ Good - named arguments
+$cookie = new Cookie(
+    name: 'session_id',
+    value: 'abc123',
+    expires: 3600,
+    secure: true,
+    httpOnly: true
+);
+
+$response->setCookie(name: 'token', value: 'xyz', options: 3600);
+
+// ❌ Bad - positional arguments (hard to read)
+$cookie = new Cookie('session_id', 'abc123', 3600, '/', '', true, true, 'Lax');
+```
+
+## Static Analysis
+- PHPStan Level 5
+- Run: `composer phpstan`
+
+## PHPDoc Types
+
+### Array Types
+Use detailed PHPDoc annotations for better IDE support and static analysis:
+
+```php
+/**
+ * @return array<string, mixed>  // Associative array
+ * @return array<int, string>    // Indexed array
+ * @return array<string, string> // String-to-string map
+ */
+```
+
+### Iterable in Signatures
+Use `iterable` type hint for flexibility, specify exact type in PHPDoc:
+
+```php
+/**
+ * @return array<string, mixed>
+ */
+public function getParams(): iterable
+{
+    return $this->params; // array implements iterable
+}
+```
+
+### Common Patterns
+- Parameters: `array<string, mixed>`
+- Headers: `array<string, string>`
+- Files: `array<string, array<string, mixed>>`
+- Query: `array<string, string|int|bool>`
+
+## Naming Conventions
+- Classes: PascalCase
+- Methods: camelCase
+- Constants: UPPER_SNAKE_CASE
+- Interfaces: end with `Interface`
+
+## Documentation
+- All public methods must have PHPDoc
+- Include `@param`, `@return`, `@throws` tags
+- Use Russian for comments in code
+- Commit messages in English

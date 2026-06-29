@@ -1,0 +1,10 @@
+parameters:
+    level: 9
+    paths:
+        - src
+    tmpDir: var/phpstan
+
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkUninitializedProperties: true
+    checkDynamicProperties: true
+    reportUnmatchedIgnoredErrors: false

@@ -4,32 +4,56 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router\Components;
 
-use FaustVik\Router\exceptions\NotAllowedHttpMethod;
-use FaustVik\Router\interfaces\Router\Components\CheckHttpMethodInterface;
+use FaustVik\Router\Exceptions\NotAllowedHttpMethod;
+use FaustVik\Router\Interfaces\Router\Components\CheckHttpMethodInterface;
 
+/**
+ * HTTP method validator
+ *
+ * Validates if current HTTP method is allowed for route.
+ * Throws exception if method not allowed.
+ *
+ * @package FaustVik\Router\Router\Components
+ */
 final class CheckerHttpMethod implements CheckHttpMethodInterface
 {
     /**
-     * @param array $methods
+     * Checks if HTTP method is allowed for route
      *
-     * @return bool
-     * @throws NotAllowedHttpMethod
+     * @param array<string> $methods Allowed HTTP methods
+     * @param string|null $currentMethod Current HTTP method (if null, taken from $_SERVER)
+     * @return void
+     * @throws NotAllowedHttpMethod If method not allowed
      */
-    public static function isAllow(array $methods): bool
+    public function isAllow(array $methods, ?string $currentMethod = null): void
     {
         if (empty($methods)) {
-            return true;
+            return;
         }
 
-        if (!in_array(self::getRequestMethod(), $methods, true)) {
-            throw new NotAllowedHttpMethod(self::getRequestMethod());
+        // Если метод не передан явно, берем из $_SERVER (обратная совместимость)
+        if ($currentMethod === null) {
+            $currentMethod = $this->getRequestMethod();
+        } else {
+            $currentMethod = strtoupper($currentMethod);
         }
 
-        return true;
+        if (in_array($currentMethod, $methods, true)) {
+            return;
+        }
+
+        throw new NotAllowedHttpMethod($currentMethod);
     }
 
-    public static function getRequestMethod(): string
+    /**
+     * Получает текущий HTTP метод запроса из $_SERVER
+     *
+     * @return string
+     * @deprecated Используйте передачу метода в isAllow() напрямую
+     */
+    public function getRequestMethod(): string
     {
-        return $_SERVER['REQUEST_METHOD'];
+        $method = is_string($_SERVER['REQUEST_METHOD'] ?? null) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+        return strtoupper($method);
     }
 }
