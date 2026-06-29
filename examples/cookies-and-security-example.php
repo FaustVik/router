@@ -168,17 +168,17 @@ $router->get('/form/delete-user', function () {
 <body>
     <h1>Delete User Form</h1>
     <p>HTML формы поддерживают только GET и POST, но мы можем эмулировать DELETE:</p>
-    
+
     <form method="POST" action="/users/123">
         <!-- Скрытое поле _method для override -->
         <input type="hidden" name="_method" value="DELETE">
-        
+
         <p>Вы уверены что хотите удалить пользователя #123?</p>
         <button type="submit">Удалить пользователя</button>
     </form>
-    
+
     <hr>
-    
+
     <h2>Как это работает:</h2>
     <ol>
         <li>Форма отправляет POST запрос</li>

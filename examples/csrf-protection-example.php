@@ -65,7 +65,7 @@ $router->get('/', function () {
 </head>
 <body>
     <h1>🛡️ CSRF Protection Demo</h1>
-    
+
     <div class="info">
         <strong>Информация:</strong> Все формы автоматически защищены от CSRF атак.
         Токен: <code>{$_SESSION['_csrf_token']}</code>
@@ -107,7 +107,7 @@ $router->get('/', function () {
         function makeAjaxRequest() {
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const resultDiv = document.getElementById('ajax-result');
-            
+
             fetch('/api/profile/update', {
                 method: 'POST',
                 headers: {
