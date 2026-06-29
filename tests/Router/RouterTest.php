@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace FaustVik\Router\Tests\Router;
 
 use FaustVik\Router\DI\DefaultContainer;
-use FaustVik\Router\exceptions\NoMatch;
-use FaustVik\Router\exceptions\NotAllowedHttpMethod;
+use FaustVik\Router\Exceptions\NoMatch;
+use FaustVik\Router\Exceptions\NotAllowedHttpMethod;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Http\Response;
 use FaustVik\Router\Interfaces\Middleware\MiddlewareInterface;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Tests\Router\Components;
 
-use FaustVik\Router\exceptions\NoMatch;
+use FaustVik\Router\Exceptions\NoMatch;
 use FaustVik\Router\Route\RouteAnonymousFunc;
 use FaustVik\Router\Route\RoutesCollection;
 use FaustVik\Router\Router\Components\matching\OptimizedMatching;

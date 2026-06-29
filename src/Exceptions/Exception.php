@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FaustVik\Router\exceptions;
+namespace FaustVik\Router\Exceptions;
 
 /**
  * Base exception for router

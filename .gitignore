@@ -3,5 +3,8 @@
 .cursor/
 vendor/
 var/
+cache/
+custom_cache/
+*.log
 
 composer.lock

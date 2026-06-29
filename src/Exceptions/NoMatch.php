@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FaustVik\Router\exceptions;
+namespace FaustVik\Router\Exceptions;
 
 /**
  * Exception thrown when no route matches the URI

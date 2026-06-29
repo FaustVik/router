@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router\Components;
 
-use FaustVik\Router\exceptions\NotAllowedHttpMethod;
+use FaustVik\Router\Exceptions\NotAllowedHttpMethod;
 use FaustVik\Router\Interfaces\Router\Components\CheckHttpMethodInterface;
 
 /**

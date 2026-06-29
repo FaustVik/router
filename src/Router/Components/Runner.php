@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Router\Components;
 
-use FaustVik\Router\exceptions\InvalidTypeRoute;
-use FaustVik\Router\exceptions\NotFoundClass;
-use FaustVik\Router\exceptions\NotFoundMethod;
+use FaustVik\Router\Exceptions\InvalidTypeRoute;
+use FaustVik\Router\Exceptions\NotFoundClass;
+use FaustVik\Router\Exceptions\NotFoundMethod;
 use FaustVik\Router\Http\Request;
 use FaustVik\Router\Interfaces\DI\RouterContainerInterface;
 use FaustVik\Router\Interfaces\Router\Components\RunnerInterface;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FaustVik\Router\Interfaces\Router\Components;
 
-use FaustVik\Router\exceptions\NoMatch;
+use FaustVik\Router\Exceptions\NoMatch;
 use FaustVik\Router\Interfaces\Collections\RoutesCollectionInterface;
 use FaustVik\Router\Router\Components\matching\MatchResult;
 
